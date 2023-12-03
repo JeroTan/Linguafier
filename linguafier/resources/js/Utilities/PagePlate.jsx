@@ -12,6 +12,8 @@ export default (Body)=>{
         'shadow-red-400',
         'focus:outline-red-400/80',
         'focus:outline-black/80',
+        'fill-black',
+        'w-4 h-4'
 
     ];
 return <main className='relative w-full h-full min-h-screen flex flex-col font-lexend'>

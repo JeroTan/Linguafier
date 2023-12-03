@@ -15,7 +15,7 @@ class SpecAccLog
      */
     public function handle(Request $request, Closure $next, ...$type): Response
     {
-        if(  ( $type[0] == 'on' && session('SpecAccLogin', false) )  || ( $type[0] == 'off' && !session('SpecAccLogin', false) ) ){
+        if(  ( $type[0] == 'on' && session('SpecialAccount', false) )  || ( $type[0] == 'off' && !session('SpecialAccount', false) ) ){
             return $next($request);
         }elseif($type[0] == 'on'){
             return redirect(route('admin.login'));

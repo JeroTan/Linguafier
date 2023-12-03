@@ -16,7 +16,7 @@ class UserAccLog
     public function handle(Request $request, Closure $next, ...$type): Response
     {
 
-        if(  ( $type[0] == 'on' && session('UserAccLogin', false) )  || ( $type[0] == 'off' && !session('UserAccLogin', false) ) ){
+        if(  ( $type[0] == 'on' && session('UserAccount', false) )  || ( $type[0] == 'off' && !session('UserAccount', false) ) ){
             return $next($request);
         }elseif($type[0] == 'on'){
             return redirect(route('user.login'));

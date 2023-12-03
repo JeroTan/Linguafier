@@ -1,11 +1,12 @@
 import { Head } from '@inertiajs/react';
 //Hooks
 import { useForm, usePage, router } from "@inertiajs/react";
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 //Utilities
 import TextBox from '../../Utilities/Textbox';
 import Button from '../../Utilities/Button';
+import Pop from '../../Utilities/Pop';
 import PagePlate from '../../Utilities/PagePlate';
 
 //CreateContext
@@ -16,9 +17,13 @@ export default function Login(){
     // v = view and e = edit
     const [v_username, e_username] = useState('');
     const [v_password, e_password] = useState('');
+    const [s_pop, se_pop] = useState(false);
 
     //** Use Page */
-    const { errors } = usePage().props;
+    const { errors, popFlash } = usePage().props;
+
+    //** Use Ref */
+    //console.log(usePage().props);
 
 
     //** Functionaility */
@@ -48,9 +53,13 @@ export default function Login(){
                 <TextBox Type="password" Handle={[v_password, e_password]} Error={errors.v_password} Placeholder="Type here"/>
             </div>
             <div className='my-8 w-full flex justify-center'>
-                <Button Type="submit" Name="Login To Realm" />
+                <Button Type="Submit" Name="Login To Realm" />
             </div>
         </form>
+        <Pop State={[s_pop, se_pop]} Flash={popFlash} Button={[
+            {'Name': "Got it", "Func":"close", Color:'bg-slate-400'  },
+        ]} />
+
 
     </main>
 
