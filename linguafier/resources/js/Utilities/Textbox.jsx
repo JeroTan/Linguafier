@@ -25,7 +25,7 @@ export default function Textbox(Option){
     return <>
         <input
             type={type}
-            className={`${padding} ${size} rounded outline outline-1 outline-${stateColor} outline-offset-0 shadow-myBox1 shadow-${stateColor} delay-100 focus:outline-4 focus:outline-offset-2 focus:outline-${stateColor}/80  placeholder:font-light`}
+            className={`${padding} ${size} rounded outline outline-1 outline-${stateColor} outline-offset-0 shadow-myBox3 shadow-${stateColor} delay-100 focus:outline-4 focus:outline-offset-2 focus:outline-${stateColor}/80  placeholder:font-light`}
             onChange={changeState}
             placeholder={placeholder}
         />

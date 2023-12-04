@@ -7,7 +7,7 @@ export default function Button(Option){
     return <>
         <button
             type={type}
-            className={`${padding} ${size} rounded outline outline-1 outline-offset-0 shadow-myBox1 ${color} delay-75 hover:outline-4 hover:brightness-150`}
+            className={`${padding} ${size} rounded outline outline-1 outline-offset-0 shadow-myBox3 ${color} delay-75 hover:outline-4 hover:brightness-150`}
             onClick={Option.Click}
         >
             {name}

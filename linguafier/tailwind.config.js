@@ -11,15 +11,16 @@ export default {
     extend: {
         colors:{
             'my-green': '#00977C',
-            'my-yellow': '#ECFFE0'
+            'my-light': '#ECFFE0',
+            'my-yellow': "#FFD816",
         },
         boxShadow:{
-            'myBox': "5px 5px 0 0",
-            'myBox1': "3px 3px 0 0",
-
+            'myBox3': "3px 3px 0 0",
+            'myBox5': "5px 5px 0 0",
         },
         dropShadow:{
-            'myDrop1' : "3px 3px 0",
+            'myDrop3' : "3px 3px 0 #000000",
+            'myDrop1' : "1px 1px 0 #000000",
         },
         fontFamily: {
             lexend: ['Lexend'],

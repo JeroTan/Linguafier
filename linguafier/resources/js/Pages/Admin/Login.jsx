@@ -36,13 +36,13 @@ export default function Login(){
     }
 
     //** Page */
-    return <PagePlate clean={true}>
+    return <PagePlate clean={true} background={`green`}>
 
     <main className='w-full h-screen flex justify-center items-center'>
 
-        <form className='w-96 rounded-xl bg-my-yellow shadow-myBox overflow-hidden' onSubmit={submit}>
+        <form className='w-96 rounded-xl bg-my-light shadow-myBox5 overflow-hidden' onSubmit={submit}>
             <div className='w-fit py-2 px-6 rounded-ee-3xl bg-zinc-500'>
-                <h5 className="text-3xl text-my-yellow"><span className='text-black'>ADMIN</span> REALM</h5>
+                <h5 className="text-3xl text-my-light"><span className='text-black'>ADMIN</span> REALM</h5>
             </div>
             <div className='mt-10 px-10'>
                 <label>Magic <span className='text-my-green font-semibold'>Username</span> </label>

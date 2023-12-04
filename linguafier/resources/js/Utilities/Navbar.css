@@ -1,0 +1,5 @@
+.my-g-profile:hover{
+    .my-dropdown{
+        display: block!important;
+    }
+}
