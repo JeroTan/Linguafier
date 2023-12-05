@@ -18,7 +18,11 @@ export default (Body)=>{
         'bg-slate-50',
         'bg-my-green',
         'bg-my-light',
+
     ];
+/*
+'hover:outline hover:bg-my-light/25 hover:outline-2 hover:outline-green-800/25 myhover-textshadow1 hover:text-my-yellow rounded-md p-2 cursor-pointer outline',
+*/
     let BackgroundColor = {
         'empty':'bg-slate-50',
         'green':'bg-my-green',

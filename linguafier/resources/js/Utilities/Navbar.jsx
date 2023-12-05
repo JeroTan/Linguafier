@@ -12,11 +12,34 @@ import { useState } from "react";
 
 export default ()=>{
     //** Use Page */
-    const { asset, popFlash } = usePage().props;
+    const { asset, popFlash, pageUser } = usePage().props;
 
     //** Use State */
     const [s_profile, se_profile] = useState(false);
 
+    //** Functionality */
+    function firstNav(x){ //Change the Navigation button if it is special user or normal
+        const firstNav = {
+            Special:<>
+                <h4 className="text-2xl font-sniglet text-my-yellow drop-shadow-myDrop1">Admin Realm</h4>
+            </>,
+            User:<>
+
+            </>
+        }
+        return firstNav[x];
+    }
+    function profileNav(x){ //Person Profile depending if it sepcial or normal user.
+        const profileNav = {
+            Special:<>
+                <Icon OutClass={`w-7 h-7`} IconName="person" />
+            </>,
+            User:<>
+
+            </>
+        }
+        return profileNav[x];
+    }
 
 
 return <>
@@ -28,16 +51,16 @@ return <>
                         <img className="object-cover w-full h-full" src={asset+"linguafier_logo.svg"}/>
                     </div>
                 </div>
-                <div>
-                    <h4 className="text-2xl font-sniglet text-my-yellow drop-shadow-myDrop1">Admin Realm</h4>
+                <div className="sm:block hidden">
+                    {firstNav(pageUser)}
                 </div>
             </div>
             <div className="flex items-center justify-center gap-6">
-                <div className="relative flex justify-center">
+                <div className="relative flex 2xl:justify-center justify-end">
                     <div className="relative bg-my-light rounded-full h-12 aspect-square drop-shadow-myDrop1 cursor-pointer overflow-hidden flex justify-center items-center delay-100 hover:drop-shadow-myDrop3 hover:brightness-125" onClick={ ()=>se_profile(prev=>prev?false:true) }>
-                        <Icon OutClass={`w-7 h-7`} IconName="person" />
+                        {profileNav(pageUser)}
                     </div>
-                    <div className={`${s_profile ? "absolute" : "hidden"} top-[60px] p-2 bg-my-green shadow-myBox3 outline outline-2 outline-black text-white`}>
+                    <div className={`${s_profile ? "absolute" : "hidden"} w-max top-[60px] p-2 bg-my-green shadow-myBox3 outline outline-2 outline-black text-white`}>
                         <div className="cursor-pointer">Settings</div>
                     </div>
                 </div>

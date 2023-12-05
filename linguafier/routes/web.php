@@ -2,7 +2,12 @@
 
 use App\Http\Controllers\Admin\Login as AdminLogin;
 use App\Http\Controllers\Admin\Dashboard as AdminDashboard;
-
+use App\Http\Controllers\Admin\DashboardContents\OverseerWizard;
+use App\Http\Controllers\Admin\DashboardContents\SpecialUser;
+use App\Http\Controllers\Admin\DashboardContents\WizardRanks;
+use App\Http\Controllers\Admin\DashboardContents\WordAttribution;
+use App\Http\Controllers\Admin\DashboardContents\WordLibrary;
+use App\Http\Controllers\Admin\DashboardContents\Roles;
 use App\Http\Controllers\User\Login as UserLogin;
 use App\Http\Controllers\User\Dashboard as UserDashboard;
 
@@ -32,6 +37,18 @@ Route::prefix('/user')->group(function(){
 Route::prefix('/admin')->group(function(){
     Route::get('/login', AdminLogin::class)->middleware('SpecAccLog:off')->name('admin.login');
     Route::post('/loginVerified', [AdminLogin::class, 'LoginVerified'])->middleware('SpecAccLog:off')->name('admin.login_verified');
-    Route::get('/dashboard', AdminDashboard::class)->middleware('SpecAccLog:on')->name('admin.dashboard');
+
+
+    Route::prefix('/dashboard')->group(function(){
+        Route::get('/', AdminDashboard::class)->name('admin.dashboard');
+        Route::get('/special_user', SpecialUser::class)->name('admin.special_user');
+        Route::get('/overseer_wizard',OverseerWizard::class )->name('admin.overseer_wizard');
+        Route::get('/word_library', WordLibrary::class)->name('admin.word_library');
+        Route::get('/word_attribution', WordAttribution::class)->name('admin.word_attribution');
+        Route::get('/wizard_ranks', WizardRanks::class)->name('admin.wizard_ranks');
+        Route::get('/roles', Roles::class)->name('admin.roles');
+    })->middleware('SpecAccLog:on');
+
+
 
 });

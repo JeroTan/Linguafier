@@ -4,3 +4,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.my-textshadow1{
+    text-shadow: 1px 1px #000000;
+}
+
+.myhover-textshadow1:hover{
+    text-shadow: 1px 1px #000000;
+}
