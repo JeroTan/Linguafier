@@ -18,6 +18,7 @@ export default (Body)=>{
         'bg-slate-50',
         'bg-my-green',
         'bg-my-light',
+        'hover:fill-black'
 
     ];
 /*

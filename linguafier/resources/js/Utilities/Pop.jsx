@@ -43,14 +43,14 @@ export default function Pop(Option){
         <dialog ref={popId} className='backdrop:backdrop-blur-sm backdrop:brightness-[.35] backdrop:contrast-75 p-5' style={dialogStyling}>
             <div className="flex justify-end ">
                 <div className="cursor-pointer pl-2">
-                    <Icon InClass={`fill-black`} OutClass="w-5 h-5" IconName="close" />
+                    <Icon InClass={`fill-black`} OutClass="w-5 h-5" Name="close" />
                 </div>
             </div>
             {
                 Option.Icon ?
                 <div className="flex justify-center">
                     <div>
-                        <Icon InClass={`fill-${colorState}`} OutClass="w-32 h-32" IconName={Option.Icon} />
+                        <Icon InClass={`fill-${colorState}`} OutClass="w-32 h-32" Name={Option.Icon} />
                     </div>
                 </div>
                 : ''

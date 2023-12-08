@@ -1,16 +1,28 @@
+import Icon from "./Icon";
+
 export default function Button(Option){
     let name = Option.Name ?? 'Button';
     let padding = Option.Padding ?? 'py-1 px-4';
     let type = Option.Type ?? 'Button';
     let size = Option.Size ?? '';
     let color = Option.Color ?? 'bg-my-green'
+
+    function icon(){
+        if(Option.Icon)
+            return <Icon InClass={ Option.IconInClass ? Option.IconInClass : `` } OutClass={Option.IconOutClass ?Option.IconOutClass : `w-4 w-4`} Name={Option.Icon} />
+
+    }
+
     return <>
         <button
             type={type}
-            className={`${padding} ${size} rounded outline outline-1 outline-offset-0 shadow-myBox3 ${color} delay-75 hover:outline-4 hover:brightness-150`}
+            className={`${padding} ${size} rounded outline outline-1 outline-offset-0 outline-black shadow-myBox3 shadow-black ${color} text-slate-200 delay-75 hover:outline-4 hover:brightness-150 hover:text-black flex justify-center items-center gap-1 fill-slate-200 hover:fill-black`}
             onClick={Option.Click}
         >
-            {name}
+            {icon()}
+            <span>
+            {name == "Button" && Option.Icon ? "" : name }
+            </span>
         </button>
     </>
 }

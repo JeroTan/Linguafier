@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 class OverseerWizard extends Controller
 {
     public function __invoke(Request $request){
-        return Inertia::render('Admin/DashboardContents/OverseerWizard', ['popFlash'=>session('popFlash'), 'pageUser'=>'Special']);
+        return Inertia::render('Admin/DashboardContents/OverseerWizard', [
+            'popFlash'=>session('popFlash'),
+            'pageUser'=>'Special',
+            'privilege'=>false,
+            'adminPage'=>"Wizard",
+        ]);
     }
 }

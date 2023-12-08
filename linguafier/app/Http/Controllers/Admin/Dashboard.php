@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 class Dashboard extends Controller
 {
     public function __invoke(Request $request){
-        return Inertia::render('Admin/Dashboard', ['popFlash'=>session('popFlash'), 'pageUser'=>'Special']);
+        return Inertia::render('Admin/MainDashboard', [
+            'popFlash'=>session('popFlash'),
+            'pageUser'=>'Special',
+            'privilege'=>false,
+            'adminPage'=>"Dashboard",
+        ]);
     }
 }

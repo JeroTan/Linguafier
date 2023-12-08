@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 class WizardRanks extends Controller
 {
     public function __invoke(Request $request){
-        return Inertia::render('Admin/DashboardContents/WizardRanks', ['popFlash'=>session('popFlash'), 'pageUser'=>'Special']);
+        return Inertia::render('Admin/DashboardContents/WizardRanks', [
+            'popFlash'=>session('popFlash'),
+            'pageUser'=>'Special',
+            'privilege'=>false,
+            'adminPage'=>"Rank",
+        ]);
     }
 }

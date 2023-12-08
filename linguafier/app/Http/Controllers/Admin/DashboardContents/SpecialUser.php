@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 class SpecialUser extends Controller
 {
     public function __invoke(Request $request){
-        return Inertia::render('Admin/DashboardContents/SpecialUser', ['popFlash'=>session('popFlash'), 'pageUser'=>'Special']);
+        return Inertia::render('Admin/DashboardContents/SpecialUser', [
+            'popFlash'=>session('popFlash'),
+            'pageUser'=>'Special',
+            'privilege'=>false,
+            'adminPage'=>"User",
+        ]);
     }
 }

@@ -35,9 +35,9 @@ Route::prefix('/user')->group(function(){
 });
 
 Route::prefix('/admin')->group(function(){
+    Route::get('/', AdminLogin::class)->middleware('SpecAccLog:off')->name('admin');
     Route::get('/login', AdminLogin::class)->middleware('SpecAccLog:off')->name('admin.login');
     Route::post('/loginVerified', [AdminLogin::class, 'LoginVerified'])->middleware('SpecAccLog:off')->name('admin.login_verified');
-
 
     Route::prefix('/dashboard')->group(function(){
         Route::get('/', AdminDashboard::class)->name('admin.dashboard');

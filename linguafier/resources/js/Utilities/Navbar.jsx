@@ -32,7 +32,7 @@ export default ()=>{
     function profileNav(x){ //Person Profile depending if it sepcial or normal user.
         const profileNav = {
             Special:<>
-                <Icon OutClass={`w-7 h-7`} IconName="person" />
+                <Icon OutClass={`w-7 h-7`} Name="person" />
             </>,
             User:<>
 

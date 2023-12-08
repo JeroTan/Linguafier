@@ -6,6 +6,35 @@
 @tailwind utilities;
 
 
+body::-webkit-scrollbar-track { /* The Body not the Slider */
+    padding: 2px 0;
+    @apply bg-my-green;
+}
+
+body::-webkit-scrollbar { /* How Wide the body */
+    border-radius: 10px;
+    width: 10px;
+}
+
+body::-webkit-scrollbar-thumb { /* The slider */
+    @apply bg-my-light rounded-sm outline outline-1 outline-black shadow-myBox3;
+}
+
+custom_scroll::-webkit-scrollbar-track{
+    padding: 2px 0;
+    @apply bg-my-green;
+}
+custom_scroll::-webkit-scrollbar {
+    border-radius: 10px;
+    width: 10px;
+}
+
+custom_scroll::-webkit-scrollbar-thumb {
+    @apply bg-my-light rounded-sm outline outline-1 outline-black shadow-myBox3;
+}
+
+
+
 .my-textshadow1{
     text-shadow: 1px 1px #000000;
 }
