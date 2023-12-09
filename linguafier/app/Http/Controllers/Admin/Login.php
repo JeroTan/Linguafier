@@ -34,19 +34,18 @@ class Login extends Controller
         }
 
         //Finally Add Session
-        $request->session()->put('SpecialAccount', [
+        session()->put('SpecialAccount', [
             'id' => $userData->id,
             'username' => $userData->username,
             'rolename' => $userData->rolename,
             'role_id' => $userData->role_id,
             'login' => true,
         ]);
-
-
-
-
-
-
         //return redirect()->route('admin.login');
+    }
+
+    public function Logout(Request $request){
+        session()->forget('SpecialAccount');
+        return redirect()->route('admin.login');
     }
 }

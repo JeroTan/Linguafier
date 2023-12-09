@@ -37,16 +37,29 @@ Route::prefix('/user')->group(function(){
 Route::prefix('/admin')->group(function(){
     Route::get('/', AdminLogin::class)->middleware('SpecAccLog:off')->name('admin');
     Route::get('/login', AdminLogin::class)->middleware('SpecAccLog:off')->name('admin.login');
+    Route::post('/logout', [AdminLogin::class, 'Logout'])->middleware('SpecAccLog:on')->name('admin.logout');
     Route::post('/loginVerified', [AdminLogin::class, 'LoginVerified'])->middleware('SpecAccLog:off')->name('admin.login_verified');
+
 
     Route::prefix('/dashboard')->group(function(){
         Route::get('/', AdminDashboard::class)->name('admin.dashboard');
+
         Route::get('/special_user', SpecialUser::class)->name('admin.special_user');
+
         Route::get('/overseer_wizard',OverseerWizard::class )->name('admin.overseer_wizard');
+
         Route::get('/word_library', WordLibrary::class)->name('admin.word_library');
+
         Route::get('/word_attribution', WordAttribution::class)->name('admin.word_attribution');
+
         Route::get('/wizard_ranks', WizardRanks::class)->name('admin.wizard_ranks');
-        Route::get('/roles', Roles::class)->name('admin.roles');
+
+
+        Route::prefix('/roles')->group(function(){
+            Route::get('/', Roles::class)->name('admin.roles');
+            Route::get('/getContents', [Roles::class, 'getContents'])->name('admin.roles.contents');
+        });
+
     })->middleware('SpecAccLog:on');
 
 
