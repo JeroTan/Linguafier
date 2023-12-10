@@ -20,9 +20,9 @@ export default function Button(Option){
             onClick={Option.Click}
         >
             {icon()}
-            <span>
-            {name == "Button" && Option.Icon ? "" : name }
-            </span>
+
+            {name == "Button" && Option.Icon ? "" : <span>{name}</span> }
+
         </button>
     </>
 }

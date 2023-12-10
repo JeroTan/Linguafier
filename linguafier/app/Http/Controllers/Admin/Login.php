@@ -39,6 +39,7 @@ class Login extends Controller
             'username' => $userData->username,
             'rolename' => $userData->rolename,
             'role_id' => $userData->role_id,
+            'privilege' => $userData->privilege,
             'login' => true,
         ]);
         //return redirect()->route('admin.login');

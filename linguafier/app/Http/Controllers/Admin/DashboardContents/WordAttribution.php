@@ -12,7 +12,6 @@ class WordAttribution extends Controller
         return Inertia::render('Admin/DashboardContents/WordAttribution', [
             'popFlash'=>session('popFlash'),
             'pageUser'=>'Special',
-            'privilege'=>false,
             'adminPage'=>"Attribute",
         ]);
     }

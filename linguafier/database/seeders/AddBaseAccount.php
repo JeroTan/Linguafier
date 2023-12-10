@@ -19,7 +19,7 @@ class AddBaseAccount extends Seeder
             [
             'id' => '1',
             'name' => 'owner',
-
+            'privilege' => '{"Manage Special User":true,"Manage Wizard":true,"Manage Wizard Rank":true,"Manage Word Library":true,"Manage Word Attributes":true,"Manage Roles":true}',
             ],
         ]);
         SpecialAccount::create([

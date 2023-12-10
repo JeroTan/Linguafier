@@ -38,6 +38,16 @@ export default function Dashboard(){
 
         <div className='flex mb-5 gap-1'>
             <div>
+                <Icon Name="book_person" OutClass="w-7 h-7" InClass="fill-my-green" />
+            </div>
+            <div className='shrink break-words'>
+                <h4 className='text-2xl text-my-green font-semibold'>Wizard Ranks</h4>
+                <p className='font-light'>Wizards may rank themselves depending on whether they have a good participation in ranked games. Here you can manage the divisions where wizards may fall unto.</p>
+            </div>
+        </div>
+
+        <div className='flex mb-5 gap-1'>
+            <div>
                 <Icon Name="w" OutClass="w-7 h-7" InClass="fill-my-green" />
             </div>
             <div className='shrink break-words'>
@@ -53,16 +63,6 @@ export default function Dashboard(){
             <div className='shrink break-words'>
                 <h4 className='text-2xl text-my-green font-semibold'>Word Attribution</h4>
                 <p className='font-light'>Each word has a weight and capabilities. Define its category here and make a tier for it.</p>
-            </div>
-        </div>
-
-        <div className='flex mb-5 gap-1'>
-            <div>
-                <Icon Name="book_person" OutClass="w-7 h-7" InClass="fill-my-green" />
-            </div>
-            <div className='shrink break-words'>
-                <h4 className='text-2xl text-my-green font-semibold'>Wizard Ranks</h4>
-                <p className='font-light'>Wizards may rank themselves depending on whether they have a good participation in ranked games. Here you can manage the divisions where wizards may fall unto.</p>
             </div>
         </div>
 

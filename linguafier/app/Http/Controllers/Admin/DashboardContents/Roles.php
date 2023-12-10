@@ -10,42 +10,25 @@ use Illuminate\Support\Facades\Redirect;
 
 class Roles extends Controller
 {
+    //GET
     public function __invoke(Request $request){
         return Inertia::render('Admin/DashboardContents/Roles', [
             'popFlash'=>session('popFlash'),
             'pageUser'=>'Special',
-            'privilege'=>false,
             'adminPage'=>"Role",
-            'data'=>session('data'),
+            'data'=>$this->getContents(),
         ]);
     }
 
-    private function getContents($search, $filter){
-        //Start Fetch
-        $data = Role::select();
-
-        //Required Condition
-
-
-        //Search
-        if($search){
-            $data = $data->where( function($query){
-                $query->where('DepartmentName', 'LIKE', '%' . request('v_search') . '%');
-            });
-        }
-
-        //Filters
-
-
-        // GET
-        $data = $data->get();
-        $data = $data->toJson();
-        //return Inertia::share('data', $data);
-        //return Inertia::render('Admin/DashboardContents/Roles', ['contents'=>$data]);
-        return Redirect::back()->with('data', $data);
-        //return response('', 200, ['ff'=>$data]);
+    public function addRole(Request $request){
+        return Inertia::render('Admin/DashboardContents/Roles/Add', [
+            'popFlash'=>session('popFlash'),
+            'pageUser'=>'Special',
+            'adminPage'=>"Role",
+        ]);
     }
 
+    //POST
     public function changeContents(Request $request){
         //Verify Data
         $request->validate([
@@ -54,6 +37,35 @@ class Roles extends Controller
             'v_search.max'=>'Search Limit Reached My Friend.'
         ]);
 
+        return redirect()->back()->with('v_search', $request->v_search);
+    }
 
+    //Functionality
+    private function getContents(){
+
+        //Start Fetch
+        $data = Role::select();
+
+        //Required Condition
+
+        //Search
+        if(session('v_search') ){
+            $data = $data->where( function($query){
+                $query->where('name', 'LIKE', '%' . session('v_search') . '%');
+            });
+        }
+
+        //Filters
+
+        // GET
+        $data = $data->get();
+
+        return $data;
+        /*
+        //return Inertia::share('data', $data);
+        //return Inertia::render('Admin/DashboardContents/Roles', ['contents'=>$data]);
+        //return Redirect::back()->with('data', $data);
+        //return response('', 200, ['ff'=>$data]);
+        */
     }
 }

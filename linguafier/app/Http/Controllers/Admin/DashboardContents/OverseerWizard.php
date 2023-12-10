@@ -12,7 +12,6 @@ class OverseerWizard extends Controller
         return Inertia::render('Admin/DashboardContents/OverseerWizard', [
             'popFlash'=>session('popFlash'),
             'pageUser'=>'Special',
-            'privilege'=>false,
             'adminPage'=>"Wizard",
         ]);
     }

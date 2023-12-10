@@ -12,7 +12,6 @@ class WizardRanks extends Controller
         return Inertia::render('Admin/DashboardContents/WizardRanks', [
             'popFlash'=>session('popFlash'),
             'pageUser'=>'Special',
-            'privilege'=>false,
             'adminPage'=>"Rank",
         ]);
     }

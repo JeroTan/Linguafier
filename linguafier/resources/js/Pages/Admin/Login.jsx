@@ -46,11 +46,11 @@ export default function Login(){
             </div>
             <div className='mt-10 px-10'>
                 <label>Magic <span className='text-my-green font-semibold'>Username</span> </label>
-                <TextBox Handle={[v_username, e_username]} Error={errors.v_username} Placeholder="Type here"/>
+                <TextBox Handle={[v_username, e_username]} Size="w-full" Error={errors.v_username} Placeholder="Type here"/>
 
                 <div className='py-2'></div>
                 <label>State your <span className='text-my-green font-semibold'>Password</span> </label>
-                <TextBox Type="password" Handle={[v_password, e_password]} Error={errors.v_password} Placeholder="Type here"/>
+                <TextBox Type="password" Handle={[v_password, e_password]} Size="w-full" Error={errors.v_password} Placeholder="Type here"/>
             </div>
             <div className='my-8 w-full flex justify-center'>
                 <Button Type="Submit" Name="Login To Realm" />

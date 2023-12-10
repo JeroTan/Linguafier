@@ -12,7 +12,6 @@ class SpecialUser extends Controller
         return Inertia::render('Admin/DashboardContents/SpecialUser', [
             'popFlash'=>session('popFlash'),
             'pageUser'=>'Special',
-            'privilege'=>false,
             'adminPage'=>"User",
         ]);
     }

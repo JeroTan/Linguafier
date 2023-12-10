@@ -12,7 +12,6 @@ class WordLibrary extends Controller
         return Inertia::render('Admin/DashboardContents/WordLibrary', [
             'popFlash'=>session('popFlash'),
             'pageUser'=>'Special',
-            'privilege'=>false,
             'adminPage'=>"Word",
         ]);
     }
