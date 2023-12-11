@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class Login extends Controller
 {
     public function __invoke(Request $request){
-        return Inertia::render('Admin/Login', ['popFlash'=> session('popFlash')]);
+        return Inertia::render('Admin/Login');
     }
 
     public function LoginVerified(Request $request){
@@ -30,7 +30,7 @@ class Login extends Controller
         //Verify Login Credentials
         $userData = SpecialAccount::select('specialaccount.*', 'role.name AS rolename', 'role.privilege AS privilege')->join('role', 'specialaccount.role_id', '=', 'role.id')->where('password', $request->v_password)->where('username', $request->v_username)->first();
         if(!$userData){
-            return redirect()->route('admin.login')->with( 'popFlash', ['Title'=>'Mismatch','Message'=>"Your Username and Password did not match in our library. Please cast your credentials again."] );
+            return redirect()->route('admin.login')->with( 'popFlash', ['Type'=>'error','Title'=>'Mismatch','Message'=>"Your Username and Password did not match in our library. Please cast your credentials again."] );
         }
 
         //Finally Add Session

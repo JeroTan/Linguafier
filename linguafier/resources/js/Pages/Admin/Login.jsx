@@ -6,7 +6,7 @@ import { useState, useRef, useEffect } from 'react';
 //Utilities
 import TextBox from '../../Utilities/Textbox';
 import Button from '../../Utilities/Button';
-import Pop from '../../Utilities/Pop';
+import PopFlash from '../../Utilities/PopFlash';
 import PagePlate from '../../Utilities/PagePlate';
 
 //CreateContext
@@ -20,7 +20,7 @@ export default function Login(){
     const [s_pop, se_pop] = useState(false);
 
     //** Use Page */
-    const { errors, popFlash } = usePage().props;
+    const { errors } = usePage().props;
 
     //** Use Ref */
     //console.log(usePage().props);
@@ -56,7 +56,8 @@ export default function Login(){
                 <Button Type="Submit" Name="Login To Realm" />
             </div>
         </form>
-        <Pop State={[s_pop, se_pop]} Flash={popFlash} Button={[
+
+        <PopFlash Button={[
             {'Name': "Got it", "Func":"close", Color:'bg-slate-400'  },
         ]} />
 

@@ -58,7 +58,11 @@ Route::prefix('/admin')->group(function(){
         Route::prefix('/roles')->group(function(){
             Route::get('/', Roles::class)->name('admin.roles');
             Route::post('/changeContents', [Roles::class, 'changeContents'])->name('admin.roles.contents');
-            Route::get('/add', [Roles::class, 'addRole'])->name('admin.roles.add');
+            Route::get('/add', [Roles::class, 'addRole_UI'])->name('admin.roles.add');
+            Route::post('/create', [Roles::class, 'create'])->name('admin.roles.create');
+            Route::get('/modify/{id}', [Roles::class, 'modifyRole_UI'])->name('admin.roles.modify_ui');
+            Route::post('/modify_submit/{id}', [Roles::class, 'modify'])->name('admin.roles.modify_submit');
+            Route::post('/delete/{id}', [Roles::class, 'delete'])->name('admin.roles.delete');
         });
 
     })->middleware('SpecAccLog:on');
