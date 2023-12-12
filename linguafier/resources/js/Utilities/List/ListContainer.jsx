@@ -1,6 +1,8 @@
 // UTILITIES
 import Navigation from "./Navigation";
 import ItemBox from "./ItemBox";
+import Pagination from "./Pagination";
+import SortBar from "./SortBar";
 
 // HOOKS
 import { createContext } from "react"
@@ -28,16 +30,30 @@ export default (Option)=>{
     let NoItemMessage = Option.NoItemMessage ?? "Nothing Found!";
     let NotItemSubMessage = Option.NoItemSubMessage ?? "Please Add More Item to the List.";
     let Name = Option.Name ?? "List of Items";
+    let Pagination = Option.Pagination ?? false;
+    let Sort = Option.Sort ?? false;
+    let Filter = Option.Filter ?? false;
 
     //<Navigation />
     return <main>
         <G_Search.Provider value={[Search[0], Search[1], Search[2], ButtonProps, OtherButtons, Name]}>
             <Navigation />
         </G_Search.Provider>
+        {
+            Sort ? <div className="my-2">
+                <SortBar />
+            </div> : ""
+        }
         <div className="my-2 md:pl-5 sm:pl-2 pl-0 flex flex-wrap gap-2">
             { ItemBoxContent.length > 0 ?
                 ItemBoxContent.map((x, i)=><Fragment key={i}><ItemBox Content={x}/></Fragment> )
                 : NoItemBox(0, NoItemMessage, NotItemSubMessage)}
         </div>
+        {
+            Pagination ? <div className="my-2">
+                <Pagination Link={Pagination}  />
+            </div> :
+            ""
+        }
     </main>
 }

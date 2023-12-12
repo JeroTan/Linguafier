@@ -57,9 +57,9 @@ export default function Login(){
             </div>
         </form>
 
-        <PopFlash Button={[
-            {'Name': "Got it", "Func":"close", Color:'bg-slate-400'  },
-        ]} />
+        <PopFlash Button={{
+            0:[{'Name': "Got it", "Func":"close", Color:'bg-slate-400'  },],
+        }} />
 
 
     </main>

@@ -8,10 +8,13 @@ import Button from './Button';
 
 export default function Pop(Option){
     //** STRUCT */
-    let Title = Option.Title;
-    let Message = Option.Message;
-    let popButton = Option.Button ?? "";
-    let Handle = Option.Handle;
+    let Pick = Option.Pick ?? 0;
+    let Content = Option.Content;
+    Content = Content[Pick] ?? {};
+    let Title = (Content.Title ?? Option.Title) ?? "";
+    let Message = (Content.Message ?? Option.Message) ?? "";
+    let popButton = (Content.Button ?? Option.Button) ?? [];
+    let Switch = Option.Switch;
 
     let popTypeList = {
         success:{
@@ -35,9 +38,9 @@ export default function Pop(Option){
             color:"black",
         }
     };
-    let popTypePick = popTypeList[Option.Type ? Option.Type : 'none'];
-    let popIcon = Option.Icon ?? popTypePick.icon;
-    let s_Color = Option.Color ?? popTypePick.color;
+    let popTypePick = popTypeList[ (Content.Type ?? Option.Type ) ?? 'none'];
+    let popIcon = (Content.Icon ?? Option.Icon) ?? popTypePick.icon;
+    let s_Color = (Content.Color ?? Option.Color) ?? popTypePick.color;
     let s_Width = Option.Width ?? "34rem";
 
 
@@ -47,12 +50,12 @@ export default function Pop(Option){
     //** Use Effect */
     //This will turn off and on the popup
     useEffect(()=>{
-        if(Handle[0] == true){ //Check if the state of PopUP
+        if(Switch[0] == true){ //Check if the state of PopUP
             popId.current.showModal(); //Activate by using showMadal();
         }else{
             popId.current.close(); //Activate Close if not true anymore;
         }
-    }, [Handle[0]]);
+    }, [Switch[0]]);
 
     //Design of UI
     const dialogStyling = {
@@ -61,7 +64,7 @@ export default function Pop(Option){
 
     //** Functionality */
     function close(){
-        Handle[1](false);
+        Switch[1](false);
     }
 
     //This will return the ui of modal pop up

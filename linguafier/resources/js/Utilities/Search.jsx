@@ -11,7 +11,13 @@ export default function Search(Option){
 
 
     return <div className="flex gap-2">
-        <Textbox Handle={Option.Handle} Color={`bg-my-light`}/>
+        <Textbox Handle={Option.Handle} Color={`bg-my-light`} PressFunc={
+            (event)=>{
+                if (event.key === 'Enter') {
+                    Option.Click();
+                }
+            }
+        }/>
         <Button Icon="search" Click={Option.Click} Padding="py-1 px-2" IconOutClass="w-5 h-5" />
     </div>
 }

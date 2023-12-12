@@ -14,8 +14,66 @@ import { usePage, router } from "@inertiajs/react"
 export default function Modify(Option){
     //** Use Page */
     const { roleId, data, errors } = usePage().props;
+
+    //** STRUCT */
+    let popContent = {
+        WarningDelete:{
+            Title: "Delete Warning",
+            Message: "Do you really want to delete this role? Deleting this role will remove all accounts that have this role, are you sure?",
+            Type: "warning",
+            Button: [
+                {Name: "Yes", Func:()=>{ e_popPick('ConfirmDelete'); }, Color:'bg-red-500'  },
+                {Name: "No! Of course not", Func:"close", Color:'bg-slate-500'  },
+            ]
+        },
+        ConfirmDelete:{
+            Title: "Delete Confirmation",
+            Message: `Click "Yes" to proceed?`,
+            Type: `notice`,
+            Button: [
+                {Name: "YES!", Func:()=>{
+                    router.post('/admin/dashboard/roles/delete/'+roleId, {}, {onFinish:()=>{
+                        e_popLoading(false);
+                    }});
+                    e_popSwitch(false);
+                    e_popLoading(true);
+                }, Color:'bg-red-500'  },
+                {Name: "I've Changed my mind", Func:"close", Color:'bg-slate-500'  },
+            ]
+        },
+        ConfirmSubmit:{
+            Title: `Confirm Modifications`,
+            Message: `Click "Yes" to modify the role.`,
+            Type: 'notice',
+            Button : [
+                {
+                    Name: "Yes",
+                    "Func":()=>{
+                        router.post('/admin/dashboard/roles/modify_submit/'+roleId, {
+                            v_name:v_name,
+                            v_mSpecialUser:v_mSpecialUser,
+                            v_mWizard:v_mWizard,
+                            v_mWizardRank:v_mWizardRank,
+                            v_mWordLibrary:v_mWordLibrary,
+                            v_mWordAttributes:v_mWordAttributes,
+                            v_mRoles:v_mRoles,
+                        }, {
+                            onFinish: ()=>{
+                                e_popLoading(false);
+                            }
+                        });
+                        e_popSwitch(false);
+                        e_popLoading(true);
+                    },
+                    Color:'bg-my-green'
+
+                },
+                {Name: "Continue Editing", Func:"close", Color:'bg-slate-500'  },
+            ]
+
+        },
+    };
     let dataPrivileges = JSON.parse(data.privilege);
-    console.log(errors);
 
     //**>> Use State */
     const [v_name, e_name] = useState(data.name);
@@ -27,20 +85,29 @@ export default function Modify(Option){
     const [v_mRoles, e_mRoles] = useState(dataPrivileges['Manage Roles']);
 
     const [v_popFlash, e_popFlash] = useState(false);
-    const [v_popWarning, e_popWarning] = useState(false);
-    const [v_popConfirmDelete, e_popConfirmDelete] = useState(false);
-    const [v_popConfirmSubmit, e_popConfirmSubmit] = useState(false);
     const [v_popLoading, e_popLoading] = useState(false);
+    const [v_popSwitch, e_popSwitch] = useState(false);
+    const [v_popPick, e_popPick] = useState('WarningDelete');
+
     //**<< Use State */
+
+
+    //** Functionaility */
+    function isUnchange(){
+        return (
+            v_name == data.name &&
+            v_mSpecialUser == dataPrivileges['Manage Special User'] &&
+            v_mWizard == dataPrivileges['Manage Wizard'] &&
+            v_mWizardRank == dataPrivileges['Manage Wizard Rank'] &&
+            v_mWordLibrary == dataPrivileges['Manage Word Library'] &&
+            v_mWordAttributes == dataPrivileges['Manage Word Attributes'] &&
+            v_mRoles == dataPrivileges['Manage Roles']
+        );
+    }
 
 
     //** Render */
     return <AdminMainUI>
-        {/* Flash */}
-        <PopFlash Handle={[v_popFlash, e_popFlash]} Button={[
-            {'Name': "Okay", "Func":"close", Color:'bg-slate-400'  },
-        ]} />
-
         {/* Navigation */}
         <div className='flex flex-wrap gap-2'>
             <Button  Icon={`back`} Click={()=>{router.get('/admin/dashboard/roles')}}/>
@@ -97,17 +164,10 @@ export default function Modify(Option){
 
             <div className="mt-5 flex flex-wrap sm:gap-4 gap-2">
                 <Button Name="Modify" Click={()=>{
-                    if(
-                        v_name == data.name &&
-                        v_mSpecialUser == dataPrivileges['Manage Special User'] &&
-                        v_mWizard == dataPrivileges['Manage Wizard'] &&
-                        v_mWizardRank == dataPrivileges['Manage Wizard Rank'] &&
-                        v_mWordLibrary == dataPrivileges['Manage Word Library'] &&
-                        v_mWordAttributes == dataPrivileges['Manage Word Attributes'] &&
-                        v_mRoles == dataPrivileges['Manage Roles']
-                    ){
+                    if(isUnchange())
                         return false;
-                    }e_popConfirmSubmit(true);
+                    e_popSwitch(true);
+                    e_popPick("ConfirmSubmit");
                 }} />
                 <Button Name="Reset" Click={()=>{
                     e_name(data.name);
@@ -120,7 +180,7 @@ export default function Modify(Option){
                 }} />
                 {
                     data.id != 1 ? <>
-                    <Button Name="Delete" Color="bg-red-500" Click={()=>{ e_popWarning(true); }}/>
+                    <Button Name="Delete" Color="bg-red-500" Click={()=>{ e_popSwitch(true); e_popPick('WarningDelete') }}/>
                     </> : ""
                 }
             </div>
@@ -128,41 +188,13 @@ export default function Modify(Option){
         </form>
 
         {/* Pop */}
-        <Pop Handle={[v_popWarning, e_popWarning]} Title="Delete Warning" Message="Do you really want to delete these role? Deleting this role will remove all accounts that have this role, are you sure?" Type="warning" Button={[
-            {'Name': "Yes", "Func":()=>{e_popWarning(false); e_popConfirmDelete(true)}, Color:'bg-red-500'  },
-            {'Name': "No! Of course not", "Func":"close", Color:'bg-slate-500'  },
-        ]} />
-        <Pop Handle={[v_popConfirmDelete, e_popConfirmDelete]} Title="Delete Confirmation" Message="Click yes to proceed?" Button={[
-            {'Name': "YES!", "Func":()=>{router.post('/admin/dashboard/roles/delete/'+roleId); e_popConfirmDelete(false) }, Color:'bg-red-500'  },
-            {'Name': "I've Changed my mind", "Func":"close", Color:'bg-slate-500'  },
-        ]} />
-
-        <Pop Handle={[v_popConfirmSubmit, e_popConfirmSubmit]} Title="Confirm Modification" Message={`Click "Yes" to modify the role.`} Type="notice" Button={[
-            {
-                Name: "Yes",
-                "Func":()=>{
-                    router.post('/admin/dashboard/roles/modify_submit/'+roleId, {
-                        v_name:v_name,
-                        v_mSpecialUser:v_mSpecialUser,
-                        v_mWizard:v_mWizard,
-                        v_mWizardRank:v_mWizardRank,
-                        v_mWordLibrary:v_mWordLibrary,
-                        v_mWordAttributes:v_mWordAttributes,
-                        v_mRoles:v_mRoles,
-                    }, {
-                        onFinish: ()=>{
-                            e_popLoading(false);
-                        }
-                    });
-                    e_popConfirmSubmit(false);
-                    e_popLoading(true);
-                },
-                Color:'bg-my-green'
-
-            },
-            {'Name': "Continue Editing", "Func":"close", Color:'bg-slate-500'  },
-        ]} />
-        <PopLoading Handle={[v_popLoading, e_popLoading]} />
+        <Pop Switch={[v_popSwitch, e_popSwitch]} Content={popContent} Pick={v_popPick} />
+        <PopLoading Switch={[v_popLoading, e_popLoading]} />
+        <PopFlash Switch={[v_popFlash, e_popFlash]} Button={{
+            0:[
+                {'Name': "Okay", "Func":"close", Color:'bg-slate-400'  },
+            ],
+        }} />
 
     </AdminMainUI>
 }

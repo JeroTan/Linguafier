@@ -11,6 +11,7 @@ export default function Textbox(Option){
     let bgcolor = Option.Color ?? '';
     let stateColor = 'black'
     let errorBag = Option.Error ?? '';
+    let pressFunc = Option.PressFunc ?? (()=>true);
 
 
     //** Functionality */
@@ -28,6 +29,7 @@ export default function Textbox(Option){
             type={type}
             className={`${padding} ${size} rounded outline outline-1 outline-${stateColor} outline-offset-0 shadow-myBox3 shadow-${stateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${stateColor}/80  placeholder:font-light ${bgcolor} max-w-full shrink`}
             onChange={changeState}
+            onKeyDown={pressFunc}
             placeholder={placeholder}
             value={handler[0]}
         />

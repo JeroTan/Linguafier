@@ -13,25 +13,26 @@ export default (Option)=>{
     const { popFlash } = usePage().props;
 
     //** Use State */
-    const [ v_flash, e_flash ] = Option.Handle ?? useState(false);
+    const [ v_switch, e_switch ] = Option.Switch ?? useState(false);
     const [ v_flashData, e_flashData] = useState({
         popType:'none',
-        popTitle:"",
-        popMessage:"f",
+        Title:"",
+        Message:"",
+        Button:popButton[Object.keys(popButton)[0]],
     });
 
     //** Use Effect */
     useEffect(()=>{
         if(popFlash){
             e_flashData({
+                Title:popFlash.Title,
+                Message:popFlash.Message,
+                Button:popButton[popFlash.Pick?? Object.keys(popButton)[0]],
                 popType:popFlash.Type,
-                popTitle:popFlash.Title,
-                popMessage:popFlash.Message,
             })
-            e_flash(1);
+            e_switch(1);
         }
-
     }, [popFlash]);
 
-    return <Pop Handle={[v_flash, e_flash]} Title={v_flashData.popTitle} Message={v_flashData.popMessage} Type={v_flashData.popType} Button={popButton} />
+    return <Pop Switch={[ v_switch, e_switch ]} Pick={0} Content={ {0:v_flashData} } Type={v_flashData.popType}/>
 }

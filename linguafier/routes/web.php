@@ -44,16 +44,32 @@ Route::prefix('/admin')->group(function(){
     Route::prefix('/dashboard')->group(function(){
         Route::get('/', AdminDashboard::class)->name('admin.dashboard');
 
-        Route::get('/special_user', SpecialUser::class)->name('admin.special_user');
+        Route::prefix('/special_user')->group(function(){
+            Route::get('/', SpecialUser::class)->name('admin.special_user');
+            Route::post('/changeContents', [SpecialUser::class, "changeContents"]);
+            Route::get('/add', [SpecialUser::class, "add_ui"]);
+            Route::post('/add_submit', [SpecialUser::class, 'add_submit']);
+            Route::get('/modify/{id}', [SpecialUser::class, 'modify_ui']);
+            Route::post('/modify_submit', [SpecialUser::class, 'modify_submit']);
+            Route::post('/delete/{id}', [SpecialUser::class, 'delete']);
 
-        Route::get('/overseer_wizard',OverseerWizard::class )->name('admin.overseer_wizard');
+        });
 
-        Route::get('/word_library', WordLibrary::class)->name('admin.word_library');
+        Route::prefix('/overseer_wizard')->group(function(){
+            Route::get('/', OverseerWizard::class)->name('admin.overseer_wizard');
+        });
 
-        Route::get('/word_attribution', WordAttribution::class)->name('admin.word_attribution');
+        Route::prefix('/word_library')->group(function(){
+            Route::get('/', WordLibrary::class)->name('admin.word_library');
+        });
 
-        Route::get('/wizard_ranks', WizardRanks::class)->name('admin.wizard_ranks');
+        Route::prefix('/word_attribution')->group(function(){
+            Route::get('/', WordAttribution::class)->name('admin.word_attribution');
+        });
 
+        Route::prefix('/wizard_ranks')->group(function(){
+            Route::get('/', WizardRanks::class)->name('admin.wizard_ranks');
+        });
 
         Route::prefix('/roles')->group(function(){
             Route::get('/', Roles::class)->name('admin.roles');

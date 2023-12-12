@@ -5,19 +5,51 @@ import ListContainer from '../../../Utilities/List/ListContainer';
 import AdminMainUI from '../Utilities/AdminMainUI';
 import Pop from '../../../Utilities/Pop';
 import PopFlash from '../../../Utilities/PopFlash';
+import PopLoading from '../../../Utilities/PopLoading';
 
 //HOOKS
 import { useEffect, useState, useRef } from 'react';
 import { router, usePage } from '@inertiajs/react';
 
+
 export default ()=>{
+    //** STRUCT */
+    const popContent = {
+        WarningDelete:{
+            Title: "Delete Warning",
+            Message: "Do you really want to delete this role? Deleting this role will remove all accounts that have this role, are you sure?",
+            Type: "warning",
+            Button: [
+                {'Name': "Yes", "Func":()=>{e_popPick('ConfirmDelete');}, Color:'bg-red-500'  },
+                {'Name': "No! Of course not", "Func":"close", Color:'bg-slate-500'  },
+            ],
+        },
+        ConfirmDelete:{
+            Title: "Delete Confirmation",
+            Message: "Click Yes to proceed?",
+            Type: "notice",
+            Button: [
+                {'Name': "YES!", "Func":()=>{
+                    router.post('/admin/dashboard/roles/delete/'+selectedRoleId,{},{
+                        onFinish:()=>e_popLoading(false)
+                    });
+                    e_popLoading(true);
+                    e_popSwitch(false);
+                }, Color:'bg-red-500'  },
+                {'Name': "I've Changed my mind", "Func":"close", Color:'bg-slate-500'  },
+            ]
+        },
+    }
+
     //** Use Page */
     const { data } = usePage().props;
 
+
     //** Use State */
     const [v_search, e_search] = useState("");
-    const [v_popWarning, e_popWarning] = useState(false);
-    const [v_popConfirmDelete, e_popConfirmDelete] = useState(false);
+    const [v_popSwitch, e_popSwitch] = useState("");
+    const [v_popPick, e_popPick] = useState('WarningDelete');
+    const [v_popLoading, e_popLoading] = useState(false);
     const [selectedRoleId, set_selectedRoleId] = useState("");
 
     //** Use Ref */
@@ -36,9 +68,6 @@ export default ()=>{
     //**<| Functionality */
     function ItemPlate(){ //Item design of Item List
         let plate = [];
-        if(data.length < 1)
-            return plate;
-
         for(let i = 0; i < data.length; i++){
             let name = data[i].name;
             let privilege = JSON.parse(data[i].privilege);
@@ -67,13 +96,13 @@ export default ()=>{
                         router.get('/admin/dashboard/roles/modify/'+data[i].id);
                     }} />
                     { data[i].id != 1 ? <Button Icon="delete" Size="w-fit h-fit" Padding="px-2 py-1" Click={()=>{
-                        e_popWarning(true);
+                        e_popSwitch(true);
+                        e_popPick('WarningDelete');
                         set_selectedRoleId(data[i].id);
                     }} /> : "" }
                 </div>
             </div>
         }
-
         return plate;
     }
     function changeContents(){//Request of contents
@@ -92,16 +121,10 @@ export default ()=>{
         <ListContainer Name="List of Roles" Search={[v_search, e_search, changeContents]} ButtonProps={{}} OtherButtons={[]} Contents={ItemPlate()} />
 
         {/* Pop */}
-        <Pop Handle={[v_popWarning, e_popWarning]} Title="Delete Warning" Message="Do you really want to delete these role? Deleting this role will remove all accounts that have this role, are you sure?" Type="warning" Button={[
-            {'Name': "Yes", "Func":()=>{e_popWarning(false); e_popConfirmDelete(true)}, Color:'bg-red-500'  },
-            {'Name': "No! Of course not", "Func":"close", Color:'bg-slate-500'  },
-        ]} />
-        <Pop Handle={[v_popConfirmDelete, e_popConfirmDelete]} Title="Delete Confirmation" Message="Click Yes to proceed?" Button={[
-            {'Name': "YES!", "Func":()=>{router.post('/admin/dashboard/roles/delete/'+selectedRoleId); e_popConfirmDelete(false) }, Color:'bg-red-500'  },
-            {'Name': "I've Changed my mind", "Func":"close", Color:'bg-slate-500'  },
-        ]} />
-        <PopFlash Button={[
+        <Pop Switch={[v_popSwitch, e_popSwitch]} Content={popContent} Pick={v_popPick} />
+        <PopFlash Button={{0:[
             {'Name': "Got it", "Func":"close", Color:'bg-slate-400' },
-        ]} />
+        ]}} />
+        <PopLoading Switch={[v_popLoading, e_popLoading]} />
     </AdminMainUI>
 }

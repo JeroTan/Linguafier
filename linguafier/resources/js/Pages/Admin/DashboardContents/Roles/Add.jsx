@@ -31,12 +31,6 @@ export default function AddRoles(){
     const { errors } = usePage().props;
 
     return <AdminMainUI>
-        {/* Flash */}
-        <PopFlash Handle={[v_popFlash, e_popFlash]} Button={[
-            {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/roles'), Color:'bg-my-green'  },
-            {'Name': "Add Again!", "Func":"close", Color:'bg-slate-400'  },
-        ]} />
-
         {/* Navigation */}
         <div className='flex flex-wrap gap-2'>
             <Button  Icon={`back`} Click={()=>{router.get('/admin/dashboard/roles')}}/>
@@ -92,7 +86,7 @@ export default function AddRoles(){
                         v_mWordAttributes:v_mWordAttributes,
                         v_mRoles:v_mRoles,
                     }, {
-                        onSuccess:()=>{
+                        onFinish:()=>{
                             e_popLoading(false);
                         }
                     });
@@ -111,7 +105,11 @@ export default function AddRoles(){
         </form>
 
         {/* POP */}
-        <PopLoading Handle={[v_popLoading, e_popLoading]} />
+        <PopLoading Switch={[v_popLoading, e_popLoading]} />
+        <PopFlash Switch={[v_popFlash, e_popFlash]} Button={{0:[
+            {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/roles'), Color:'bg-my-green'  },
+            {'Name': "Add Again!", "Func":"close", Color:'bg-slate-400'  },
+        ]}} />
 
     </AdminMainUI>
 }

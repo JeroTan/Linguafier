@@ -11,7 +11,7 @@ export default function PopLoading(Option){
     let Title = Option.Title;
     let Message = Option.Message ?? "Processing . . .";
     let popButton = Option.Button ?? "";
-    let Handle = Option.Handle ?? useState();
+    let Switch = Option.Switch ?? useState();
     let CloseButton = Option.Close ?? false;
     let popTypeList = {
         success:{
@@ -41,12 +41,12 @@ export default function PopLoading(Option){
     //** Use Effect */
     //This will turn off and on the popup
     useEffect(()=>{
-        if(Handle[0] == true){ //Check if the state of PopUP
+        if(Switch[0] == true){ //Check if the state of PopUP
             popId.current.showModal(); //Activate by using showMadal();
         }else{
             popId.current.close(); //Activate Close if not true anymore;
         }
-    }, [Handle[0]]);
+    }, [Switch[0]]);
 
     //Design of UI
     const dialogStyling = {
@@ -55,7 +55,7 @@ export default function PopLoading(Option){
 
     //** Functionality */
     function close(){
-        Handle[1](false);
+        Switch[1](false);
     }
 
     //This will return the ui of modal pop up
