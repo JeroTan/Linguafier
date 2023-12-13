@@ -11,7 +11,8 @@ import { usePage, router } from '@inertiajs/react';
 export default ()=>{
 
     //** Use Page */
-    const { data, specialAccount } = usePage().props;
+    const { data, specialAccount, roles } = usePage().props;
+
 
     //** Use State */
     const [ v_search, e_search] = useState("");
@@ -21,11 +22,35 @@ export default ()=>{
         {Name:"Created", Ref:"created_time", Sort:"ASC"},
         {Name:"Modified", Ref:"modified_time", Sort:"ASC"},
     ]);
+    const [ v_filter, e_filter] = useState([]);
     const [ v_popSwitch, e_popSwitch] = useState(false);
     const [ v_popPick, e_popPick]= useState("WarningDelete");
     const [ v_selectId, e_selectId] = useState("");
 
     //** Use Effect */
+    useEffect(()=>{
+        let rolesData = roles.map((x)=>({Name:x.name, Ref:x.id, Value:false}));
+        e_filter([
+        {
+            Ref:"rolename",
+            Alias:"Roles",
+            Type:"checklist",
+            Data:rolesData,
+        },
+        {
+            Ref:"created_time",
+            Alias:"Created Date",
+            Type:"range",
+            Data:{Min:false,Max:true,}
+        },
+        {
+            Ref:"modified_time",
+            Alias:"Modified Date",
+            Type:"range_date",
+            Data:{Min:false,Max:true,}
+        },
+        ]);
+    }, [roles]);
     useEffect(()=>{
         const debouncer = setTimeout(()=>{
             changeContents();
@@ -35,7 +60,7 @@ export default ()=>{
 
     //** Functionality */
     function changeContents(){//Request of contents
-        router.post('/admin/dashboard/special_user/changeContents', {"v_search": v_search});
+        router.post('/admin/dashboard/special_user/changeContents', {"v_search": v_search, 'v_sort':v_sort, 'v_filter':v_filter});
     }
     function ItemPlate(){ //Item design of Item List
         let plate = [];
@@ -82,7 +107,7 @@ export default ()=>{
         </div>
 
         {/* List Contents*/}
-        <ListContainer Name="List of System User" Search={[v_search, e_search, changeContents]} ButtonProps={{}} OtherButtons={[]} Sort={v_sort} Contents={ItemPlate()} />
+        <ListContainer Name="List of System User" Search={[v_search, e_search, changeContents]} Sort={[v_sort, e_sort, 1]} Filter={[v_filter, e_filter]} OtherButtons={[]}  Contents={ItemPlate()} />
 
     </AdminMainUI>
 }

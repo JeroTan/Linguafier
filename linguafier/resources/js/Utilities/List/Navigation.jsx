@@ -3,13 +3,14 @@ import { useContext } from "react"
 
 import Search from "../Search"
 import { G_Search } from "./ListContainer"
+import FilterBar from "./FilterBar"
 
 
 export default ()=>{
     //** STRUCTURE */
 
     //** Use Context */
-    const [ v_search, e_search, f_search, ButtonProps, OtherButtons, Name ] = useContext(G_Search);
+    const [ v_search, e_search, f_search, Filter, OtherButtons, Name ] = useContext(G_Search);
 
     /*
     ButtonsProps
@@ -24,6 +25,9 @@ export default ()=>{
         <div className='flex sm:flex-nowrap flex-wrap gap-2 items-center mb-5'>
             <div className='p-2 border-l-2 border-b-2 border-r-2 rounded-b border-black font-semibold text-my-green shrink-0 sm:w-auto w-full break-keep'>{Name}</div>
             <div className='flex flex-wrap justify-end gap-2 w-full shrink'>
+                {
+                    Filter ? <FilterBar Filter={Filter} /> : ""
+                }
                 <Search Handle={[v_search, e_search]} Click={f_search}  />
                 {OtherButtons.map(x=>x)}
             </div>

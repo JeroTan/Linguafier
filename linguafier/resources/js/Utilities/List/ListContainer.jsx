@@ -36,12 +36,12 @@ export default (Option)=>{
 
     //<Navigation />
     return <main>
-        <G_Search.Provider value={[Search[0], Search[1], Search[2], ButtonProps, OtherButtons, Name]}>
+        <G_Search.Provider value={[Search[0], Search[1], Search[2], Filter, OtherButtons, Name]}>
             <Navigation />
         </G_Search.Provider>
         {
             Sort ? <div className="my-2">
-                <SortBar />
+                <SortBar Sort={Sort} />
             </div> : ""
         }
         <div className="my-2 md:pl-5 sm:pl-2 pl-0 flex flex-wrap gap-2">

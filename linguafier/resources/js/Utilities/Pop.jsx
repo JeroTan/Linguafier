@@ -8,8 +8,9 @@ import Button from './Button';
 
 export default function Pop(Option){
     //** STRUCT */
+    let BlankPlate = Option.BlankPlate ?? false;
     let Pick = Option.Pick ?? 0;
-    let Content = Option.Content;
+    let Content = Option.Content ?? {};
     Content = Content[Pick] ?? {};
     let Title = (Content.Title ?? Option.Title) ?? "";
     let Message = (Content.Message ?? Option.Message) ?? "";
@@ -76,17 +77,21 @@ export default function Pop(Option){
                 </div>
             </div>
             {
-                popIcon ?
-                <div className="flex justify-center">
-                    <div>
-                        <Icon InClass={`fill-${s_Color}`} OutClass="w-32 h-32 " Name={popIcon} />
+                BlankPlate ? BlankPlate : <>
+                {
+                    popIcon ?
+                    <div className="flex justify-center">
+                        <div>
+                            <Icon InClass={`fill-${s_Color}`} OutClass="w-32 h-32 " Name={popIcon} />
+                        </div>
                     </div>
-                </div>
-                : ''
+                    : ''
+                }
+                <h2 className={`text-4xl text-center text-${s_Color}`}>{Title} </h2>
+                <p className="mb-10 text-center">{Message}</p>
+                </>
             }
 
-            <h2 className={`text-4xl text-center text-${s_Color}`}>{Title} </h2>
-            <p className="mb-10 text-center">{Message}</p>
             <div className="flex flex-wrap md:gap-4 gap-2 justify-center">
             {
                 popButton ?

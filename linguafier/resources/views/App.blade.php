@@ -6,6 +6,7 @@
     <meta name="description" content="Website for Wizard who have learned how to utter a Language.">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/icon" href="{{ asset('favicon.ico') }}" />
     @inertiaHead {{--  IMPORTANTE TO SA INTERTIA REACT AT WALA TO SA DOCUMENTATION NILA KAYA MAARING PAKILAGAY PAG GAGAWA KA ULET NG BAGO PLEASE--}}
     @viteReactRefresh
     @vite('resources/css/app.css')

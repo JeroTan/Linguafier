@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\SpecialAccount;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use PHPUnit\Event\Code\Throwable;
 
 class SpecialUser extends Controller
 {
@@ -16,6 +18,7 @@ class SpecialUser extends Controller
             'pageUser'=>'Special',
             'adminPage'=>"User",
             'data'=>$this->getContents(),
+            'roles'=>Role::all(),
         ]);
     }
     public function add_UI(Request $request, $id){
@@ -39,7 +42,44 @@ class SpecialUser extends Controller
 
     // POST
     public function changeContents(Request $request){
+        //Verify Data
+        //Search
+        $request->validate([
+            'v_search' => 'nullable|max:256',
+            'v_sort' => 'required',
+        ], [
+            'v_search.max'=>'Search Limit Reached My Friend.'
+        ]);
+        //Filter | Range | Checklist | Radio | Text
 
+
+        //Sort
+        $sortKey = ['username', 'rolename', 'created_time', 'modified_time'];
+        $sortKeyVerify = [];
+        $sortKeyRule = [];
+        $sortVerify = [];
+        $sortRule = [];
+        try{
+            foreach($request->v_sort as $key => $val){
+                $sortKeyVerify["sortKey".$key] = $val['Ref'];
+                $sortKeyVerify["sortKey".$key] = 'required|in:'.implode(',', $sortKey);
+                $sortVerify[$val['Ref']] = $val['Sort'];
+                $sortRule[$val['Ref']] = 'required|in:ASC,DESC';
+            };
+        }catch(Throwable $e){
+            return redirect()->back()->withErrors($e);
+        }
+        $sortKeyValidate = Validator::make($sortKeyVerify, $sortKeyRule );
+        if($sortKeyValidate->fails()){
+            return redirect()->back()->withErrors($sortKeyValidate);
+        }
+        $sortValidate = Validator::make($sortVerify, $sortRule );
+        if($sortValidate->fails()){
+            return redirect()->back()->withErrors($sortValidate);
+        }
+
+
+        return redirect()->back()->with(['v_search'=>$request->v_search, 'v_sort'=>$request->v_sort]);
     }
     public function add_submit(Request $request){
 
@@ -70,7 +110,14 @@ class SpecialUser extends Controller
 
         //Filters
 
+
         //Sort
+        if(session('v_sort')){
+            foreach(session('v_sort') as $key => $val){
+                $data = $data->orderBy($val['Ref'], $val['Sort']);
+            }
+        }
+
 
         // GET
         $data = $data->paginate(15)->onEachSide(2);
