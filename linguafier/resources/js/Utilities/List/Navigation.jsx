@@ -22,9 +22,9 @@ export default ()=>{
     return <>
         {/* List Navigation*/}
         <div className='w-full bg-slate-800 h-1 mt-10'></div>
-        <div className='flex sm:flex-nowrap flex-wrap gap-2 items-center mb-5'>
+        <div className='flex sm:flex-nowrap flex-wrap gap-2 items-start mb-5'>
             <div className='p-2 border-l-2 border-b-2 border-r-2 rounded-b border-black font-semibold text-my-green shrink-0 sm:w-auto w-full break-keep'>{Name}</div>
-            <div className='flex flex-wrap justify-end gap-2 w-full shrink'>
+            <div className='mt-1 flex sm:flex-nowrap flex-wrap justify-end gap-2 w-full shrink'>
                 {
                     Filter ? <FilterBar Filter={Filter} /> : ""
                 }

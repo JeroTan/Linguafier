@@ -205,7 +205,7 @@ class Roles extends Controller
         //Search
         if(session('v_search') ){
             $data = $data->where( function($query){
-                $query->where('name', 'LIKE', '%' . session('v_search') . '%');
+                $query->orwhere('name', 'LIKE', '%' . session('v_search') . '%');
             });
         }
 

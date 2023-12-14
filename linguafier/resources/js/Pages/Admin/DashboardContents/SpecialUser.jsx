@@ -12,7 +12,7 @@ export default ()=>{
 
     //** Use Page */
     const { data, specialAccount, roles } = usePage().props;
-
+    let rolesData = roles.map((x)=>({Name:x.name, Ref:x.id, Value:false}));
 
     //** Use State */
     const [ v_search, e_search] = useState("");
@@ -22,15 +22,7 @@ export default ()=>{
         {Name:"Created", Ref:"created_time", Sort:"ASC"},
         {Name:"Modified", Ref:"modified_time", Sort:"ASC"},
     ]);
-    const [ v_filter, e_filter] = useState([]);
-    const [ v_popSwitch, e_popSwitch] = useState(false);
-    const [ v_popPick, e_popPick]= useState("WarningDelete");
-    const [ v_selectId, e_selectId] = useState("");
-
-    //** Use Effect */
-    useEffect(()=>{
-        let rolesData = roles.map((x)=>({Name:x.name, Ref:x.id, Value:false}));
-        e_filter([
+    const [ v_filter, e_filter] = useState([
         {
             Ref:"rolename",
             Alias:"Roles",
@@ -40,23 +32,30 @@ export default ()=>{
         {
             Ref:"created_time",
             Alias:"Created Date",
-            Type:"range",
-            Data:{Min:false,Max:true,}
+            Type:"range_date",
+            Data:{Min:false,Max:false,Limit:[0, 1000]}
         },
         {
             Ref:"modified_time",
             Alias:"Modified Date",
             Type:"range_date",
-            Data:{Min:false,Max:true,}
+            Data:{Min:false,Max:false,}
         },
-        ]);
-    }, [roles]);
+    ]);
+    const [ v_popSwitch, e_popSwitch] = useState(false);
+    const [ v_popPick, e_popPick]= useState("WarningDelete");
+    const [ v_selectId, e_selectId] = useState("");
+
+    //** Use Effect */
     useEffect(()=>{
         const debouncer = setTimeout(()=>{
             changeContents();
         }, 500);
         return ()=>clearTimeout(debouncer);
     }, [v_search]);
+    useEffect(()=>{
+        changeContents();
+    }, [v_sort, v_filter]);
 
     //** Functionality */
     function changeContents(){//Request of contents

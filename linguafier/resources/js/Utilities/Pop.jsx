@@ -42,7 +42,7 @@ export default function Pop(Option){
     let popTypePick = popTypeList[ (Content.Type ?? Option.Type ) ?? 'none'];
     let popIcon = (Content.Icon ?? Option.Icon) ?? popTypePick.icon;
     let s_Color = (Content.Color ?? Option.Color) ?? popTypePick.color;
-    let s_Width = Option.Width ?? "34rem";
+    let s_Width = (Content.Width ?? Option.Width) ?? "34rem";
 
 
     //** Use Ref */
