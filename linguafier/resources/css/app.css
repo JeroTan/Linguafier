@@ -20,17 +20,30 @@ body::-webkit-scrollbar-thumb { /* The slider */
     @apply bg-my-light rounded-sm outline outline-1 outline-black shadow-myBox3;
 }
 
-custom_scroll::-webkit-scrollbar-track{
+.custom_scroll::-webkit-scrollbar-track{
     padding: 2px 0;
     @apply bg-my-green;
 }
-custom_scroll::-webkit-scrollbar {
+.custom_scroll::-webkit-scrollbar {
     border-radius: 10px;
     width: 10px;
 }
 
-custom_scroll::-webkit-scrollbar-thumb {
+.custom_scroll::-webkit-scrollbar-thumb {
     @apply bg-my-light rounded-sm outline outline-1 outline-black shadow-myBox3;
+}
+
+.custom_scroll_2::-webkit-scrollbar-track{
+    padding: 2px 0;
+    @apply bg-zinc-100;
+}
+.custom_scroll_2::-webkit-scrollbar {
+    border-radius: 10px;
+    width: 5px;
+}
+
+.custom_scroll_2::-webkit-scrollbar-thumb {
+    @apply bg-my-green rounded-sm outline outline-1 outline-black shadow-myBox3;
 }
 
 

@@ -32,19 +32,18 @@ class SpecialUser extends Controller
             'roles'=>Role::all(),
         ]);
     }
-    public function add_UI(Request $request, $id){
-        $data = SpecialAccount::select('specialaccount.id', 'specialaccount.username', 'specialaccount.created_time', 'specialaccount.modified_time', 'role.name AS rolename', 'role.privilege AS privilege')->join('role', 'specialaccount.role_id', '=', 'role.id')->whereNot('specialaccount.role_id', '1')->where('specialaccount.id', $id);
+    public function add_UI(Request $request){
 
-        return Inertia::render('Admin/DashboardContents/SpecialUser/add', [
+        return Inertia::render('Admin/DashboardContents/SpecialUser/Add', [
             'pageUser'=>'Special',
             'adminPage'=>"User",
-            'data'=>$data,
+            'roles'=>Role::all(),
         ]);
     }
     public function modify_UI(Request $request, $id){
-        $data = SpecialAccount::select('specialaccount.id', 'specialaccount.username', 'specialaccount.created_time', 'specialaccount.modified_time', 'role.name AS rolename', 'role.privilege AS privilege')->join('role', 'specialaccount.role_id', '=', 'role.id')->whereNot('specialaccount.role_id', '1')->where('specialaccount.id', $id);
+        $data = $this->getAccount($id);
 
-        return Inertia::render('Admin/DashboardContents/SpecialUser/modify', [
+        return Inertia::render('Admin/DashboardContents/SpecialUser/Modify', [
             'pageUser'=>'Special',
             'adminPage'=>"User",
             'data'=>$data,
@@ -190,6 +189,10 @@ class SpecialUser extends Controller
         // GET
         $data = $data->paginate(15)->onEachSide(2);
 
+        return $data;
+    }
+    public function getAccount($id){
+        $data = SpecialAccount::select('specialaccount.id', 'specialaccount.username', 'specialaccount.created_time', 'specialaccount.modified_time', 'role.name AS rolename', 'role.privilege AS privilege')->join('role', 'specialaccount.role_id', '=', 'role.id')->whereNot('specialaccount.role_id', '1')->where('specialaccount.id', $id);
         return $data;
     }
 
