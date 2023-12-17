@@ -21,7 +21,7 @@ class SpecialUser extends Controller
             $roles[$key] = $val->name;
         }
 
-        return [ ['rolename', "checklist", $roles], ['created_time', "range_date",], ['modified_time',"range_date"],];
+        return [ ['role.name', "checklist", $roles], ['created_time', "range_date",], ['modified_time',"range_date"],];
     }
 
     // GET
@@ -61,20 +61,23 @@ class SpecialUser extends Controller
         ], [
             'v_search.max'=>'Search Limit Reached My Friend.'
         ]);
+
         //Filter | Range | Checklist | Radio | Text
         $toFilter = [];
         try{
             foreach($this->filter() as $key => $val){
                 $Data = $request->v_filter[$key]['Data'];
                 $toFilter[$key] = [$val[0], $val[1], []];
+
                 if($val[1] == "radio"){
                     $toFilter[$key][2] = $Data["Selected"];
                 }elseif($val[1] == "checklist"){
-                    foreach($val[2] as $key => $val2){
-                        if($Data[$key]["Value"] == true){
-                            $toFilter[$key][2][ count($toFilter[$key][2]) ] = $val2;
+                    foreach($val[2] as $key2 => $val2){
+                        if($Data[$key2]["Value"] == true){
+                            array_push($toFilter[$key][2], $val2);
                         }
                     }
+
                 }elseif($val[1] == "range"){
                     if(!$Data['Min']){
                         $Data['Min']="0";
@@ -115,6 +118,7 @@ class SpecialUser extends Controller
             return redirect()->back()->withErrors($e);
         }
 
+
         //Sort
         $sortKeyVerify = [];
         $sortKeyRule = [];
@@ -150,23 +154,9 @@ class SpecialUser extends Controller
         return redirect()->back()->with("v_search", $request->v_search);
     }
     public function add_submit(Request $request){
+        ///// VERIFY THAT THE DATA IS NOT OWNER ROLE
         //Verify Data
-        $request->validate([
-            'v_username' => 'required|regex:/^[a-zA-Z0-9\,\.\s]*$/|max:32|unique:specialaccount,username',
-            'v_role' => 'required|regex:/^[a-zA-Z0-9\,\.\s]*$/|max:32|exists:role,name',
-            'v_password' => 'required|max:128',
-        ], [
-            'v_username.required'=>'Name of the account is required.',
-            'v_username.regex'=>'Name of the account must contain only letters and number.',
-            'v_username.max'=>"Name of the account character limit reached. The maximum is 32 characters.",
-            'v_username.unique'=>"Name of the account is already existed in the system.",
-            'v_role.required'=>'Please indicate the role of this user.',
-            'v_role.regex'=>'Role contains foreign symbols thus it is not existed in our magic system.',
-            'v_role.max'=>"Role seems exceed the maximum character limit thus it is not existed in our magic system.",
-            'v_role.in'=>"Role does not exist in our magic system.",
-            'v_password.required'=>'Please provide passsword for this user.',
-            'v_password.max'=>'The maximum password character limit is 128. Please reduce the total character amount.',
-        ]);
+        $request->validate(...$this->quickValidate());
 
         //Compile Data
 
@@ -213,6 +203,7 @@ class SpecialUser extends Controller
             });
         }
 
+
         //Filters
         if(session('v_filter') ){
             foreach(session('v_filter') as $key=>$val){
@@ -244,6 +235,8 @@ class SpecialUser extends Controller
     }
     public function getRoles(){
         $data = Role::select('name');
+        //Requirement
+        $data = $data->whereNot('id', 1);
 
         //Search
         if( session('v_search') ){
@@ -252,6 +245,23 @@ class SpecialUser extends Controller
             });
         }
         return $data->get();
+    }
+    protected function quickValidate($type = "add"){
+        $rules = [ 'v_username' => 'required|regex:/^[a-zA-Z0-9\,\.\s]*$/|max:32|unique:specialaccount,username',
+        'v_role' => 'required|regex:/^[a-zA-Z0-9\,\.\s]*$/|max:32|exists:role,name|not_in:'.Role::find(1)->name,
+        'v_password' => 'required|max:128',];
+        $message = ['v_username.required'=>'Name of the account is required.',
+        'v_username.regex'=>'Name of the account must contain only letters and number.',
+        'v_username.max'=>"Name of the account character limit reached. The maximum is 32 characters.",
+        'v_username.unique'=>"Name of the account is already existed in the system.",
+        'v_role.required'=>'Please indicate the role of this user.',
+        'v_role.regex'=>'Role contains foreign symbols thus it is not existed in our magic system.',
+        'v_role.max'=>"Role seems exceed the maximum character limit thus it is not existed in our magic system.",
+        'v_role.exists'=>"Role does not exist in our magic system.",
+        'v_role.not_in'=>"Role does not exist in our magic system.",
+        'v_password.required'=>'Please provide passsword for this user.',
+        'v_password.max'=>'The maximum password character limit is 128. Please reduce the total character amount.',];
+        return [$rules, $message];
     }
 
 }

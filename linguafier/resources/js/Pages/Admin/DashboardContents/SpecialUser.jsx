@@ -24,7 +24,7 @@ export default ()=>{
     ]);
     const [ v_filter, e_filter] = useState([
         {
-            Ref:"rolename",
+            Ref:"role.name",
             Alias:"Roles",
             Type:"checklist",
             Data:rolesData,
@@ -84,15 +84,17 @@ export default ()=>{
                     <small><span className='text-orange-500'>Modified:</span> {x.modified_time}</small>
                 </div>
                 <div className='flex flex-wrap pb-1 pr-1 flex-col gap-2'>
-                    <Button Icon="edit" Size="w-fit h-fit" Padding="px-2 py-1" Click={()=>{
-                        router.get('/admin/dashboard/special_user/modify/'+x.id);
-                    }} />
-                    { x.id != 1 ?
+                    { x.id != 1 ? <>
+                        <Button Icon="edit" Size="w-fit h-fit" Padding="px-2 py-1" Click={()=>{
+                            router.get('/admin/dashboard/special_user/modify/'+x.id);
+                        }} />
                         <Button Icon="delete" Size="w-fit h-fit" Padding="px-2 py-1" Click={()=>{
                             e_popSwitch(true);
                             e_popPick('WarningDelete');
                             e_selectId(x.id);
                         }} />
+                    </>
+
                     : "" }
                 </div>
             </div>
