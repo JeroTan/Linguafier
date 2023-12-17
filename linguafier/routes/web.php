@@ -41,13 +41,14 @@ Route::prefix('/admin')->group(function(){
     Route::post('/loginVerified', [AdminLogin::class, 'LoginVerified'])->middleware('SpecAccLog:off')->name('admin.login_verified');
 
 
-    Route::prefix('/dashboard')->group(function(){
+    Route::prefix('/dashboard')->middleware('SpecAccLog:on')->group(function(){
         Route::get('/', AdminDashboard::class)->name('admin.dashboard');
 
         Route::prefix('/special_user')->group(function(){
             Route::get('/', SpecialUser::class)->name('admin.special_user');
             Route::post('/changeContents', [SpecialUser::class, "changeContents"]);
             Route::get('/add', [SpecialUser::class, "add_ui"]);
+            Route::post('add_roleSearch', [SpecialUser::class, "add_roleSearch"]);
             Route::post('/add_submit', [SpecialUser::class, 'add_submit']);
             Route::get('/modify/{id}', [SpecialUser::class, 'modify_ui']);
             Route::post('/modify_submit', [SpecialUser::class, 'modify_submit']);
@@ -81,7 +82,7 @@ Route::prefix('/admin')->group(function(){
             Route::post('/delete/{id}', [Roles::class, 'delete'])->name('admin.roles.delete');
         });
 
-    })->middleware('SpecAccLog:on');
+    });
 
 
 

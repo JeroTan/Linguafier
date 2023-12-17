@@ -32,7 +32,5 @@ export default()=>{
             <Button  Icon={`back`} Click={()=>{router.get('/admin/dashboard/special_user')}}/>
         </div>
 
-
-
     </AdminMainUI>
 }

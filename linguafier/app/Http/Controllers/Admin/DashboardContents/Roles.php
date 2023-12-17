@@ -51,7 +51,7 @@ class Roles extends Controller
     public function create(Request $request){ // Verify and add if verified
         //Verify Data
         $request->validate([
-            'v_name' => 'required|regex:/^[a-zA-Z0-9\,\.\s]*$/|max:32',
+            'v_name' => 'required|regex:/^[a-zA-Z0-9\,\.\s]*$/|max:32|unique:role,name',
             'v_mSpecialUser' => 'boolean',
             'v_mWizard' => 'boolean',
             'v_mWizardRank' => 'boolean',
@@ -62,6 +62,7 @@ class Roles extends Controller
             'v_name.required'=>'Name of the role is required.',
             'v_name.regex'=>'Name of the role must contain only letters and number.',
             'v_name.max'=>"Name of the role character limit reached. The maximum is 32 characters.",
+            'v_name.unique'=>"Name of the role is already existed in the system.",
             'v_mSpecialUser.boolean'=>'Privileges must be true or false only',
             'v_mWizard.boolean'=>'Privileges must be true or false only',
             'v_mWizardRank.boolean'=>'Privileges must be true or false only',

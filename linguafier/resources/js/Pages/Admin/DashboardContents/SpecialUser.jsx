@@ -68,10 +68,12 @@ export default ()=>{
             let x = pageData[i];
             plate[i] = <Fragment>
             <div className='w-full flex sm:flex-nowrap flex-wrap'>
-                <div className='sm:w-64 w-full shrink-0 grow flex items-center gap-1'>
-                    <h3 className='text-xl text-my-green font-bold'>{x.username}</h3>
-                    { x.id == 1 ? <Icon Name="crown" OutClass="w-5 h-5" InClass="fill-my-green"/> : "" }
-                    { x.id == specialAccount.id ? <small className='italic'>You</small> : ""}
+                <div className='sm:w-64 w-full shrink-0 grow'>
+                    <div className='flex items-center gap-1'>
+                        <h3 className='text-xl text-my-green font-bold'>{x.username}</h3>
+                        { x.id == 1 ? <Icon Name="crown" OutClass="w-5 h-5" InClass="fill-my-green"/> : "" }
+                        { x.id == specialAccount.id ? <small className='italic'>You</small> : ""}
+                    </div>
                 </div>
                 <div className='w-full shrink flex flex-wrap gap-1'>
                     <small className='rounded w-2 h-2 mt-2 bg-green-400'></small>

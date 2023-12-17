@@ -16,7 +16,7 @@ import { useState } from "react"
 
 export default()=>{
     //** Use Page */
-    const { errors, roleSearch } = usePage().props;
+    const { errors, roles } = usePage().props;
 
     //**>> Use State */
     const [v_username, e_username] = useState("");
@@ -53,18 +53,15 @@ export default()=>{
 
             <div className="flex flex-col gap-1">
                 <label className="">Roles: </label>
-                {/** ADD ANOTHER COMPONENT FOR This kind of thing */}
-                <TextboxDropDown Handle={[v_role, e_role]} Size="sm:ml-3 w-96" Placeholder="Pick Role. . ." Error={errors.v_role} />
+                <TextboxDropDown Handle={[v_role, e_role]} Size="sm:ml-3 w-96" Placeholder="Pick Role. . ." Error={errors.v_role} DropData={roles} Request={`/admin/dashboard/special_user/add_roleSearch`} SelectSkip={true}  />
             </div>
-
-
 
             <div className="mt-5 flex flex-wrap sm:gap-5 gap-2">
                 <Button Name="Create Account" Click={()=>{
                     router.post('/admin/dashboard/special_user/add_submit', {
                         v_username:v_username,
                         v_password:v_password,
-                        v_role_id:v_role_id,
+                        v_role:v_role,
                     }, {
                         onFinish:()=>{
                             e_popLoading(false);
@@ -75,7 +72,7 @@ export default()=>{
                 <Button Name="Reset" Click={()=>{
                     e_username("");
                     e_password("");
-                    e_role_id("");
+                    e_role("");
                 }}/>
             </div>
         </form>
@@ -83,7 +80,7 @@ export default()=>{
         {/* POP */}
         <PopLoading Switch={[v_popLoading, e_popLoading]} />
         <PopFlash Switch={[v_popFlash, e_popFlash]} Button={{0:[
-            {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/roles'), Color:'bg-my-green'  },
+            {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/special_user'), Color:'bg-my-green'  },
             {'Name': "Add Again!", "Func":"close", Color:'bg-slate-400'  },
         ]}} />
 

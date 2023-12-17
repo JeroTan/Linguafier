@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\SpecialAccount;
+use HelpMoKo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use PHPUnit\Event\Code\Throwable;
@@ -37,7 +38,7 @@ class SpecialUser extends Controller
         return Inertia::render('Admin/DashboardContents/SpecialUser/Add', [
             'pageUser'=>'Special',
             'adminPage'=>"User",
-            'roles'=>Role::all(),
+            'roles'=>$this->getRoles(),
         ]);
     }
     public function modify_UI(Request $request, $id){
@@ -139,7 +140,53 @@ class SpecialUser extends Controller
         }
         return redirect()->back()->with(['v_search'=>$request->v_search, 'v_sort'=>$request->v_sort, 'v_filter'=>$toFilter]);
     }
+    public function add_roleSearch(Request $request){
+        //Search
+        $request->validate([
+            'v_search' => 'nullable|max:256',
+        ], [
+            'v_search.max'=>'Search Limit Reached My Friend.'
+        ]);
+        return redirect()->back()->with("v_search", $request->v_search);
+    }
     public function add_submit(Request $request){
+        //Verify Data
+        $request->validate([
+            'v_username' => 'required|regex:/^[a-zA-Z0-9\,\.\s]*$/|max:32|unique:specialaccount,username',
+            'v_role' => 'required|regex:/^[a-zA-Z0-9\,\.\s]*$/|max:32|exists:role,name',
+            'v_password' => 'required|max:128',
+        ], [
+            'v_username.required'=>'Name of the account is required.',
+            'v_username.regex'=>'Name of the account must contain only letters and number.',
+            'v_username.max'=>"Name of the account character limit reached. The maximum is 32 characters.",
+            'v_username.unique'=>"Name of the account is already existed in the system.",
+            'v_role.required'=>'Please indicate the role of this user.',
+            'v_role.regex'=>'Role contains foreign symbols thus it is not existed in our magic system.',
+            'v_role.max'=>"Role seems exceed the maximum character limit thus it is not existed in our magic system.",
+            'v_role.in'=>"Role does not exist in our magic system.",
+            'v_password.required'=>'Please provide passsword for this user.',
+            'v_password.max'=>'The maximum password character limit is 128. Please reduce the total character amount.',
+        ]);
+
+        //Compile Data
+
+
+        //Create New Role
+        $newAccount = new SpecialAccount;
+        $newAccount->id = HelpMoKo::generateID('OnlyMeChanics', 8);
+        $newAccount->username = $request->v_username;
+        $newAccount->password = $request->v_password;
+        $roleId = Role::select('id')->where('name', $request->v_role)->first()->id;
+        $newAccount->role_id = $roleId;
+        $newAccount->modified_time = now();
+        $newAccount->save();
+
+        //Return Success
+        return redirect()->back()->with( 'popFlash', [
+            'Type'=>'success',
+            'Title'=>'Created Successfully',
+            'Message'=>"A new account name \"".$newAccount->username."\" was added to the magic system.",
+        ]);
 
     }
     public function modify_submit(Request $request){
@@ -194,6 +241,17 @@ class SpecialUser extends Controller
     public function getAccount($id){
         $data = SpecialAccount::select('specialaccount.id', 'specialaccount.username', 'specialaccount.created_time', 'specialaccount.modified_time', 'role.name AS rolename', 'role.privilege AS privilege')->join('role', 'specialaccount.role_id', '=', 'role.id')->whereNot('specialaccount.role_id', '1')->where('specialaccount.id', $id);
         return $data;
+    }
+    public function getRoles(){
+        $data = Role::select('name');
+
+        //Search
+        if( session('v_search') ){
+            $data = $data->where( function($query){
+                $query->orwhereRaw("LOWER(name) LIKE '%". addslashes(strtolower(session('v_search')))."%'");
+            });
+        }
+        return $data->get();
     }
 
 }

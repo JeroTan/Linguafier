@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { router } from "@inertiajs/react";
 
 export default function TextboxDropDown(Option){
     //
@@ -12,38 +13,82 @@ export default function TextboxDropDown(Option){
     let stateColor = 'black'
     let errorBag = Option.Error ?? '';
     let pressFunc = Option.PressFunc ?? (()=>true);
+    let dropTouch = Option.DropTouch ?? true;
+    let selectSkip = Option.SelectSkip ?? false;
+    let dropData = Option.DropData ?? false;
+    let siteVisit = Option.Request ?? "#";
+    let siteData = Option.RequestKey ?? "v_search";
 
     //*** USE STATE */
-    const [c_openBox, s_openBox] = useState(true);
+    const [c_textBox, s_textBox] = useState(undefined);
+    const [c_dropBox, s_dropBox] = useState(false);
+
+    //*** USE REF */
+    const textField = useRef();
+    const dropField = useRef();
+
+    //** USE EFFECT */
+    useEffect(()=>{
+
+    }, [c_textBox])
 
 
     //** Functionality */
     function changeState(event){
         handler[1](event.target.value);
+        s_dropBox(true);
+        let siteDataContainer = {};
+        siteDataContainer[siteData] = event.target.value;
+        router.post(siteVisit, siteDataContainer);
     }
     if(errorBag){
         stateColor = 'red-400';
     }else{
         stateColor = 'black';
     }
+    function selectDropDown(data){
+        handler[1](data);
+        s_dropBox(false);
+        s_textBox(false);
+    }
 
     return <>
-    <div className="relative">
+    <div className="relative"
+        onFocus={()=>{
+            s_textBox(true);
+            if(dropTouch)
+                s_dropBox(true);
+        }}
+        onBlur={(event)=>{
+            if(event.currentTarget.contains(event.relatedTarget)){
+                return true;
+            }
+            if(selectSkip == true && dropData.length > 0){
+                handler[1](dropData[0].name);
+            }
+            s_textBox(false);
+            s_dropBox(false);
+        }}
+        >
 
         <input
+            ref={textField}
             type={type}
-            className={`${padding} ${size} rounded outline outline-1 outline-${stateColor} outline-offset-0 shadow-myBox3 shadow-${stateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${stateColor}/80  placeholder:font-light ${bgcolor} max-w-full shrink ${c_openBox ? "cursor-pointer hover:outline-4 bg-gray-300" :""}`}
+            className={`${padding} ${size} rounded outline outline-1 outline-${stateColor} outline-offset-0 shadow-myBox3 shadow-${stateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${stateColor}/80  placeholder:font-light ${bgcolor} max-w-full shrink ${c_textBox ? "" :"cursor-pointer hover:outline-4 bg-gray-300"}`}
             onChange={changeState}
-            onKeyDown={pressFunc}
+            onKeyDown={(event)=>{
+                pressFunc(event);
+                if (event.key === 'Enter') {
+                    if(dropData.length > 0){
+                        handler[1](dropData[0].name);
+                    }
+                    s_textBox(false);
+                    s_dropBox(false);
+                }
+            }}
             placeholder={placeholder}
             value={handler[0]}
-            readOnly={c_openBox}
-            onFocus={()=>{
-                s_openBox(undefined);
-            }}
-            onBlur={()=>{
-                s_openBox(true);
-            }}
+            readOnly={!c_textBox}
         />
         {
             errorBag ?
@@ -52,35 +97,16 @@ export default function TextboxDropDown(Option){
             </div>
             : ''
         }
-        <div className="absolute top-[36px] rounded border border-slate-700 border-t-4 bg-my-light min-w-[25rem] max-h-96 overflow-y-auto custom_scroll_2 flex flex-col gap-2">
-            <div className=" p-2 cursor-pointer border-b-2 border-slate-500 hover:bg-slate-700 hover:text-white">
-            HELLO
-            </div>
-            <div className=" p-2 cursor-pointer border-b-2 border-slate-500 hover:bg-slate-700 hover:text-white">
-            HELLO
-            </div>
-            <div className=" p-2 cursor-pointer border-b-2 border-slate-500 hover:bg-slate-700 hover:text-white">
-            HELLO
-            </div>
-            <div className=" p-2 cursor-pointer border-b-2 border-slate-500 hover:bg-slate-700 hover:text-white">
-            HELLO
-            </div>
-            <div className=" p-2 cursor-pointer border-b-2 border-slate-500 hover:bg-slate-700 hover:text-white">
-            HELLO
-            </div>
-            <div className=" p-2 cursor-pointer border-b-2 border-slate-500 hover:bg-slate-700 hover:text-white">
-            HELLO
-            </div>
-            <div className=" p-2 cursor-pointer border-b-2 border-slate-500 hover:bg-slate-700 hover:text-white">
-            HELLO
-            </div>
-            <div className=" p-2 cursor-pointer border-b-2 border-slate-500 hover:bg-slate-700 hover:text-white">
-            HELLO
-            </div>
-            <div className=" p-2 cursor-pointer border-b-2 border-slate-500 hover:bg-slate-700 hover:text-white">
-            HELLO
-            </div>
-        </div>
+
+        { c_dropBox && dropData.length > 0 ? <div ref={dropField} tabIndex={0} className="absolute top-[36px] rounded border border-slate-700 border-t-4 bg-my-light min-w-[25rem] max-h-96 overflow-y-auto custom_scroll_2 flex flex-col gap-2" >
+            { dropData.map((x, i)=>{
+                return <div key={i} className=" p-2 cursor-pointer border-b-2 border-slate-500 hover:bg-slate-700 hover:text-white" onClick={()=>{selectDropDown(x.name)}}>
+                    {x.name}
+                </div>
+            }) }
+            </div> : ""
+        }
+
     </div>
 
 
