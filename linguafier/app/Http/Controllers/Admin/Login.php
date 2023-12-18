@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Controller;
 use App\Models\SpecialAccount;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class Login extends Controller
 {
@@ -28,8 +29,10 @@ class Login extends Controller
 
 
         //Verify Login Credentials
-        $userData = SpecialAccount::select('specialaccount.*', 'role.name AS rolename', 'role.privilege AS privilege')->join('role', 'specialaccount.role_id', '=', 'role.id')->where('password', $request->v_password)->where('username', $request->v_username)->first();
-        if(!$userData){
+        $userData = SpecialAccount::select('specialaccount.*', 'role.name AS rolename', 'role.privilege AS privilege')->join('role', 'specialaccount.role_id', '=', 'role.id')->where('username', $request->v_username)->first();
+        if(!empty($userData))
+            $passwordData = Hash::check($request->v_password, $userData->password);
+        if( !($userData && $passwordData) ){
             return redirect()->route('admin.login')->with( 'popFlash', ['Type'=>'error','Title'=>'Mismatch','Message'=>"Your Username and Password did not match in our library. Please cast your credentials again."] );
         }
 

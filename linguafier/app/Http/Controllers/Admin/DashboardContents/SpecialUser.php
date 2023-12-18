@@ -8,7 +8,9 @@ use App\Models\Role;
 use App\Models\SpecialAccount;
 use HelpMoKo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use PHPUnit\Event\Code\Throwable;
 
 class SpecialUser extends Controller
@@ -43,11 +45,11 @@ class SpecialUser extends Controller
     }
     public function modify_UI(Request $request, $id){
         $data = $this->getAccount($id);
-
         return Inertia::render('Admin/DashboardContents/SpecialUser/Modify', [
             'pageUser'=>'Special',
             'adminPage'=>"User",
             'data'=>$data,
+            'roles'=>$this->getRoles(),
         ]);
     }
 
@@ -165,7 +167,7 @@ class SpecialUser extends Controller
         $newAccount = new SpecialAccount;
         $newAccount->id = HelpMoKo::generateID('OnlyMeChanics', 8);
         $newAccount->username = $request->v_username;
-        $newAccount->password = $request->v_password;
+        $newAccount->password = Hash::make($request->v_password);
         $roleId = Role::select('id')->where('name', $request->v_role)->first()->id;
         $newAccount->role_id = $roleId;
         $newAccount->modified_time = now();
@@ -179,11 +181,48 @@ class SpecialUser extends Controller
         ]);
 
     }
-    public function modify_submit(Request $request){
+    public function modify_submit(Request $request, $id){
+        //Verify Data
+        $request->validate(...$this->quickValidate("modify"));
 
+        //Compile Data
+
+
+        //Modify Role
+        $account = SpecialAccount::find( $id );
+        $account->username = $request->v_username;
+        if($request->v_password){
+            $account->password = Hash::make($request->v_password);
+        }
+        $roleId = Role::select('id')->where('name', $request->v_role)->first()->id;
+        $account->role_id =  $roleId;
+        $account->modified_time = now();
+        $account->save();
+
+        //Return Success
+        return redirect()->back()->with( 'popFlash', [
+            'Type'=>'success',
+            'Title'=>'Modified Successfully',
+            'Message'=>"An account name \"".$account->username."\" was modified successfully.",
+        ]);
     }
-    public function delete(Request $request){
+    public function delete(Request $request, $id){
+        //Verify
+        $verifyID = Validator::make(['id'=> $id], ['id'=>'required|exists:specialaccount,id'] );
+        if($verifyID->fails()){
+            return redirect()->back()->withErrors($verifyID)->with('popFlash', ['Type'=>'error','Title'=>'ID not Found','Message'=>"Record does not exist in our magical index."]);
+        }
 
+        //Delete the Account
+        $account = SpecialAccount::find($id);
+        SpecialAccount::destroy($id);
+
+        //Return Success
+        return redirect('/admin/dashboard/special_user')->with( 'popFlash', [
+            'Type'=>'success',
+            'Title'=>'Deleted Successfully',
+            'Message'=>"An account name \"".$account->username."\" was removed from the magic system.",
+        ]);
     }
 
     // Functionality
@@ -222,6 +261,10 @@ class SpecialUser extends Controller
             foreach(session('v_sort') as $key => $val){
                 $data = $data->orderBy($val['Ref'], $val['Sort']);
             }
+        }else{
+            foreach($this->sortKey as $key => $val){
+                $data = $data->orderBy($val, 'ASC');
+            }
         }
 
         // GET
@@ -230,7 +273,11 @@ class SpecialUser extends Controller
         return $data;
     }
     public function getAccount($id){
-        $data = SpecialAccount::select('specialaccount.id', 'specialaccount.username', 'specialaccount.created_time', 'specialaccount.modified_time', 'role.name AS rolename', 'role.privilege AS privilege')->join('role', 'specialaccount.role_id', '=', 'role.id')->whereNot('specialaccount.role_id', '1')->where('specialaccount.id', $id);
+        $data = SpecialAccount::select('specialaccount.id', 'specialaccount.username', 'specialaccount.created_time', 'specialaccount.modified_time', 'role.name AS rolename', 'role.privilege AS privilege')
+        ->join('role', 'specialaccount.role_id', '=', 'role.id')
+        ->whereNot('specialaccount.role_id', '1')
+        ->where('specialaccount.id', $id)
+        ->first();
         return $data;
     }
     public function getRoles(){
@@ -247,9 +294,21 @@ class SpecialUser extends Controller
         return $data->get();
     }
     protected function quickValidate($type = "add"){
-        $rules = [ 'v_username' => 'required|regex:/^[a-zA-Z0-9\,\.\s]*$/|max:32|unique:specialaccount,username',
-        'v_role' => 'required|regex:/^[a-zA-Z0-9\,\.\s]*$/|max:32|exists:role,name|not_in:'.Role::find(1)->name,
-        'v_password' => 'required|max:128',];
+        $rules = [
+            'v_username' => [
+                'required',
+                'regex:/^[a-zA-Z0-9\,\.\s]*$/',
+                'max:32',
+            ],
+            'v_role' => 'required|regex:/^[a-zA-Z0-9\,\.\s]*$/|max:32|exists:role,name|not_in:'.Role::find(1)->name,
+            'v_password' => [
+                'max:128'
+            ],
+        ];
+        $ruleOption = Rule::unique('specialaccount', 'username');
+        array_push($rules['v_username'], $type == "add" ? $ruleOption : $ruleOption->ignore( request()->route('id') ) );
+        array_push($rules['v_password'], $type == "add" ? "required" : "nullable" );
+
         $message = ['v_username.required'=>'Name of the account is required.',
         'v_username.regex'=>'Name of the account must contain only letters and number.',
         'v_username.max'=>"Name of the account character limit reached. The maximum is 32 characters.",
@@ -261,6 +320,9 @@ class SpecialUser extends Controller
         'v_role.not_in'=>"Role does not exist in our magic system.",
         'v_password.required'=>'Please provide passsword for this user.',
         'v_password.max'=>'The maximum password character limit is 128. Please reduce the total character amount.',];
+        if($type == "add")
+            $message['v_role.required'] = 'Please indicate the role of this user.';
+
         return [$rules, $message];
     }
 

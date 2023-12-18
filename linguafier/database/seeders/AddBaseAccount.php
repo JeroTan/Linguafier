@@ -6,6 +6,7 @@ use App\Models\Role;
 use App\Models\SpecialAccount;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class AddBaseAccount extends Seeder
 {
@@ -26,7 +27,7 @@ class AddBaseAccount extends Seeder
             [
                 'id'=>'1',
                 'username'=>'admin',
-                'password'=>'admin',
+                'password'=>Hash::make('admin'),
                 'role_id'=>'1',
                 'modified_time' => now(),
             ]

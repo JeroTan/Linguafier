@@ -3,12 +3,42 @@ import Icon from '../../../Utilities/Icon';
 import ListContainer from '../../../Utilities/List/ListContainer';
 import Button from '../../../Utilities/Button';
 import AdminMainUI from '../Utilities/AdminMainUI';
+import PopFlash from '../../../Utilities/PopFlash';
+import Pop from '../../../Utilities/Pop';
+import PopLoading from '../../../Utilities/PopLoading';
 
 // HOOKS
 import { Fragment, useEffect, useState } from 'react';
 import { usePage, router } from '@inertiajs/react';
 
 export default ()=>{
+    //** STRUCT */
+    const popContent = {
+        WarningDelete:{
+            Title: "Delete Warning",
+            Message: "Do you really want to delete this account? Are you sure?",
+            Type: "warning",
+            Button: [
+                {'Name': "Yes", "Func":()=>{e_popPick('ConfirmDelete');}, Color:'bg-red-500'  },
+                {'Name': "No! Of course not", "Func":"close", Color:'bg-slate-500'  },
+            ],
+        },
+        ConfirmDelete:{
+            Title: "Delete Confirmation",
+            Message: "Click Yes to proceed?",
+            Type: "notice",
+            Button: [
+                {'Name': "YES!", "Func":()=>{
+                    router.post('/admin/dashboard/special_user/delete/'+v_selectId,{},{
+                        onFinish:()=>e_popLoading(false)
+                    });
+                    e_popLoading(true);
+                    e_popSwitch(false);
+                }, Color:'bg-red-500'  },
+                {'Name': "I've Changed my mind", "Func":"close", Color:'bg-slate-500'  },
+            ]
+        },
+    }
 
     //** Use Page */
     const { data, specialAccount, roles } = usePage().props;
@@ -44,6 +74,7 @@ export default ()=>{
     ]);
     const [ v_popSwitch, e_popSwitch] = useState(false);
     const [ v_popPick, e_popPick]= useState("WarningDelete");
+    const [ v_popLoading, e_popLoading] = useState(false);
     const [ v_selectId, e_selectId] = useState("");
 
     //** Use Effect */
@@ -84,7 +115,7 @@ export default ()=>{
                     <small><span className='text-orange-500'>Modified:</span> {x.modified_time}</small>
                 </div>
                 <div className='flex flex-wrap pb-1 pr-1 flex-col gap-2'>
-                    { x.id != 1 ? <>
+                    { !(x.id == 1 || x.id == specialAccount.id)  ? <>
                         <Button Icon="edit" Size="w-fit h-fit" Padding="px-2 py-1" Click={()=>{
                             router.get('/admin/dashboard/special_user/modify/'+x.id);
                         }} />
@@ -110,7 +141,14 @@ export default ()=>{
         </div>
 
         {/* List Contents*/}
-        <ListContainer Name="List of System User" Search={[v_search, e_search, changeContents]} Sort={[v_sort, e_sort, 1]} Filter={[v_filter, e_filter]} OtherButtons={[]}  Contents={ItemPlate()} />
+        <ListContainer Name="List of System User" Search={[v_search, e_search, changeContents]} Sort={[v_sort, e_sort]} Filter={[v_filter, e_filter]} OtherButtons={[]}  Contents={ItemPlate()} />
+
+        {/* Pop */}
+        <Pop Switch={[v_popSwitch, e_popSwitch]} Content={popContent} Pick={v_popPick} />
+        <PopFlash Button={{0:[
+            {'Name': "Got it", "Func":"close", Color:'bg-slate-400' },
+        ]}} />
+        <PopLoading Switch={[v_popLoading, e_popLoading]} />
 
     </AdminMainUI>
 }

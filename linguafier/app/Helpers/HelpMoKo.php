@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Hash;
 
 class HelpMoKo{
     public static function generateID($moreSalt = '', $idLength = 6, $extended = false){
