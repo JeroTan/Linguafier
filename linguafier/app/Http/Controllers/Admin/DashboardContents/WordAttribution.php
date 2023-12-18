@@ -4,17 +4,29 @@ namespace App\Http\Controllers\Admin\DashboardContents;
 
 use Inertia\Inertia;
 use App\Http\Controllers\Controller;
+use App\Models\Attribute;
+use App\Models\Language;
+use App\Models\Rarity;
+use App\Models\Variation;
+use HelpMoKo;
 use Illuminate\Http\Request;
 
 class WordAttribution extends Controller
 {
     // STRUCT
+    protected function sortKey(){
+        return match( session("v_pageSwitch") ){
+            "Rarity"=>['name', 'level'],
+            default=>['name'],
+        };
+    }
 
     // GET
     public function __invoke(Request $request){
         return Inertia::render('Admin/DashboardContents/WordAttribution', [
             'pageUser'=>'Special',
             'adminPage'=>"Attribute",
+            'data'=> $this->getContents(),
         ]);
     }
     public function changeContent(Request $request){
@@ -109,6 +121,45 @@ class WordAttribution extends Controller
 
     // Functionality
     protected function getContents(){
-        return [];
+        //Start Fetch
+        $data = null;
+
+        //Select Base On What is Looking For
+        $data = match( session('v_pageSwitch') ){
+            'Variation'=>Variation::select(),
+            'Attribute'=>Attribute::select(),
+            'Rarity'=>Rarity::select(),
+            'Language'=>Language::select(),
+            default=>Variation::select(),
+        };
+
+
+        //Required Condition
+
+        //Search
+        if(session('v_search') ){
+            $data = $data->where( function($query){
+                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::clense(session('v_search')) ."%'");
+                if( session('v_pageSwitch') == "Rarity")
+                    $query->orwhereRaw("LOWER(level) LIKE '%". HelpMoKo::clense(session('v_search')) ."%'");
+            });
+        }
+
+        //Filters
+
+        //Sort
+        if(session('v_sort')){
+            foreach(session('v_sort') as $key => $val){
+                $data = $data->orderBy($val['Ref'], $val['Sort']);
+            }
+        }else{
+            foreach($this->sortKey() as $key => $val){
+                $data = $data->orderBy($val, 'ASC');
+            }
+        }
+        // GET
+        $data = $data->paginate(15)->onEachSide(2);
+
+        return $data;
     }
 }
