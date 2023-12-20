@@ -16,6 +16,7 @@ export default function Pop(Option){
     let Message = (Content.Message ?? Option.Message) ?? "";
     let popButton = (Content.Button ?? Option.Button) ?? [];
     let Switch = Option.Switch;
+    let CloseOutside = Option.CloseOutside ?? true;
 
     let popTypeList = {
         success:{
@@ -70,7 +71,11 @@ export default function Pop(Option){
 
     //This will return the ui of modal pop up
     return <>
-        <dialog ref={popId} className='backdrop:backdrop-blur-sm backdrop:brightness-[.35] backdrop:contrast-75 p-5 drop-shadow-myDrop3' style={dialogStyling}>
+        <dialog ref={popId} className='backdrop:backdrop-blur-sm backdrop:brightness-[.35] backdrop:contrast-75 p-5 drop-shadow-myDrop3 custom_scroll_2' style={dialogStyling} onClick={(event)=>{
+             if (event.target === popId.current && CloseOutside) {
+                close();
+            }
+        }}>
             <div className="flex justify-end ">
                 <div className="cursor-pointer pl-2" onClick={close}>
                     <Icon InClass={`fill-black`} OutClass="w-5 h-5" Name="close" />

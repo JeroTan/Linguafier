@@ -13,7 +13,7 @@ import { usePage, router } from '@inertiajs/react';
 
 export default ()=>{
     //** Use Page */
-    const { data, } = usePage();
+    const { data, } = usePage().props;
 
     //** STRUCT */
     let d_pageSwitch = [

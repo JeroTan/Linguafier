@@ -12,6 +12,9 @@ export default ()=>{
         <div className='flex flex-wrap gap-2'>
             <Button  Icon={`back`} Click={()=>{router.get('/admin/dashboard/word_attribution')}}/>
         </div>
+        {/* Add Role Section */}
+        <form className="mt-10">
 
+        </form>
     </AdminMainUI>
 }
