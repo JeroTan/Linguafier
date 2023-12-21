@@ -39,6 +39,7 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             'popFlash' => fn () => session('popFlash') ?? null,
             'asset' => url('/')."/",
+            'storage' => url('/storage')."/",
             'specialAccount' => fn () => session('SpecialAccount') ?? null,
             // 'flash' => fn () => $request->session()->all() ?? null,
         ]);

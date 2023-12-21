@@ -21,8 +21,8 @@ export default function FIleInput(Option){
 
 
     //** Use State */
-    const [d_prevFile, e_prevFile] = useState(false);
-    const [c_popSwitch, e_popSwitch] = Option.Preview ?? useState(false);
+    const [d_prevFile, e_prevFile] = Option.Preview ?? useState(false);
+    const [c_popSwitch, e_popSwitch] =  useState(false);
 
     //** Use Ref */
     const inputRef = useRef();

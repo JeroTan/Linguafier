@@ -13,7 +13,7 @@ import { usePage, router } from '@inertiajs/react';
 
 export default ()=>{
     //** Use Page */
-    const { data, } = usePage().props;
+    const { data, storage } = usePage().props;
 
     //** STRUCT */
     let d_pageSwitch = [
@@ -25,14 +25,17 @@ export default ()=>{
 
     //**>> Use State */
     const [c_pageSwitch, e_pageSwitch] = useState("Variation");
-
     const [v_search, e_search] = useState('');
     const [v_sort, e_sort] = useState([]);
+
     const [v_popSwitch, e_popSwitch] = useState(false);
     const [v_popPick, e_popPick] = useState("WarningDelete");
     const [v_popLoading, e_popLoading] = useState('');
     const [v_popFlash, e_popFlash] = useState('');
+
     const [v_selectId, e_selectId] = useState('');
+
+    const [c_dataLoading, e_dataLoading] = useState(false);
     //**<< Use State */
 
     //**>> Use Effect */
@@ -55,6 +58,18 @@ export default ()=>{
         e_sort(sortData[c_pageSwitch]);
 
     }, [c_pageSwitch]);
+    useEffect(()=>{
+        const debouncer = setTimeout(()=>{
+            changeContents();
+        }, 500);
+        return ()=>clearTimeout(debouncer);
+    }, [v_search]);
+    useEffect(()=>{
+        changeContents();
+    }, [v_sort]);
+    useEffect(()=>{ //Stop the Loading Animation if the Render of data is done
+        e_dataLoading(false);
+    }, [data.data]);
 
     //**<< Use Effect */
 
@@ -69,23 +84,25 @@ export default ()=>{
         return c_pageSwitch == name ? true : undefined
     }
     function changeContents(){
-
+        e_dataLoading(true);
+        router.post('/admin/dashboard/word_attribution/changeContents', {"c_pageSwitch":c_pageSwitch, "v_search": v_search, 'v_sort':v_sort,}, );
     }
     function ItemPlate(){
-        if(data == undefined)
-            return [];
         return data.data.map((x, i)=>{
+            // Design for Name
             let t_Name = <div className='sm:w-64 w-full shrink-0 grow'>
                 <h3 className='text-xl text-my-green font-bold'>{x.name}</h3>
             </div>;
+            // Design for Image
             let t_Image;
             if(c_pageSwitch == "Variation" || c_pageSwitch == "Attribute"){
                 t_Image = <div className='w-full shrink flex flex-wrap gap-1'>
-                    <div className='min-w-[10rem] aspect-square rounded border-2 relative' style={{border: 'black'}}>
-                        <img className='relative w-full h-full object-contain' src='https://db.pokemongohub.net/images/icons/Badge_27.png' />
+                    <div className='w-[5rem] outline outline-slate-500 outline-[2px] aspect-square rounded border-2 relative overflow-hidden' style={{border: 'black'}}>
+                        <img className='relative w-full h-full object-cover' src={`${storage}${x.image}`} />
                     </div>
                 </div>
             }
+            // Design for Rarity
             let t_Rarity;
             if(c_pageSwitch == "Rarity"){
                 t_Rarity = <div className='w-full shrink flex flex-wrap gap-1'>
@@ -150,6 +167,10 @@ export default ()=>{
             }}/>
         ]
     }
+    function pageSwitch(event, name){
+        changeContents();
+        e_pageSwitch(name);
+    }
     //**<< Functionality */
 
     //** Render */
@@ -157,13 +178,13 @@ export default ()=>{
         {/* Navigation */}
         <div className='flex flex-wrap gap-2'>
             {d_pageSwitch.map((x, i)=>{
-                    return <Button key={i} Name={x} Color={buttonColor(x)} TextColor={buttonTextColor(x)} Disabled={buttonPWD(x)} Click={()=>e_pageSwitch(x)}/>
+                    return <Button key={i} Name={x} Color={buttonColor(x)} TextColor={buttonTextColor(x)} Disabled={buttonPWD(x)} Click={(e)=>pageSwitch(e, x)}/>
                 })
             }
         </div>
 
         {/* List Contents*/}
-        <ListContainer Name="List of System User" Search={[v_search, e_search, changeContents]} Sort={[v_sort, e_sort]} OtherButtons={addButton()}  Contents={ItemPlate()} />
+        <ListContainer Name="List of System User" Search={[v_search, e_search, changeContents]} Sort={[v_sort, e_sort]} OtherButtons={addButton()} Loading={[c_dataLoading, e_dataLoading]} Contents={ItemPlate()} />
 
     </AdminMainUI>
 }

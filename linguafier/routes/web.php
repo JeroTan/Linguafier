@@ -69,7 +69,7 @@ Route::prefix('/admin')->group(function(){
         Route::prefix('/word_attribution')->group(function(){
             $ctrl = WordAttribution::class;
             Route::get('/', $ctrl)->name('admin.word_attribution');
-            Route::post('/changeContents', [$ctrl, 'chnageContents']);
+            Route::post('/changeContents', [$ctrl, 'changeContents']);
             Route::get('/add_variation', [$ctrl, 'add_variation_UI']);
             Route::get('/add_attribute', [$ctrl, 'add_attribute_UI']);
             Route::get('/add_rarity', [$ctrl, 'add_rarity_UI']);
@@ -78,18 +78,18 @@ Route::prefix('/admin')->group(function(){
             Route::post('/add_attribute_submit', [$ctrl, 'add_attribute_submit']);
             Route::post('/add_rarity_submit', [$ctrl, 'add_rarity_submit']);
             Route::post('/add_language_submit', [$ctrl, 'add_language_submit']);
-            Route::get('/modify_variation', [$ctrl, 'add_variation_UI']);
-            Route::get('/modify_attribute', [$ctrl, 'add_attribute_UI']);
-            Route::get('/modify_rarity', [$ctrl, 'add_rarity_UI']);
-            Route::get('/modify_language', [$ctrl, 'add_language_UI']);
-            Route::post('/modify_variation_submit', [$ctrl, 'add_variation_submit']);
-            Route::post('/modify_attribute_submit', [$ctrl, 'add_attribute_submit']);
-            Route::post('/modify_rarity_submit', [$ctrl, 'add_rarity_submit']);
-            Route::post('/modify_language_submit', [$ctrl, 'add_language_submit']);
-            Route::post('/delete_variation', [$ctrl, 'delete_variation']);
-            Route::post('/delete_attribute', [$ctrl, 'delete_attribute']);
-            Route::post('/delete_rarity', [$ctrl, 'delete_rarity']);
-            Route::post('/delete_language', [$ctrl, 'delete_language']);
+            Route::get('/modify_variation/{id}', [$ctrl, 'modify_variation_UI']);
+            Route::get('/modify_attribute/{id}', [$ctrl, 'modify_attribute_UI']);
+            Route::get('/modify_rarity/{id}', [$ctrl, 'modify_rarity_UI']);
+            Route::get('/modify_language/{id}', [$ctrl, 'modify_language_UI']);
+            Route::post('/modify_variation_submit/{id}', [$ctrl, 'modify_variation_submit']);
+            Route::post('/modify_attribute_submit/{id}', [$ctrl, 'modify_attribute_submit']);
+            Route::post('/modify_rarity_submit/{id}', [$ctrl, 'modify_rarity_submit']);
+            Route::post('/modify_language_submit/{id}', [$ctrl, 'modify_language_submit']);
+            Route::post('/delete_variation/{id}', [$ctrl, 'delete_variation']);
+            Route::post('/delete_attribute/{id}', [$ctrl, 'delete_attribute']);
+            Route::post('/delete_rarity/{id}', [$ctrl, 'delete_rarity']);
+            Route::post('/delete_language/{id}', [$ctrl, 'delete_language']);
         });
 
         Route::prefix('/wizard_ranks')->group(function(){

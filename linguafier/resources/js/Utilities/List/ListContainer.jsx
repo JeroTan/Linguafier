@@ -3,6 +3,8 @@ import Navigation from "./Navigation";
 import ItemBox from "./ItemBox";
 import Pagination from "./Pagination";
 import SortBar from "./SortBar";
+import Progress from "../Progress";
+import LoadingComp from "../Loading";
 
 // HOOKS
 import { createContext } from "react"
@@ -33,8 +35,20 @@ export default (Option)=>{
     let Pagination = Option.Pagination ?? false;
     let Sort = Option.Sort ?? false;
     let Filter = Option.Filter ?? false;
+    let Loading = Option.Loading ?? undefined;
 
-    //<Navigation />
+    // Functionality
+    function ProgressOrLoading(){
+        if(Loading[0] === true || Loading[0] === false){
+            return <div className="w-full flex justify-center">
+                < LoadingComp />
+            </div>
+        }else{
+            return <Progress Handler={Loading} />
+        }
+    }
+
+    // Render
     return <main>
         <G_Search.Provider value={[Search[0], Search[1], Search[2], Filter, OtherButtons, Name]}>
             <Navigation />
@@ -45,9 +59,15 @@ export default (Option)=>{
             </div> : ""
         }
         <div className="my-2 md:pl-5 sm:pl-2 pl-0 flex flex-wrap gap-2">
-            { ItemBoxContent.length > 0 ?
-                ItemBoxContent.map((x, i)=><Fragment key={i}><ItemBox Content={x}/></Fragment> )
-                : NoItemBox(0, NoItemMessage, NotItemSubMessage)}
+            {
+                Loading && Loading[0] ? ProgressOrLoading() : <>
+                { ItemBoxContent.length > 0 ?
+                    ItemBoxContent.map((x, i)=><Fragment key={i}><ItemBox Content={x}/></Fragment> )
+                    : NoItemBox(0, NoItemMessage, NotItemSubMessage)
+                }
+                </>
+            }
+
         </div>
         {
             Pagination ? <div className="my-2">
