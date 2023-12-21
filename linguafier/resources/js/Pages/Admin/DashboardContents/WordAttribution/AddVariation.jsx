@@ -3,6 +3,8 @@ import AdminMainUI from "../../Utilities/AdminMainUI";
 import Button from "../../../../Utilities/Button";
 import Textbox from "../../../../Utilities/Textbox";
 import FIleInput from "../../../../Utilities/FileInput";
+import PopFlash from "../../../../Utilities/PopFlash";
+import PopLoading from "../../../../Utilities/PopLoading";
 
 // HOOKS
 import { useState } from "react";
@@ -20,12 +22,13 @@ export default ()=>{
     const [v_popLoading, e_popLoading] = useState(false);
     //**<< Use State */
 
+    //** Render */
     return <AdminMainUI>
         {/* Navigation */}
         <div className='flex flex-wrap gap-2'>
             <Button  Icon={`back`} Click={()=>{router.get('/admin/dashboard/word_attribution')}}/>
         </div>
-        {/* Add Role Section */}
+        {/* Add Section */}
         <form className="mt-10">
             <h4 className='text-2xl mb-4 text-my-green font-semibold'>Add Word Variation</h4>
 
@@ -38,7 +41,7 @@ export default ()=>{
 
             <div className="flex flex-col gap-1">
                 <label className="">Image: </label>
-                <FIleInput Handler={[v_image, e_image]}/>
+                <FIleInput Handler={[v_image, e_image]} Error={errors.v_image} />
             </div>
 
             <div className="mt-10 flex flex-wrap sm:gap-5 gap-2">
@@ -59,5 +62,13 @@ export default ()=>{
                 }}/>
             </div>
         </form>
+
+        {/* POP */}
+        <PopLoading Switch={[v_popLoading, e_popLoading]} />
+        <PopFlash Switch={[v_popFlash, e_popFlash]} Button={{0:[
+            {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/word_attribution'), Color:'bg-my-green'  },
+            {'Name': "Add Again!", "Func":"close", Color:'bg-slate-400'  },
+        ]}} />
+
     </AdminMainUI>
 }

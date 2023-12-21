@@ -11,6 +11,7 @@ export default function FIleInput(Option){
     let Progress = Option.Progress;
     let Size = Option.Size ?? 100;
     let Accept = Option.Accept ?? "image/*";
+    let errorBag = Option.Error ?? '';
 
 
     //** STYLE */
@@ -21,7 +22,7 @@ export default function FIleInput(Option){
 
     //** Use State */
     const [d_prevFile, e_prevFile] = useState(false);
-    const [c_popSwitch, e_popSwitch] = useState(false);
+    const [c_popSwitch, e_popSwitch] = Option.Preview ?? useState(false);
 
     //** Use Ref */
     const inputRef = useRef();
@@ -72,6 +73,13 @@ export default function FIleInput(Option){
             Handler[1](event.target.files[0]);
             e_prevFile(URL.createObjectURL(event.target.files[0]));
         }} accept={Accept} />
+        {
+            errorBag ?
+            <div>
+                <small className='font-light text-red-500'>{errorBag}</small>
+            </div>
+            : ''
+        }
         <Pop Switch={[c_popSwitch, e_popSwitch]} BlankPlate={PopUpDesign()} Width={`fit-content`} />
     </div>
 }

@@ -18,7 +18,7 @@ export default function Button(Option){
     return <>
         <button
             type={type}
-            className={`${padding} ${size} rounded outline outline-1 outline-offset-0 outline-black shadow-myBox3 shadow-black ${color} ${textColor ? textColor : "text-slate-200"}  delay-75 hover:outline-4 hover:brightness-150 hover:text-black flex justify-center items-center gap-1 fill-slate-200 hover:fill-black`}
+            className={`${padding} ${size} rounded outline outline-1 outline-offset-0 outline-black shadow-myBox3 shadow-black ${color} ${textColor ? textColor : "text-slate-200"}  delay-75 hover:outline-4 hover:brightness-150 hover:text-black flex justify-center items-center gap-1 fill-slate-200 hover:fill-black disabled:opacity-70`}
             onClick={Option.Click}
             disabled={disabled}
         >

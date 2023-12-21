@@ -10,6 +10,7 @@ use App\Models\Rarity;
 use App\Models\Variation;
 use HelpMoKo;
 use Illuminate\Http\Request;
+use PDO;
 
 class WordAttribution extends Controller
 {
@@ -83,7 +84,21 @@ class WordAttribution extends Controller
 
     // POST
     public function add_variation_submit(Request $request){
+        //Verify Data
+        $request->validate(...$this->quickValidate());
 
+        //Compile Data
+
+
+        //Create New Role
+        $newVariation = new Variation;
+        $newVariation->id = HelpMoKo::generateID('OnlyMeChanics', 8);
+        $newVariation->name = $request->v_name;
+        $newVariation->image = "";
+        $newVariation->save();
+
+        //Return Success
+        $this->successReturn("word variation", $newVariation->name);
     }
     public function add_attribute_submit(Request $request){
 
@@ -161,5 +176,45 @@ class WordAttribution extends Controller
         $data = $data->paginate(15)->onEachSide(2);
 
         return $data;
+    }
+    protected function quickValidate($type = "AddVariation"){
+        $rules = [
+            'v_name'=>[
+                "required",
+                "regex:/^[a-zA-Z0-9\,\.\s]*$/",
+                "unique:variation,name",
+                "max:48",
+            ],
+            'v_image'=>[
+                "required",
+                "file",
+                "mimes:jpeg,jpg,png,gif,bimp,tiff,webp,svg",
+                "size:8192",
+            ]
+
+        ];
+        $messages = [
+            'v_name.required'=>'Name of the word variation is required.',
+            'v_name.regex'=>'Name of the word variation must contain only letters and number.',
+            'v_name.max'=>"Name of the word variation character limit reached. The maximum is 48 characters.",
+            'v_name.unique'=>"Name of the word variation is already existed in the system.",
+            'v_image.required'=>'Image is required.',
+            'v_image.file'=>'The data that you have uploaded is not a file.',
+            'v_image.size'=>"File is too large, please upload less 8mb only.",
+        ];
+        return [$rules, $messages];
+    }
+    protected function successReturn($type, $name){
+        return redirect()->back()->with( 'popFlash', [
+            'Type'=>'success',
+            'Title'=>'Created Successfully',
+            'Message'=>"A new ".$type." name \"".$name."\" was added to the magic system.",
+        ]);
+    }
+    protected function uploadReturnFile($image){
+
+    }
+    protected function refineImage($image){
+
     }
 }
