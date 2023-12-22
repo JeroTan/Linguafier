@@ -40,6 +40,7 @@ class HandleInertiaRequests extends Middleware
             'popFlash' => fn () => session('popFlash') ?? null,
             'asset' => url('/')."/",
             'storage' => url('/storage')."/",
+            'storageVariation' => url('/storage/word_variation')."/",
             'specialAccount' => fn () => session('SpecialAccount') ?? null,
             // 'flash' => fn () => $request->session()->all() ?? null,
         ]);

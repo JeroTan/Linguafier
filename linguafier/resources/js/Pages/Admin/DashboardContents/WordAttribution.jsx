@@ -6,6 +6,7 @@ import ListContainer from '../../../Utilities/List/ListContainer';
 import Pop from '../../../Utilities/Pop';
 import PopFlash from '../../../Utilities/PopFlash';
 import PopLoading from '../../../Utilities/PopLoading';
+import ImageFlash from '../../../Utilities/ImageFlash';
 
 //HOOKS
 import { Fragment, useEffect, useState } from 'react';
@@ -13,7 +14,7 @@ import { usePage, router } from '@inertiajs/react';
 
 export default ()=>{
     //** Use Page */
-    const { data, storage } = usePage().props;
+    const { data, storageVariation } = usePage().props;
 
     //** STRUCT */
     let d_pageSwitch = [
@@ -97,9 +98,7 @@ export default ()=>{
             let t_Image;
             if(c_pageSwitch == "Variation" || c_pageSwitch == "Attribute"){
                 t_Image = <div className='w-full shrink flex flex-wrap gap-1'>
-                    <div className='w-[5rem] outline outline-slate-500 outline-[2px] aspect-square rounded border-2 relative overflow-hidden' style={{border: 'black'}}>
-                        <img className='relative w-full h-full object-cover' src={`${storage}${x.image}`} />
-                    </div>
+                    <ImageFlash Src={`${storageVariation}${x.image}`} Outline={true} Pop={true} Active={true} />
                 </div>
             }
             // Design for Rarity

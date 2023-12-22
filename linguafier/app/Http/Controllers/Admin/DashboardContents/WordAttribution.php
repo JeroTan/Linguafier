@@ -136,11 +136,11 @@ class WordAttribution extends Controller
 
         //Compile Data
 
-        //Create New Role
+        //Create New Variation
         $newVariation = new Variation;
         $newVariation->id = HelpMoKo::generateID('OnlyMeChanics', 8);
         $newVariation->name = $request->v_name;
-        $newVariation->image = $this->uploadReturnFile($request->v_image, $newVariation->name);
+        $newVariation->image = $this->uploadReturnFile($request->v_image, "word_variation/" ,$newVariation->name);
         $newVariation->save();
 
         //Return Success
@@ -156,14 +156,29 @@ class WordAttribution extends Controller
 
     }
     public function modify_variation_submit(Request $request, $id){
+        //Validate
         $ImageValidate = Validator::make(['v_image'=> $request->v_image], ['v_image'=>"required|file"]);
         if($ImageValidate->fails()){
+            $includeImage = false;
             $request->validate(...$this->quickValidate('ModifyVariation', ""));
         }else{
+            $includeImage = true;
             $request->validate(...$this->quickValidate('ModifyVariation'));
         };
 
+        // Compile Data
 
+        //Modify Variation
+        $variation = Variation::find($id);
+        if($includeImage){
+            $this->deleteImage("word_variation/", $variation->name);
+            $variation->image = $this->uploadReturnFile($request->v_image,  "word_variation/", $request->v_name);
+        }
+        $variation->name = $request->v_name;
+        $variation->save();
+
+        //Return Success
+        $this->successReturn("Word variation", $variation->name, "modify");
     }
     public function modify_attribute_submit(Request $request, $id){
 
@@ -236,22 +251,21 @@ class WordAttribution extends Controller
             'v_name'=>[
                 "required",
                 "regex:/^[a-zA-Z0-9\,\.\s]*$/",
-                "unique:variation,name",
                 "max:48",
             ],
         ];
         $messages = [
-            'v_name.required'=>'Name of the '.$placeText.' is required.',
-            'v_name.regex'=>'Name of the '.$placeText.' must contain only letters and number.',
-            'v_name.max'=>"Name of the '.$placeText.' character limit reached. The maximum is 48 characters.",
-            'v_name.unique'=>"Name of the '.$placeText.' is already existed in the system.",
+            "v_name.required"=>"Name of the ".$placeText." is required.",
+            "v_name.regex"=>"Name of the ".$placeText." must contain only letters and number.",
+            "v_name.max"=>"Name of the ".$placeText." character limit reached. The maximum is 48 characters.",
+            "v_name.unique"=>"Name of the ".$placeText." is already existed in the system.",
         ];
         //**<< MAIN */
 
         //**>> Add-On */
         $ruleOption = match($type){
-            "AddVariation"=>Rule::unique('variation', 'name'),
-            "ModifyVariation"=>Rule::unique('variation', 'name')->ignore( request()->route('id') ),
+            "AddVariation"=>"unique:variation,name",
+            "ModifyVariation"=>"unique:variation,name,".request()->route('id'),
         };
         $imageRule = [
             "required",
@@ -267,6 +281,7 @@ class WordAttribution extends Controller
         //**<< Add-On */
         switch($type){
             case "AddVariation":
+                array_push($rules['v_name'], $ruleOption);
                 $rules['v_image'] = $imageRule;
                 $messages = $messages + $imageMessage;
             break;
@@ -283,20 +298,33 @@ class WordAttribution extends Controller
         }
         return [$rules, $messages];
     }
-    protected function successReturn($type, $name){
+    protected function successReturn($type, $name, $type2 = "create"){
         return redirect()->back()->with( 'popFlash', [
             'Type'=>'success',
-            'Title'=>'Created Successfully',
-            'Message'=>"A new ".$type." name \"".$name."\" was added to the magic system.",
+            'Title'=>match($type2){
+                "create"=>'Created Successfully',
+                "modify"=>'Modified Succesfully',
+            },
+            'Message'=>match($type2){
+                "create"=>"A new ".$type." name \"".$name."\" was added to the magic system.",
+                "modify"=>$type." name \"".$name."\" was modified in the magic system.",
+            },
         ]);
     }
-    protected function uploadReturnFile($image, $imageName, $type="png", $size = [1080, 1080]){
+    protected function uploadReturnFile($image, $path, $name, $type="png", $size = [1080, 1080]){
         $image = $this->refineImage($image);
-        Storage::disk('public')->put($imageName.".".$type, $image);
-        return $imageName.".".$type;
+        $this->deleteImage($path, $name);
+        Storage::disk('public')->put( ($path.$name.".".$type), $image );
+        return $name.".".$type;
+    }
+    protected function deleteImage($path, $name, $types=["jpeg","jpg","png","gif","bimp","tiff","webp","svg"]){
+        foreach($types as $key => $val){
+            if( Storage::disk('public')->exists( $path.$name.".".$val ) ){
+                Storage::disk('public')->delete( $path.$name.".".$val );
+            }
+        };
     }
     protected function refineImage($image, $size = [1080, 1080]){
-
         $Image = new Image(new ImagickDriver());
         $Image = $Image->read(($image));
         $Image = $Image->scale($size[0], $size[1]);

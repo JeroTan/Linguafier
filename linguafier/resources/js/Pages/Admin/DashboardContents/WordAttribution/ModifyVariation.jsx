@@ -13,12 +13,12 @@ import { router, usePage } from "@inertiajs/react";
 
 export default ()=>{
     //** Use Page */
-    const { errors, data, storage } = usePage().props
+    const { errors, data, storageVariation } = usePage().props
 
     //**>> Use State */
     const [ v_name, e_name ] = useState(data.name);
     const [ v_image, e_image ] = useState({name:data.image});
-    const [ v_preview, e_preview] = useState(storage+data.image);
+    const [ v_preview, e_preview] = useState(storageVariation+data.image);
 
     const [ c_disabled, e_disabled ] = useState(true);
 
@@ -125,7 +125,7 @@ export default ()=>{
                 <Button Name="Reset" Click={()=>{
                     e_name(data.name);
                     e_image({name:data.image});
-                    e_preview(storage+data.image);
+                    e_preview(storageVariation+data.image);
                 }}/>
                 <Button Name="Delete" Color="bg-red-500" Click={ ()=>{ e_popSwitch(true); e_popPick('WarningDelete') }}/>
             </div>

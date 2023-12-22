@@ -21,7 +21,7 @@ export default function FIleInput(Option){
 
 
     //** Use State */
-    const [d_prevFile, e_prevFile] = Option.Preview ?? useState(false);
+    const [d_prevFile, e_prevFile] = Option.Preview ?? useState(undefined);
     const [c_popSwitch, e_popSwitch] =  useState(false);
 
     //** Use Ref */
@@ -39,7 +39,6 @@ export default function FIleInput(Option){
             <h6 className="text-slate-100 font-semibold">Upload</h6>
         </div>
     }
-
     function PreviewDesign(){
         return <div className={`group relative aspect-square rounded outline outline-1 outline-${StateColor} hover:outline-slate-800 hover:outline-4 outline-offset-0 shadow-myBox3 bg-my-light cursor-pointer delay-75`}
         style={UploadStyle} >
@@ -55,7 +54,7 @@ export default function FIleInput(Option){
             }}>
                 <Icon Name="close" OutClass={`w-5 h-5`} />
             </div>
-            <img className="w-full h-full object-cover group-hover:opacity-20 delay-75" src={d_prevFile ?? "#"} onClick={()=>{
+            <img className="w-full h-full object-cover group-hover:opacity-20 delay-75" src={d_prevFile ? d_prevFile: "#"} onClick={()=>{
                 e_popSwitch(true);
             }}/>
         </div>
