@@ -98,7 +98,7 @@ export default function TextboxDropDown(Option){
             : ''
         }
 
-        { c_dropBox && dropData.length > 0 ? <div ref={dropField} tabIndex={0} className="absolute top-[36px] rounded border border-slate-700 border-t-4 bg-my-light min-w-[25rem] max-h-96 overflow-y-auto custom_scroll_2 flex flex-col gap-2" >
+        { c_dropBox && dropData.length > 0 ? <div ref={dropField} tabIndex={0} className="absolute z-20 top-[36px] rounded border border-slate-700 border-t-4 bg-my-light min-w-[25rem] max-h-96 overflow-y-auto custom_scroll_2 flex flex-col gap-2" >
             { dropData.map((x, i)=>{
                 return <div key={i} className=" p-2 cursor-pointer border-b-2 border-slate-500 hover:bg-slate-700 hover:text-white" onClick={()=>{selectDropDown(x.name)}}>
                     {x.name}

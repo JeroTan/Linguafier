@@ -94,6 +94,11 @@ export default ()=>{
         JSON.stringify(v_image) == JSON.stringify({name:data.image})
        )
     }
+    function resetData(){
+        e_name(data.name);
+        e_image({name:data.image});
+        e_preview(storageVariation+data.image);
+    }
 
 
     return <AdminMainUI>
@@ -122,11 +127,7 @@ export default ()=>{
                     e_popPick('ConfirmSubmit');
                     e_popSwitch(true);
                 }} Disabled={c_disabled} />
-                <Button Name="Reset" Click={()=>{
-                    e_name(data.name);
-                    e_image({name:data.image});
-                    e_preview(storageVariation+data.image);
-                }}/>
+                <Button Name="Reset" Click={resetData}/>
                 <Button Name="Delete" Color="bg-red-500" Click={ ()=>{ e_popSwitch(true); e_popPick('WarningDelete') }}/>
             </div>
 
@@ -136,8 +137,7 @@ export default ()=>{
         <Pop Switch={[v_popSwitch, e_popSwitch]} Content={popContent} Pick={v_popPick} />
         <PopLoading Switch={[v_popLoading, e_popLoading]} />
         <PopFlash Switch={[v_popFlash, e_popFlash]} Button={{0:[
-            {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/word_attribution'), Color:'bg-my-green'  },
-            {'Name': "Add Again!", "Func":"close", Color:'bg-slate-400'  },
+            {'Name': "Good", "Func":"close", Color:'bg-my-green'  },
         ]}} />
     </AdminMainUI>
 }

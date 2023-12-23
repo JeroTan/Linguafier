@@ -6,20 +6,24 @@ import FIleInput from "../../../../Utilities/FileInput";
 import Pop from "../../../../Utilities/Pop";
 import PopFlash from "../../../../Utilities/PopFlash";
 import PopLoading from "../../../../Utilities/PopLoading";
+import ColorPicker from "../../../../Utilities/ColorPicker";
 
 
 // HOOKS
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { router, usePage } from "@inertiajs/react";
 
 export default ()=>{
     //** Use Page */
-    const { errors, data } = usePage().props
+    const { errors, data, storageAttribute } = usePage().props
 
     //**>> Use State */
+    const [v_name, e_name] = useState(data.name);
+    const [v_image, e_image] = useState({name:data.image});
+    const [v_preview, e_preview] = useState(storageAttribute+data.image);
+    const [v_color, e_color] = useState(data.color);
 
     const [ c_disabled, e_disabled ] = useState(true);
-
     const [v_popSwitch, e_popSwitch] = useState(false);
     const [v_popPick, e_popPick] = useState("WarningDelete");
     const [v_popFlash, e_popFlash] = useState(false);
@@ -60,7 +64,9 @@ export default ()=>{
             Button : [
                 {Name: "Yes", "Func":()=>{
                     router.post('/admin/dashboard/word_attribution/modify_attribute_submit/'+data.id, {
-                       //Data
+                       v_name:v_name,
+                       v_image:v_image,
+                       v_color:v_color,
                     }, {onFinish:()=>{
                         e_popLoading(false);
                     }});
@@ -74,9 +80,28 @@ export default ()=>{
     };
     //**<< STRUCT */
 
+    //** Use Effect */
+    useEffect(()=>{
+        if(isUnchange()){
+            e_disabled(true);
+        }else{
+            e_disabled(false);
+        }
+    }, [v_name, v_image, v_color]);
+
     //** Functionality */
     function isUnchange(){
-
+        return (
+            v_name == data.name &&
+            JSON.stringify(v_image) == JSON.stringify({name:data.image}) &&
+            v_color == data.color
+        )
+    }
+    function resetData(){
+        e_name(data.name);
+        e_image({name:data.image});
+        e_preview(storageAttribute+data.image);
+        e_color(data.color);
     }
 
     //** RENDER */
@@ -87,16 +112,33 @@ export default ()=>{
         </div>
         {/* Modify Section */}
         <form className="mt-10">
+            <h4 className='text-2xl mb-4 text-my-green font-semibold'>Modify Word Attribute</h4>
+
+            <div className="flex flex-col gap-1">
+                <label className="">Name: </label>
+                <Textbox Handle={[v_name, e_name]} Size="sm:ml-3 w-96" Placeholder="Type here. . ." Error={errors.v_name} />
+            </div>
+
+            <div className="my-5"></div>
+
+            <div className="flex flex-col gap-1">
+                <label className="">Image: </label>
+                <FIleInput Handler={[v_image, e_image]} Error={errors.v_image} Preview={[v_preview, e_preview]} />
+            </div>
+
+            <div className="my-5"></div>
+
+            <div className="flex flex-col gap-1">
+                <label className="">Color: </label>
+                <ColorPicker Handle={[v_color, e_color]} Error={errors.v_color} />
+            </div>
 
             <div className="mt-10 flex flex-wrap sm:gap-5 gap-2">
                 <Button Name="Modify" Click={()=>{
                     e_popPick('ConfirmSubmit');
                     e_popSwitch(true);
                 }} Disabled={c_disabled} />
-                <Button Name="Reset" Click={()=>{
-                    // e_name(data.name);
-                    // e_image({name:data.image});
-                }}/>
+                <Button Name="Reset" Click={resetData}/>
                 <Button Name="Delete" Color="bg-red-500" Click={ ()=>{ e_popSwitch(true); e_popPick('WarningDelete') }}/>
             </div>
         </form>
@@ -105,8 +147,7 @@ export default ()=>{
         <Pop Switch={[v_popSwitch, e_popSwitch]} Content={popContent} Pick={v_popPick} />
         <PopLoading Switch={[v_popLoading, e_popLoading]} />
         <PopFlash Switch={[v_popFlash, e_popFlash]} Button={{0:[
-            {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/word_attribution'), Color:'bg-my-green'  },
-            {'Name': "Add Again!", "Func":"close", Color:'bg-slate-400'  },
+            {'Name': "Good", "Func":"close", Color:'bg-my-green'  },
         ]}} />
     </AdminMainUI>
 }

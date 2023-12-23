@@ -12,6 +12,7 @@ export default function Textbox(Option){
     let stateColor = 'black'
     let errorBag = Option.Error ?? '';
     let pressFunc = Option.PressFunc ?? (()=>true);
+    let minmax = Option.MinMax ?? [undefined, undefined];
 
 
     //** Functionality */
@@ -32,6 +33,8 @@ export default function Textbox(Option){
             onKeyDown={pressFunc}
             placeholder={placeholder}
             value={handler[0]}
+            min={minmax[0]}
+            max={minmax[1]}
         />
         {
             errorBag ?

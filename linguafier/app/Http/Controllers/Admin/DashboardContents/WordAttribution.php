@@ -147,7 +147,20 @@ class WordAttribution extends Controller
         $this->successReturn("word variation", $newVariation->name);
     }
     public function add_attribute_submit(Request $request){
+        //Verify Data
+        $request->validate(...$this->quickValidate("AddAttribute", "", "word attribute"));
+        //Compile Data
 
+        //Create New Variation
+        $newAttribute = new Attribute;
+        $newAttribute->id = HelpMoKo::generateID('OnlyMeChanics', 8);
+        $newAttribute->name = $request->v_name;
+        $newAttribute->image = $this->uploadReturnFile($request->v_image, "word_attribute/" ,$newAttribute->name);
+        $newAttribute->color = $request->v_color;
+        $newAttribute->save();
+
+        //Return Success
+        $this->successReturn("word variation", $newAttribute->name);
     }
     public function add_rarity_submit(Request $request){
 
@@ -181,6 +194,30 @@ class WordAttribution extends Controller
         $this->successReturn("Word variation", $variation->name, "modify");
     }
     public function modify_attribute_submit(Request $request, $id){
+        //Validate
+        $ImageValidate = Validator::make(['v_image'=> $request->v_image], ['v_image'=>"required|file"]);
+        if($ImageValidate->fails()){
+            $includeImage = false;
+            $request->validate(...$this->quickValidate('ModifyAttribute', ""));
+        }else{
+            $includeImage = true;
+            $request->validate(...$this->quickValidate('ModifyAttribute'));
+        };
+
+        //Compile Data
+
+        //Modify Variation
+        $attribute = Attribute::find($id);
+        if($includeImage){
+            $this->deleteImage("word_attribute/", $attribute->name);
+            $attribute->image = $this->uploadReturnFile($request->v_image,  "word_attribute/", $request->v_name);
+        }
+        $attribute->name = $request->v_name;
+        $attribute->color = $request->v_color;
+        $attribute->save();
+
+        //Return Success
+        $this->successReturn("Word attribute", $attribute->name, "modify");
 
     }
     public function modify_rarity_submit(Request $request, $id){
@@ -263,10 +300,16 @@ class WordAttribution extends Controller
         //**<< MAIN */
 
         //**>> Add-On */
-        $ruleOption = match($type){
-            "AddVariation"=>"unique:variation,name",
-            "ModifyVariation"=>"unique:variation,name,".request()->route('id'),
-        };
+        $ruleOptionName = "";
+        switch($type){
+            case "AddVariation": case "AddAttribute":
+                $ruleOptionName = "unique:variation,name";
+            break;
+            case "ModifyVariation": case "ModifyAttribute":
+                $ruleOptionName = "unique:variation,name,".request()->route('id');
+            break;
+        }
+        array_push($rules['v_name'], $ruleOptionName);
         $imageRule = [
             "required",
             "file",
@@ -276,23 +319,33 @@ class WordAttribution extends Controller
         $imageMessage = [
             'v_image.required'=>'Image is required.',
             'v_image.file'=>'The data that you have uploaded is not a file.',
+            'v_image.mimes'=>'The data that you have uploaded is not a valid filetypes.',
             'v_image.max'=>"File is too large, please upload less 8mb only.",
+        ];
+        $colorRule = [
+            "required",
+            "regex:/^#([0-9a-fA-F]{6})$/"
+        ];
+        $colorMessage = [
+            'v_color.required'=>'Color is required.',
+            'v_color.regex'=>'Invalid color, please use hex code only.',
         ];
         //**<< Add-On */
         switch($type){
             case "AddVariation":
-                array_push($rules['v_name'], $ruleOption);
                 $rules['v_image'] = $imageRule;
                 $messages = $messages + $imageMessage;
             break;
-            case "ModifyVariation":
-                array_push($rules['v_name'], $ruleOption);
+            case "AddAttribute":
+                $rules['v_image'] = $imageRule;
+                $messages = $messages + $imageMessage;
+                $rules['v_color'] = $colorRule;
+                $messages = $messages + $colorMessage;
+            break;
+            case "ModifyVariation": case "ModifyAttribute":
                 if($type2 == 'Image'){
                     $rules['v_image'] = $imageRule;
                     $messages = $messages + $imageMessage;
-                }
-                else{
-
                 }
             break;
         }

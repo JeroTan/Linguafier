@@ -12,7 +12,7 @@ import PopFlash from "../../../../Utilities/PopFlash"
 import PopLoading from "../../../../Utilities/PopLoading"
 
 // HOOKS
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 export default()=>{
     //** Use Page */
@@ -28,6 +28,7 @@ export default()=>{
     const [v_popLoading, e_popLoading] = useState(false);
     const [v_popSwitch, e_popSwitch] = useState(false);
     const [v_popPick, e_popPick] = useState('WarningDelete');
+    const [c_disabled, e_disabled] = useState(true);
     //**<< Use State */
 
     //** STRUCT */
@@ -85,6 +86,15 @@ export default()=>{
         },
     };
 
+    //** Use Effect */
+    useEffect(()=>{
+        if(isUnchange()){
+            e_disabled(true);
+        }else{
+            e_disabled(false);
+        }
+    }, [v_username, v_password, v_role]);
+
     //** FUNCTIONALITY */
     function isUnchange(){
         return (
@@ -125,11 +135,9 @@ export default()=>{
 
             <div className="mt-5 flex flex-wrap sm:gap-5 gap-2">
                 <Button Name="Modify" Click={()=>{
-                    if(isUnchange())
-                        return true;
                     e_popPick('ConfirmSubmit');
                     e_popSwitch(true);
-                }}/>
+                }} Disabled={c_disabled} />
                 <Button Name="Reset" Click={()=>{
                     e_username(data.username);
                     e_password("");

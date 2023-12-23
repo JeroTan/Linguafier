@@ -14,7 +14,7 @@ import { usePage, router } from '@inertiajs/react';
 
 export default ()=>{
     //** Use Page */
-    const { data, storageVariation } = usePage().props;
+    const { data, storageVariation, storageAttribute } = usePage().props;
 
     //** STRUCT */
     let d_pageSwitch = [
@@ -97,8 +97,10 @@ export default ()=>{
             // Design for Image
             let t_Image;
             if(c_pageSwitch == "Variation" || c_pageSwitch == "Attribute"){
+                let imageLink = (c_pageSwitch == "Variation" ? storageVariation : storageAttribute) + x.image;
+                let outlineLink = (c_pageSwitch == "Variation" ? true : x.color);
                 t_Image = <div className='w-full shrink flex flex-wrap gap-1'>
-                    <ImageFlash Src={`${storageVariation}${x.image}`} Outline={true} Pop={true} Active={true} />
+                    <ImageFlash Src={imageLink} Outline={outlineLink} Pop={true} Active={true} />
                 </div>
             }
             // Design for Rarity

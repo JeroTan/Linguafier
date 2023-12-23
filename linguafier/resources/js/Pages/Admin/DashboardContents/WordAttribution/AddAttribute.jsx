@@ -24,6 +24,12 @@ export default ()=>{
     const [v_popFlash, e_popFlash] = useState(false);
     const [v_popLoading, e_popLoading] = useState(false);
 
+    //** Functionality */
+    function resetData(){
+        e_name("");
+        e_image("");
+        e_color("#000000");
+    }
     return <AdminMainUI>
         {/* Navigation */}
         <div className='flex flex-wrap gap-2'>
@@ -49,16 +55,31 @@ export default ()=>{
 
             <div className="flex flex-col gap-1">
                 <label className="">Color: </label>
-                <ColorPicker Handle={[v_color, e_color]} />
+                <ColorPicker Handle={[v_color, e_color]} Error={errors.v_color} />
             </div>
 
+            <div className="mt-10 flex flex-wrap sm:gap-5 gap-2">
+                <Button Name="Create" Click={()=>{
+                    router.post('/admin/dashboard/word_attribution/add_attribute_submit', {
+                        v_name:v_name,
+                        v_image:v_image,
+                        v_color:v_color,
+                    }, {
+                        onFinish:()=>{
+                            e_popLoading(false);
+                        }
+                    });
+                    e_popLoading(true);
+                }}/>
+                <Button Name="Reset" Click={resetData}/>
+            </div>
         </form>
 
         {/* POP */}
         <PopLoading Switch={[v_popLoading, e_popLoading]} />
         <PopFlash Switch={[v_popFlash, e_popFlash]} Button={{0:[
             {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/word_attribution'), Color:'bg-my-green'  },
-            {'Name': "Add Again!", "Func":"close", Color:'bg-slate-400'  },
+            {'Name': "Add Again!", "Func":()=>{e_popFlash(false); resetData();}, Color:'bg-slate-400'  },
         ]}} />
     </AdminMainUI>
 

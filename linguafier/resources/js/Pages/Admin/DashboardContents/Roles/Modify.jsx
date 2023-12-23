@@ -8,7 +8,7 @@ import Pop from "../../../../Utilities/Pop"
 import PopLoading from "../../../../Utilities/PopLoading"
 
 // HOOKS
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { usePage, router } from "@inertiajs/react"
 
 export default function Modify(Option){
@@ -88,9 +88,17 @@ export default function Modify(Option){
     const [v_popLoading, e_popLoading] = useState(false);
     const [v_popSwitch, e_popSwitch] = useState(false);
     const [v_popPick, e_popPick] = useState('WarningDelete');
-
+    const [c_disabled, e_disabled] = useState(true);
     //**<< Use State */
 
+    //** Use Effect */
+    useEffect(()=>{
+        if(isUnchange()){
+            e_disabled(true);
+        }else{
+            e_disabled(false);
+        }
+    }, [v_name,v_mSpecialUser,v_mWizard,v_mWizardRank,v_mWordLibrary,v_mWordAttributes,v_mRoles]);
 
     //** Functionaility */
     function isUnchange(){
@@ -164,11 +172,9 @@ export default function Modify(Option){
 
             <div className="mt-5 flex flex-wrap sm:gap-4 gap-2">
                 <Button Name="Modify" Click={()=>{
-                    if(isUnchange())
-                        return false;
                     e_popSwitch(true);
                     e_popPick("ConfirmSubmit");
-                }} />
+                }} Disabled={c_disabled} />
                 <Button Name="Reset" Click={()=>{
                     e_name(data.name);
                     e_mSpecialUser(dataPrivileges['Manage Special User']);

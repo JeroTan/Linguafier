@@ -22,6 +22,12 @@ export default ()=>{
     const [v_popLoading, e_popLoading] = useState(false);
     //**<< Use State */
 
+    //** Functionality */
+    function resetData(){
+        e_name("");
+        e_image("");
+    }
+
     //** Render */
     return <AdminMainUI>
         {/* Navigation */}
@@ -56,10 +62,7 @@ export default ()=>{
                     });
                     e_popLoading(true);
                 }}/>
-                <Button Name="Reset" Click={()=>{
-                    e_name("");
-                    e_image("");
-                }}/>
+                <Button Name="Reset" Click={resetData}/>
             </div>
         </form>
 
@@ -67,7 +70,7 @@ export default ()=>{
         <PopLoading Switch={[v_popLoading, e_popLoading]} />
         <PopFlash Switch={[v_popFlash, e_popFlash]} Button={{0:[
             {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/word_attribution'), Color:'bg-my-green'  },
-            {'Name': "Add Again!", "Func":"close", Color:'bg-slate-400'  },
+            {'Name': "Add Again!", "Func":()=>{e_popFlash(false);resetData();}, Color:'bg-slate-400'  },
         ]}} />
 
     </AdminMainUI>
