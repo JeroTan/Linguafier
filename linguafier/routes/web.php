@@ -12,6 +12,7 @@ use App\Http\Controllers\User\Login as UserLogin;
 use App\Http\Controllers\User\Dashboard as UserDashboard;
 
 use App\Http\Controllers\Homepage;
+use App\Http\Middleware\CheckId;
 use App\Http\Middleware\NotOwnerAllowed;
 use App\Http\Middleware\SpecAccNoSelf;
 use Illuminate\Support\Facades\Route;
@@ -68,6 +69,7 @@ Route::prefix('/admin')->group(function(){
 
         Route::prefix('/word_attribution')->group(function(){
             $ctrl = WordAttribution::class;
+            $checkId  = CheckId::class.":admin.word_attribution,";
             Route::get('/', $ctrl)->name('admin.word_attribution');
             Route::post('/changeContents', [$ctrl, 'changeContents']);
             Route::get('/add_variation', [$ctrl, 'add_variation_UI']);
@@ -78,18 +80,18 @@ Route::prefix('/admin')->group(function(){
             Route::post('/add_attribute_submit', [$ctrl, 'add_attribute_submit']);
             Route::post('/add_rarity_submit', [$ctrl, 'add_rarity_submit']);
             Route::post('/add_language_submit', [$ctrl, 'add_language_submit']);
-            Route::get('/modify_variation/{id}', [$ctrl, 'modify_variation_UI']);
-            Route::get('/modify_attribute/{id}', [$ctrl, 'modify_attribute_UI']);
-            Route::get('/modify_rarity/{id}', [$ctrl, 'modify_rarity_UI']);
-            Route::get('/modify_language/{id}', [$ctrl, 'modify_language_UI']);
-            Route::post('/modify_variation_submit/{id}', [$ctrl, 'modify_variation_submit']);
-            Route::post('/modify_attribute_submit/{id}', [$ctrl, 'modify_attribute_submit']);
-            Route::post('/modify_rarity_submit/{id}', [$ctrl, 'modify_rarity_submit']);
-            Route::post('/modify_language_submit/{id}', [$ctrl, 'modify_language_submit']);
-            Route::post('/delete_variation/{id}', [$ctrl, 'delete_variation']);
-            Route::post('/delete_attribute/{id}', [$ctrl, 'delete_attribute']);
-            Route::post('/delete_rarity/{id}', [$ctrl, 'delete_rarity']);
-            Route::post('/delete_language/{id}', [$ctrl, 'delete_language']);
+            Route::get('/modify_variation/{id}', [$ctrl, 'modify_variation_UI'])->middleware($checkId."variation");
+            Route::get('/modify_attribute/{id}', [$ctrl, 'modify_attribute_UI'])->middleware($checkId."attribute");
+            Route::get('/modify_rarity/{id}', [$ctrl, 'modify_rarity_UI'])->middleware($checkId."rarity");
+            Route::get('/modify_language/{id}', [$ctrl, 'modify_language_UI'])->middleware($checkId."language");
+            Route::post('/modify_variation_submit/{id}', [$ctrl, 'modify_variation_submit'])->middleware($checkId."variation");
+            Route::post('/modify_attribute_submit/{id}', [$ctrl, 'modify_attribute_submit'])->middleware($checkId."attribute");
+            Route::post('/modify_rarity_submit/{id}', [$ctrl, 'modify_rarity_submit'])->middleware($checkId."rarity");
+            Route::post('/modify_language_submit/{id}', [$ctrl, 'modify_language_submit'])->middleware($checkId."language");
+            Route::post('/delete_variation/{id}', [$ctrl, 'delete_variation'])->middleware($checkId."variation");
+            Route::post('/delete_attribute/{id}', [$ctrl, 'delete_attribute'])->middleware($checkId."attribute");
+            Route::post('/delete_rarity/{id}', [$ctrl, 'delete_rarity'])->middleware($checkId."rarity");
+            Route::post('/delete_language/{id}', [$ctrl, 'delete_language'])->middleware($checkId."language");
         });
 
         Route::prefix('/wizard_ranks')->group(function(){

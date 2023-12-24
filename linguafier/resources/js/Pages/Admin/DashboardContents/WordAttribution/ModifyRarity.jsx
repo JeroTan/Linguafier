@@ -2,10 +2,10 @@
 import AdminMainUI from "../../Utilities/AdminMainUI";
 import Button from "../../../../Utilities/Button";
 import Textbox from "../../../../Utilities/Textbox";
-import FIleInput from "../../../../Utilities/FileInput";
 import Pop from "../../../../Utilities/Pop";
 import PopFlash from "../../../../Utilities/PopFlash";
 import PopLoading from "../../../../Utilities/PopLoading";
+import ColorPicker from "../../../../Utilities/ColorPicker";
 
 // HOOKS
 import { useState, useEffect } from "react";
@@ -16,6 +16,9 @@ export default ()=>{
     const { errors, data } = usePage().props
 
     //**>> Use State */
+    const [ v_name, e_name] = useState(data.name);
+    const [ v_level, e_level] = useState(data.level);
+    const [ v_color, e_color] = useState(data.color);
 
     const [ c_disabled, e_disabled ] = useState(true);
 
@@ -59,7 +62,9 @@ export default ()=>{
             Button : [
                 {Name: "Yes", "Func":()=>{
                     router.post('/admin/dashboard/word_attribution/modify_rarity_submit/'+data.id, {
-                       //Data
+                       v_name:v_name,
+                       v_level:v_level,
+                       v_color:v_color,
                     }, {onFinish:()=>{
                         e_popLoading(false);
                     }});
@@ -74,22 +79,55 @@ export default ()=>{
     //**<< STRUCT */
 
 
+    //** Use Effect */
+    useEffect(()=>{
+        if(isUnchange()){
+            e_disabled(true);
+        }else{
+            e_disabled(false);
+        }
+    }, [v_name, v_level, v_color]);
+
     //** Functionality */
     function isUnchange(){
-        //DATA
+        return (
+            v_name == data.name &&
+            v_level == data.level &&
+            v_color == data.color
+        )
     }
     function resetData(){
-        //DATA
+        e_name(data.name);
+        e_level(data.level);
+        e_color(data.color);
     }
 
     //** RENDER */
     return <AdminMainUI>
         {/* Navigation */}
         <div className='flex flex-wrap gap-2'>
-            <Button  Icon={`back`} Click={()=>{router.get('/admin/dashboard/word_attribution')}}/>
+            <Button  Icon={`back`} Click={()=>{router.get('/admin/dashboard/word_attribution?pgsw=Rarity')}}/>
         </div>
         {/* Modify Section */}
         <form className="mt-10">
+            <div className="flex flex-col gap-1">
+                <label className="">Name: </label>
+                <Textbox Handle={[v_name, e_name]} Size="sm:ml-3 w-96" Placeholder="Type here. . ." Error={errors.v_name} />
+            </div>
+
+            <div className="my-5"></div>
+
+            <div className="flex flex-col gap-1">
+                <label className="">Rarity Level: </label>
+                <Textbox Handle={[v_level, e_level]} Type={'number'} MinMax={[0, 100]} Size="sm:ml-3 w-96" Placeholder="Type here. . ." Error={errors.v_level} />
+            </div>
+
+            <div className="my-5"></div>
+
+            <div className="flex flex-col gap-1">
+                <label className="">Color: </label>
+                <ColorPicker Handle={[v_color, e_color]} Error={errors.v_color} />
+            </div>
 
             <div className="mt-10 flex flex-wrap sm:gap-5 gap-2">
                 <Button Name="Modify" Click={()=>{

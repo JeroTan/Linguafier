@@ -14,7 +14,7 @@ import { usePage, router } from '@inertiajs/react';
 
 export default ()=>{
     //** Use Page */
-    const { data, storageVariation, storageAttribute } = usePage().props;
+    const { data, storageVariation, storageAttribute, pgsw } = usePage().props;
 
     //** STRUCT */
     let d_pageSwitch = [
@@ -23,9 +23,41 @@ export default ()=>{
         'Rarity',
         'Language',
     ];
+    const popContent = {
+        WarningDelete:{
+            Title: "Delete Warning",
+            Message: "Do you really want to delete this? Are you sure?",
+            Type: "warning",
+            Button: [
+                {'Name': "Yes", "Func":()=>{e_popPick('ConfirmDelete');}, Color:'bg-red-500'  },
+                {'Name': "No! Of course not", "Func":"close", Color:'bg-slate-500'  },
+            ],
+        },
+        ConfirmDelete:{
+            Title: "Delete Confirmation",
+            Message: "Click Yes to proceed?",
+            Type: "notice",
+            Button: [
+                {'Name': "YES!", "Func":()=>{
+                    let deleteWhere = {
+                        Variation:"delete_variation",
+                        Attribute:"delete_attribute",
+                        Rarity:"delete_rarity",
+                        Language:"delete_language",
+                    }
+                    router.post(`/admin/dashboard/word_attribution/${deleteWhere[c_pageSwitch]}/${v_selectId}`,{},{
+                        onFinish:()=>e_popLoading(false)
+                    });
+                    e_popLoading(true);
+                    e_popSwitch(false);
+                }, Color:'bg-red-500'  },
+                {'Name': "I've Changed my mind", "Func":"close", Color:'bg-slate-500'  },
+            ]
+        },
+    }
 
     //**>> Use State */
-    const [c_pageSwitch, e_pageSwitch] = useState("Variation");
+    const [c_pageSwitch, e_pageSwitch] = useState(pgsw ?? "Variation");
     const [v_search, e_search] = useState('');
     const [v_sort, e_sort] = useState([]);
 
@@ -109,16 +141,8 @@ export default ()=>{
                 t_Rarity = <div className='w-full shrink flex flex-wrap gap-1'>
                     <div className='flex flex-wrap gap-1'>
                         { Array(x.level).fill(0).map((y,j)=>{
-                            let InClass = "fill-my-green";
-                            if(3 < x.level && x.level <= 7){
-                                InClass = "fill-my-yellow";
-                            }else if(7 < x.level  && x.level <= 10){
-                                InClass = "fill-red-500";
-                            }else if(10 < x.level){
-                                InClass = "fill-purple-500";
-                            }
                             return <div key={j} className=''>
-                                <Icon Name={'star'} OutClass={"w-5 h-5"} InClass={InClass} />
+                                <Icon Name={'star'} OutClass={"w-5 h-5"} InStyle={{fill:x.color}} />
                             </div>
                         }) }
                     </div>
@@ -136,11 +160,11 @@ export default ()=>{
                 }} />
                 <Button Icon="delete" Size="w-fit h-fit" Padding="px-2 py-1" Click={()=>{
                     e_popSwitch(true);
-                    e_popPick('WarningDelete'+c_pageSwitch);
+                    e_popPick('WarningDelete');
                     e_selectId(x.id);
                 }} />
             </div>
-            return <div className='w-full flex sm:flex-nowrap flex-wrap' key={i}>
+            return <div className='w-full flex sm:flex-nowrap flex-wrap gap-1' key={i}>
                 {t_Name}
                 {t_Image}
                 {t_Rarity}
@@ -186,6 +210,13 @@ export default ()=>{
 
         {/* List Contents*/}
         <ListContainer Name="List of System User" Search={[v_search, e_search, changeContents]} Sort={[v_sort, e_sort]} OtherButtons={addButton()} Loading={[c_dataLoading, e_dataLoading]} Contents={ItemPlate()} />
+
+        {/* Pop */}
+        <Pop Switch={[v_popSwitch, e_popSwitch]} Content={popContent} Pick={v_popPick} />
+        <PopFlash Button={{0:[
+            {'Name': "Got it", "Func":"close", Color:'bg-slate-400' },
+        ]}} />
+        <PopLoading Switch={[v_popLoading, e_popLoading]} />
 
     </AdminMainUI>
 }

@@ -104,7 +104,7 @@ export default ()=>{
     return <AdminMainUI>
         {/* Navigation */}
         <div className='flex flex-wrap gap-2'>
-            <Button  Icon={`back`} Click={()=>{router.get('/admin/dashboard/word_attribution')}}/>
+            <Button  Icon={`back`} Click={()=>{router.get('/admin/dashboard/word_attribution?pgsw=Variation')}}/>
         </div>
         {/* Modify Section */}
         <form className="mt-10">

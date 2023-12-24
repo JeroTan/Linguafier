@@ -3,7 +3,6 @@ import AdminMainUI from "../../Utilities/AdminMainUI";
 import Button from "../../../../Utilities/Button";
 import PopFlash from "../../../../Utilities/PopFlash";
 import PopLoading from "../../../../Utilities/PopLoading";
-import FIleInput from "../../../../Utilities/FileInput";
 import Textbox from "../../../../Utilities/Textbox";
 
 // HOOKS
@@ -23,13 +22,13 @@ export default ()=>{
 
     //** Functionality */
     function resetData(){
-        //Data
+        e_name('');
     }
 
     return <AdminMainUI>
         {/* Navigation */}
         <div className='flex flex-wrap gap-2'>
-            <Button  Icon={`back`} Click={()=>{router.get('/admin/dashboard/word_attribution')}}/>
+            <Button  Icon={`back`} Click={()=>{router.get('/admin/dashboard/word_attribution?pgsw=Language')}}/>
         </div>
         {/* Add Section */}
         <form className="mt-10">
@@ -43,7 +42,7 @@ export default ()=>{
             <div className="mt-10 flex flex-wrap sm:gap-5 gap-2">
                 <Button Name="Create" Click={()=>{
                     router.post('/admin/dashboard/word_attribution/add_language_submit', {
-                        //DATA
+                        v_name:v_name,
                     }, {
                         onFinish:()=>{
                             e_popLoading(false);
@@ -58,7 +57,7 @@ export default ()=>{
         {/* POP */}
         <PopLoading Switch={[v_popLoading, e_popLoading]} />
         <PopFlash Switch={[v_popFlash, e_popFlash]} Button={{0:[
-            {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/word_attribution'), Color:'bg-my-green'  },
+            {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/word_attribution?pgsw=Language'), Color:'bg-my-green'  },
             {'Name': "Add Again!", "Func":()=>{e_popFlash(false); resetData();}, Color:'bg-slate-400'  },
         ]}} />
     </AdminMainUI>

@@ -33,7 +33,7 @@ export default ()=>{
     return <AdminMainUI>
         {/* Navigation */}
         <div className='flex flex-wrap gap-2'>
-            <Button  Icon={`back`} Click={()=>{router.get('/admin/dashboard/word_attribution')}}/>
+            <Button  Icon={`back`} Click={()=>{router.get('/admin/dashboard/word_attribution?pgsw=Attribute')}}/>
         </div>
         {/* Add Section */}
         <form className="mt-10">
@@ -78,7 +78,7 @@ export default ()=>{
         {/* POP */}
         <PopLoading Switch={[v_popLoading, e_popLoading]} />
         <PopFlash Switch={[v_popFlash, e_popFlash]} Button={{0:[
-            {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/word_attribution'), Color:'bg-my-green'  },
+            {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/word_attribution?pgsw=Attribute'), Color:'bg-my-green'  },
             {'Name': "Add Again!", "Func":()=>{e_popFlash(false); resetData();}, Color:'bg-slate-400'  },
         ]}} />
     </AdminMainUI>

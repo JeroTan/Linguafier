@@ -18,7 +18,7 @@ export default ()=>{
     const { errors, data } = usePage().props
 
     //**>> Use State */
-
+    const [ v_name, e_name ] = useState(data.name);
     const [ c_disabled, e_disabled ] = useState(true);
 
     const [v_popSwitch, e_popSwitch] = useState(false);
@@ -61,7 +61,7 @@ export default ()=>{
             Button : [
                 {Name: "Yes", "Func":()=>{
                     router.post('/admin/dashboard/word_attribution/modify_language_submit/'+data.id, {
-                    //Data
+                        v_name:v_name,
                     }, {onFinish:()=>{
                         e_popLoading(false);
                     }});
@@ -75,22 +75,40 @@ export default ()=>{
     };
     //**<< STRUCT */
 
+    //** Use Effect */
+    useEffect(()=>{
+        if(isUnchange()){
+            e_disabled(true);
+        }else{
+            e_disabled(false);
+        }
+    }, [v_name]);
+
     //** Functionality */
     function isUnchange(){
-        //Data
+        return (
+            v_name == data.name
+        )
     }
     function resetData(){
-        //DATA
+        e_name(data.name);
     }
 
     //** RENDER */
     return <AdminMainUI>
         {/* Navigation */}
         <div className='flex flex-wrap gap-2'>
-            <Button  Icon={`back`} Click={()=>{router.get('/admin/dashboard/word_attribution')}}/>
+            <Button  Icon={`back`} Click={()=>{router.get('/admin/dashboard/word_attribution?pgsw=Language')}}/>
         </div>
         {/* Modify Section */}
         <form className="mt-10">
+            <h4 className='text-2xl mb-4 text-my-green font-semibold'>Add Language</h4>
+
+            <div className="flex flex-col gap-1">
+                <label className="">Name: </label>
+                <Textbox Handle={[v_name, e_name]} Size="sm:ml-3 w-96" Placeholder="Type here. . ." Error={errors.v_name} />
+            </div>
+
             <div className="mt-10 flex flex-wrap sm:gap-5 gap-2">
                 <Button Name="Modify" Click={()=>{
                     e_popPick('ConfirmSubmit');

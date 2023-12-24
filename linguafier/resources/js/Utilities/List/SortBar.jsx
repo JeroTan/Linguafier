@@ -15,7 +15,14 @@ export default (Option)=>{
     //** Use Ref */
     let FixedLabel = useRef(Option.Sort[0]);
     useEffect(()=>{
-        FixedLabel.current = v_sort;
+        let change = v_sort.length != FixedLabel.current.length || !FixedLabel.current.every(x=>{
+            return v_sort.some(y=>{
+                if(y.Ref == x.Ref && y.Name == x.Name)
+                    return true;
+            })
+        });
+        if(change)
+            FixedLabel.current = v_sort;
     }, [v_sort.length, v_sort.map(x=>x.Name), v_sort.map(x=>x.Ref)]);
 
     //** Render */

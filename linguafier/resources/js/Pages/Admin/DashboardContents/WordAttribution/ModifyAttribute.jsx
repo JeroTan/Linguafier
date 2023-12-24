@@ -49,7 +49,7 @@ export default ()=>{
                 {Name: "YES!", Func:()=>{
                     router.post('/admin/dashboard/word_attribution/delete_attribute/'+data.id, {}, {onFinish:()=>{
                         e_popLoading(false);
-                    }});
+                    }, preserveState:false, replace:true});
                     e_popLoading(true);
                     e_popSwitch(false);
 
@@ -108,7 +108,7 @@ export default ()=>{
     return <AdminMainUI>
         {/* Navigation */}
         <div className='flex flex-wrap gap-2'>
-            <Button  Icon={`back`} Click={()=>{router.get('/admin/dashboard/word_attribution')}}/>
+            <Button  Icon={`back`} Click={()=>{router.get('/admin/dashboard/word_attribution?pgsw=Attribute')}}/>
         </div>
         {/* Modify Section */}
         <form className="mt-10">

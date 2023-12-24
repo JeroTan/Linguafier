@@ -36,6 +36,7 @@ class WordAttribution extends Controller
             'pageUser'=>'Special',
             'adminPage'=>"Attribute",
             'data'=> $this->getContents(),
+            'pgsw'=>$_GET['pgsw'] ?? null,
         ]);
     }
     public function changeContents(Request $request){
@@ -151,7 +152,7 @@ class WordAttribution extends Controller
         $request->validate(...$this->quickValidate("AddAttribute", "", "word attribute"));
         //Compile Data
 
-        //Create New Variation
+        //Create New Attribute
         $newAttribute = new Attribute;
         $newAttribute->id = HelpMoKo::generateID('OnlyMeChanics', 8);
         $newAttribute->name = $request->v_name;
@@ -163,10 +164,34 @@ class WordAttribution extends Controller
         $this->successReturn("word variation", $newAttribute->name);
     }
     public function add_rarity_submit(Request $request){
+        //Verify Data
+        $request->validate(...$this->quickValidate("AddRarity", "", "word rarity"));
+        //Compile Data
 
+        //Create New Rarity
+        $newRarity = new Rarity;
+        $newRarity->id = HelpMoKo::generateID('OnlyMeChanics', 8);
+        $newRarity->name = $request->v_name;
+        $newRarity->level = $request->v_level;
+        $newRarity->color = $request->v_color;
+        $newRarity->save();
+
+        //Return Success
+        $this->successReturn("word rarity", $newRarity->name);
     }
     public function add_language_submit(Request $request){
+        //Verify Data
+        $request->validate(...$this->quickValidate("AddLanguage", "", "language"));
+        //Compile Data
 
+        //Create New Rarity
+        $newLanguage = new Language;
+        $newLanguage->id = HelpMoKo::generateID('OnlyMeChanics', 8);
+        $newLanguage->name = $request->v_name;
+        $newLanguage->save();
+
+        //Return Success
+        $this->successReturn("language", $newLanguage->name);
     }
     public function modify_variation_submit(Request $request, $id){
         //Validate
@@ -198,15 +223,15 @@ class WordAttribution extends Controller
         $ImageValidate = Validator::make(['v_image'=> $request->v_image], ['v_image'=>"required|file"]);
         if($ImageValidate->fails()){
             $includeImage = false;
-            $request->validate(...$this->quickValidate('ModifyAttribute', ""));
+            $request->validate(...$this->quickValidate('ModifyAttribute', "", "word attribute"));
         }else{
             $includeImage = true;
-            $request->validate(...$this->quickValidate('ModifyAttribute'));
+            $request->validate(...$this->quickValidate('ModifyAttribute', "Image", "word attribute"));
         };
 
         //Compile Data
 
-        //Modify Variation
+        //Modify Attribute
         $attribute = Attribute::find($id);
         if($includeImage){
             $this->deleteImage("word_attribute/", $attribute->name);
@@ -221,22 +246,66 @@ class WordAttribution extends Controller
 
     }
     public function modify_rarity_submit(Request $request, $id){
+        //Validate
+        $request->validate(...$this->quickValidate("ModifyRarity", "", "word rarity"));
+        //Compile Data
 
+        //Modify Rarity
+        $rarity = Rarity::find($id);
+        $rarity->name = $request->v_name;
+        $rarity->level = $request->v_level;
+        $rarity->color = $request->v_color;
+        $rarity->save();
+
+        //Return Success
+        $this->successReturn("Word rarity", $rarity->name, "modify");
     }
     public function modify_language_submit(Request $request, $id){
+        //Verify Data
+        $request->validate(...$this->quickValidate("ModifyLanguage", "", "language"));
+        //Compile Data
 
+        //Create New Rarity
+        $language = Language::find($id);
+        $language->name = $request->v_name;
+        $language->save();
+
+        //Return Success
+        $this->successReturn("language", $language->name, "modify");
     }
     public function delete_variation(Request $request, $id){
+        //Delete
+        $variation = Variation::find($id);
+        $this->deleteImage("word_variation/", $variation->name);
+        Variation::destroy($id);
 
+        //Return Success
+        $this->successReturn("Word variation", $variation->name, "delete");
     }
     public function delete_attribute(Request $request, $id){
+        //Delete
+        $attribute = Attribute::find($id);
+        $this->deleteImage("word_attribute/", $attribute->name);
+        Attribute::destroy($id);
 
+        //Return Success
+        $this->successReturn("Word attribute", $attribute->name, "delete");
     }
     public function delete_rarity(Request $request, $id){
+        //Delete
+        $rarity = Rarity::find($id);
+        Rarity::destroy($id);
 
+        //Return Success
+        $this->successReturn("Word rarity", $rarity->name, "delete");
     }
     public function delete_language(Request $request, $id){
+        //Delete
+        $language = Language::find($id);
+        Language::destroy($id);
 
+        //Return Success
+        $this->successReturn("Language", $language->name, "delete");
     }
 
     // Functionality
@@ -245,7 +314,7 @@ class WordAttribution extends Controller
         $data = null;
 
         //Select Base On What is Looking For
-        $data = match( session('c_pageSwitch') ){
+        $data = match( session('c_pageSwitch') ? session('c_pageSwitch') : ($_GET['pgsw']??"Variation") ){
             'Variation'=>Variation::select(),
             'Attribute'=>Attribute::select(),
             'Rarity'=>Rarity::select(),
@@ -302,10 +371,10 @@ class WordAttribution extends Controller
         //**>> Add-On */
         $ruleOptionName = "";
         switch($type){
-            case "AddVariation": case "AddAttribute":
+            case "AddVariation": case "AddAttribute": case "AddRarity" : case "AddLanguage":
                 $ruleOptionName = "unique:variation,name";
             break;
-            case "ModifyVariation": case "ModifyAttribute":
+            case "ModifyVariation": case "ModifyAttribute": case "ModifyRarity": case "ModifyLanguage":
                 $ruleOptionName = "unique:variation,name,".request()->route('id');
             break;
         }
@@ -330,6 +399,18 @@ class WordAttribution extends Controller
             'v_color.required'=>'Color is required.',
             'v_color.regex'=>'Invalid color, please use hex code only.',
         ];
+        $numberRule = [
+            "required",
+            "numeric",
+            "min:0",
+            "max:100",
+        ];
+        $numberMessage = [
+            'v_level.required'=>"Level is required.",
+            'v_level.numeric'=>"Level must be a number.",
+            "v_level.min"=>"Level should not be less than 0.",
+            'v_level.max'=>"Level should not be more than 100.",
+        ];
         //**<< Add-On */
         switch($type){
             case "AddVariation":
@@ -339,6 +420,12 @@ class WordAttribution extends Controller
             case "AddAttribute":
                 $rules['v_image'] = $imageRule;
                 $messages = $messages + $imageMessage;
+                $rules['v_color'] = $colorRule;
+                $messages = $messages + $colorMessage;
+            break;
+            case "AddRarity":  case "ModifyRarity":
+                $rules['v_level'] = $numberRule;
+                $messages = $messages + $numberMessage;
                 $rules['v_color'] = $colorRule;
                 $messages = $messages + $colorMessage;
             break;
@@ -352,17 +439,20 @@ class WordAttribution extends Controller
         return [$rules, $messages];
     }
     protected function successReturn($type, $name, $type2 = "create"){
-        return redirect()->back()->with( 'popFlash', [
+        $flashData = [
             'Type'=>'success',
             'Title'=>match($type2){
                 "create"=>'Created Successfully',
                 "modify"=>'Modified Succesfully',
+                "delete"=>'Removed Successfully'
             },
             'Message'=>match($type2){
                 "create"=>"A new ".$type." name \"".$name."\" was added to the magic system.",
                 "modify"=>$type." name \"".$name."\" was modified in the magic system.",
+                "delete"=>$type." name \"".$name."\" was removed from the magic system.",
             },
-        ]);
+        ];
+        return redirect()->back()->with( 'popFlash', $flashData);
     }
     protected function uploadReturnFile($image, $path, $name, $type="png", $size = [1080, 1080]){
         $image = $this->refineImage($image);
@@ -384,4 +474,5 @@ class WordAttribution extends Controller
         $Image = $Image->toPng();
         return $Image;
     }
+
 }

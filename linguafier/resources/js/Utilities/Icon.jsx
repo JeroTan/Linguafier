@@ -6,7 +6,14 @@ export default (Option)=>{
     Name
     InClass
     OutClass
+    InStyle
     */
+   //** STRUCT */
+   let Name = Option.Name;
+   let InClass = Option.InClass;
+   let OutClass = Option.OutClass;
+   let InStyle = Option.InStyle;
+   let Ref = Option.Ref;
 
     //0 = Only 1 Path Color; 1 = ViewBox Is Different; 2 = Custom Path inside SVG; 3 = All custom
     const iconList = {
@@ -63,10 +70,10 @@ Temporary Holder
 
     // Store the Icon Data from icons parameter; Check if use state or not
     let iconData;
-    if(useState.isPrototypeOf(Option.Name)){
-        iconData = iconList[Option.Name[0]];
+    if(useState.isPrototypeOf(Name)){
+        iconData = iconList[Name[0]];
     }else{
-        iconData = iconList[Option.Name];
+        iconData = iconList[Name];
     }
 
     //** Functionality */
@@ -74,10 +81,10 @@ Temporary Holder
     const svgFrame = (frame, content)=>{
         switch(frame){
             case 0:
-                return <><svg xmlns="http://www.w3.org/2000/svg" width='100%' height='100%' viewBox="0 0 24 24"><path className={Option.InClass} d={content}></path></svg></>
+                return <><svg xmlns="http://www.w3.org/2000/svg" width='100%' height='100%' viewBox="0 0 24 24"><path className={InClass} style={InStyle} d={content}></path></svg></>
             break;
             case 1:
-                return <><svg xmlns="http://www.w3.org/2000/svg" width='100%' height='100%' viewBox={content.viewBox}><path className={Option.InClass} d={content.d}></path></svg></>
+                return <><svg xmlns="http://www.w3.org/2000/svg" width='100%' height='100%' viewBox={content.viewBox}><path className={InClass} style={InStyle} d={content.d}></path></svg></>
             break;
             case 2:
                 return <><svg xmlns="http://www.w3.org/2000/svg" width='100%' height='100%' viewBox={content.viewBox}>{content.d}</svg></>
@@ -92,7 +99,7 @@ Temporary Holder
 
     //** RETURN */
     return <>
-        <div className={Option.OutClass ?? "w-4 h-4"} ref={Option.Ref ? Option.Ref : undefined}>
+        <div className={OutClass ?? "w-4 h-4"} ref={Ref ? Ref : undefined}>
             {svgFrame( iconData[0], iconData[1] )}
         </div>
     </>
