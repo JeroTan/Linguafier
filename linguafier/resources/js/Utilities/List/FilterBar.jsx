@@ -1,6 +1,7 @@
 // UTILITIES
 import Pop from "../Pop"
 import Button from "../Button"
+import TextboxDropDown from "../TextboxDropDown";
 
 // HOOKS
 import { useRef, useState, createContext, useContext, Fragment } from "react"
@@ -92,7 +93,7 @@ function Combiner(v_filter, e_filter){
     return  <div className="flex flex-wrap justify-between gap-8 sm:gap-4 mb-6">
         {v_filter.map((x, i)=>{
             return <Fragment key={i}>
-                <G_filter.Provider  value={[x.Alias, x.Data, x.Ref, x.Type, e_filter, i]}>
+                <G_filter.Provider  value={[x.Name, x.Data, x.Ref, x.Type, e_filter, i]}>
                     <Plate />
                 </G_filter.Provider>
             </Fragment>

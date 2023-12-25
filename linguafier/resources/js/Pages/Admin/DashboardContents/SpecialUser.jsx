@@ -54,20 +54,20 @@ export default ()=>{
     ]);
     const [ v_filter, e_filter] = useState([
         {
+            Name: "Roles",
             Ref:"role.name",
-            Alias:"Roles",
             Type:"checklist",
             Data:rolesData,
         },
         {
+            Name: "Created Date",
             Ref:"created_time",
-            Alias:"Created Date",
             Type:"range_date",
-            Data:{Min:false,Max:false,Limit:[0, 1000]}
+            Data:{Min:false,Max:false,}
         },
         {
+            Name: "Modified Date",
             Ref:"modified_time",
-            Alias:"Modified Date",
             Type:"range_date",
             Data:{Min:false,Max:false,}
         },

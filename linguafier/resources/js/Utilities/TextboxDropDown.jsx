@@ -34,12 +34,12 @@ export default function TextboxDropDown(Option){
 
 
     //** Functionality */
-    function changeState(event){
+    function changeState(event){ //Check the site and try to input the data to Handler
         handler[1](event.target.value);
         s_dropBox(true);
         let siteDataContainer = {};
         siteDataContainer[siteData] = event.target.value;
-        router.post(siteVisit, siteDataContainer);
+        router.post(siteVisit, siteDataContainer);//Send Request
     }
     if(errorBag){
         stateColor = 'red-400';

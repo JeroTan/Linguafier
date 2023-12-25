@@ -235,10 +235,10 @@ class SpecialUser extends Controller
         //Search
         if(session('v_search') ){
             $data = $data->where( function($query){
-                $query->orwhere('specialaccount.username', 'LIKE', '%' . session('v_search') . '%');
-                $query->orwhere('specialaccount.created_time', 'LIKE', '%' . session('v_search') . '%');
-                $query->orwhere('specialaccount.modified_time', 'LIKE', '%' . session('v_search') . '%');
-                $query->orwhere('role.name', 'LIKE', '%' . session('v_search') . '%');
+                $query->orWhere('specialaccount.username', 'LIKE', '%' . session('v_search') . '%');
+                $query->orWhere('specialaccount.created_time', 'LIKE', '%' . session('v_search') . '%');
+                $query->orWhere('specialaccount.modified_time', 'LIKE', '%' . session('v_search') . '%');
+                $query->orWhere('role.name', 'LIKE', '%' . session('v_search') . '%');
             });
         }
 

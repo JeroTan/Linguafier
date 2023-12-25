@@ -47,7 +47,7 @@ return new class extends Migration
                 $table->foreign('language_id')->references('id')->on('language')->nullOnDelete()->cascadeOnUpdate();
             $table->json('pronounciation')->nullable();
             $table->json('attributes')->nullable();
-            $table->json('synonyms')->nullable();
+            $table->json('relationyms')->nullable();
             $table->json('heirarchy_map')->nullable();
             $table->json('examples')->nullable();
             $table->text('origin')->nullable();

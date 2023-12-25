@@ -48,14 +48,15 @@ Route::prefix('/admin')->group(function(){
         Route::get('/', AdminDashboard::class)->name('admin.dashboard');
 
         Route::prefix('/special_user')->group(function(){
+            $checkId  = CheckId::class.":admin.special_user,specialaccount";
             Route::get('/', SpecialUser::class)->name('admin.special_user');
             Route::post('/changeContents', [SpecialUser::class, "changeContents"]);
             Route::get('/add', [SpecialUser::class, "add_ui"]);
             Route::post('add_roleSearch', [SpecialUser::class, "add_roleSearch"]);
             Route::post('/add_submit', [SpecialUser::class, 'add_submit']);
-            Route::get('/modify/{id}', [SpecialUser::class, 'modify_ui'])->middleware(SpecAccNoSelf::class)->middleware(NotOwnerAllowed::class.":true");
-            Route::post('/modify_submit/{id}', [SpecialUser::class, 'modify_submit'])->middleware(SpecAccNoSelf::class)->middleware(NotOwnerAllowed::class.":true");
-            Route::post('/delete/{id}', [SpecialUser::class, 'delete'])->middleware(SpecAccNoSelf::class)->middleware(NotOwnerAllowed::class.":true");
+            Route::get('/modify/{id}', [SpecialUser::class, 'modify_ui'])->middleware($checkId)->middleware(SpecAccNoSelf::class)->middleware(NotOwnerAllowed::class.":true");
+            Route::post('/modify_submit/{id}', [SpecialUser::class, 'modify_submit'])->middleware($checkId)->middleware(SpecAccNoSelf::class)->middleware(NotOwnerAllowed::class.":true");
+            Route::post('/delete/{id}', [SpecialUser::class, 'delete'])->middleware($checkId)->middleware(SpecAccNoSelf::class)->middleware(NotOwnerAllowed::class.":true");
 
         });
 
@@ -64,7 +65,15 @@ Route::prefix('/admin')->group(function(){
         });
 
         Route::prefix('/word_library')->group(function(){
+            $checkId = CheckId::class.":admin.word_library,word";
             Route::get('/', WordLibrary::class)->name('admin.word_library');
+            Route::post('/changeContents', [WordLibrary::class, 'changeContents']);
+            Route::get('/add', [WordLibrary::class, 'add_ui']);
+            Route::post('/add_submit', [WordLibrary::class, 'add_submit']);
+            Route::get('/modify/{id}', [WordLibrary::class, 'modify_ui']);
+            Route::post('/modify_submit/{id}', [WordLibrary::class, 'modify_submit']);
+            Route::post('/delete/{id}', [WordLibrary::class, 'delete']);
+
         });
 
         Route::prefix('/word_attribution')->group(function(){
@@ -99,13 +108,14 @@ Route::prefix('/admin')->group(function(){
         });
 
         Route::prefix('/roles')->group(function(){
+            $checkId  = CheckId::class.":admin.roles,role";
             Route::get('/', Roles::class)->name('admin.roles');
             Route::post('/changeContents', [Roles::class, 'changeContents'])->name('admin.roles.contents');
             Route::get('/add', [Roles::class, 'addRole_UI'])->name('admin.roles.add');
             Route::post('/create', [Roles::class, 'create'])->name('admin.roles.create');
-            Route::get('/modify/{id}', [Roles::class, 'modifyRole_UI'])->name('admin.roles.modify_ui');
-            Route::post('/modify_submit/{id}', [Roles::class, 'modify'])->name('admin.roles.modify_submit');
-            Route::post('/delete/{id}', [Roles::class, 'delete'])->name('admin.roles.delete');
+            Route::get('/modify/{id}', [Roles::class, 'modifyRole_UI'])->name('admin.roles.modify_ui')->middleware($checkId);
+            Route::post('/modify_submit/{id}', [Roles::class, 'modify'])->name('admin.roles.modify_submit')->middleware($checkId);
+            Route::post('/delete/{id}', [Roles::class, 'delete'])->name('admin.roles.delete')->middleware($checkId);
         });
 
     });

@@ -39,43 +39,6 @@ class WordAttribution extends Controller
             'pgsw'=>$_GET['pgsw'] ?? null,
         ]);
     }
-    public function changeContents(Request $request){
-        //Verify Data
-        //Page
-
-        $request->validate([
-            'c_pageSwitch'=>'required|in:'.implode(",",$this->pageSwitch),
-        ]);
-
-        //Search
-        $request->validate([
-            'v_search' => 'nullable|max:256',
-            'v_sort' => 'required',
-        ], [
-            'v_search.max'=>'Search Limit Reached My Friend.'
-        ]);
-
-        //Sort
-        $sortVerify = [];
-        $sortRule = [];
-        try{
-            foreach($request->v_sort as $key => $val){
-                if( !in_array($val['Ref'], $this->sortKey($request->c_pageSwitch)) )
-                    throw new Exception("Tampered JSON");
-                $sortVerify[$val['Ref']] = $val['Sort'];
-                $sortRule[$val['Ref']] = 'required|in:ASC,DESC';
-            }
-        }catch(Throwable $e){
-            return redirect()->back()->withErrors($e);
-        }
-        $sortValidate = Validator::make($sortVerify, $sortRule );
-        if($sortValidate->fails()){
-            return redirect()->back()->withErrors($sortValidate);
-        }
-
-        //Return
-        return redirect()->back()->with(['c_pageSwitch'=>$request->c_pageSwitch, 'v_search'=>$request->v_search, 'v_sort'=>$request->v_sort, ]);
-    }
 
     public function add_variation_UI(Request $request){
         return Inertia::render('Admin/DashboardContents/WordAttribution/AddVariation', [
@@ -131,6 +94,43 @@ class WordAttribution extends Controller
     }
 
     // POST
+    public function changeContents(Request $request){
+        //Verify Data
+        //Page
+
+        $request->validate([
+            'c_pageSwitch'=>'required|in:'.implode(",",$this->pageSwitch),
+        ]);
+
+        //Search
+        $request->validate([
+            'v_search' => 'nullable|max:256',
+            'v_sort' => 'required',
+        ], [
+            'v_search.max'=>'Search Limit Reached My Friend.'
+        ]);
+
+        //Sort
+        $sortVerify = [];
+        $sortRule = [];
+        try{
+            foreach($request->v_sort as $key => $val){
+                if( !in_array($val['Ref'], $this->sortKey($request->c_pageSwitch)) )
+                    throw new Exception("Tampered JSON");
+                $sortVerify[$val['Ref']] = $val['Sort'];
+                $sortRule[$val['Ref']] = 'required|in:ASC,DESC';
+            }
+        }catch(Throwable $e){
+            return redirect()->back()->withErrors($e);
+        }
+        $sortValidate = Validator::make($sortVerify, $sortRule );
+        if($sortValidate->fails()){
+            return redirect()->back()->withErrors($sortValidate);
+        }
+
+        //Return
+        return redirect()->back()->with(['c_pageSwitch'=>$request->c_pageSwitch, 'v_search'=>$request->v_search, 'v_sort'=>$request->v_sort, ]);
+    }
     public function add_variation_submit(Request $request){
         //Verify Data
         $request->validate(...$this->quickValidate());
@@ -209,7 +209,7 @@ class WordAttribution extends Controller
         //Modify Variation
         $variation = Variation::find($id);
         if($includeImage){
-            $this->deleteImage("word_variation/", $variation->name);
+            $this->deleteImage("word_variation/", trim($variation->image, ".png"));
             $variation->image = $this->uploadReturnFile($request->v_image,  "word_variation/", $request->v_name);
         }
         $variation->name = $request->v_name;
@@ -234,7 +234,7 @@ class WordAttribution extends Controller
         //Modify Attribute
         $attribute = Attribute::find($id);
         if($includeImage){
-            $this->deleteImage("word_attribute/", $attribute->name);
+            $this->deleteImage("word_variation/", trim($attribute->image, ".png"));
             $attribute->image = $this->uploadReturnFile($request->v_image,  "word_attribute/", $request->v_name);
         }
         $attribute->name = $request->v_name;
@@ -276,7 +276,7 @@ class WordAttribution extends Controller
     public function delete_variation(Request $request, $id){
         //Delete
         $variation = Variation::find($id);
-        $this->deleteImage("word_variation/", $variation->name);
+        $this->deleteImage("word_variation/", trim($variation->image, ".png"));
         Variation::destroy($id);
 
         //Return Success
@@ -285,7 +285,7 @@ class WordAttribution extends Controller
     public function delete_attribute(Request $request, $id){
         //Delete
         $attribute = Attribute::find($id);
-        $this->deleteImage("word_attribute/", $attribute->name);
+        $this->deleteImage("word_variation/", trim($attribute->image, ".png"));
         Attribute::destroy($id);
 
         //Return Success
@@ -328,9 +328,9 @@ class WordAttribution extends Controller
         //Search
         if(session('v_search') ){
             $data = $data->where( function($query){
-                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::clense(session('v_search')) ."%'");
+                $query->orWhereRaw("LOWER(name) LIKE '%". HelpMoKo::clense(session('v_search')) ."%'");
                 if( session('c_pageSwitch') == "Rarity")
-                    $query->orwhereRaw("LOWER(level) LIKE '%". HelpMoKo::clense(session('v_search')) ."%'");
+                    $query->orWhereRaw("LOWER(level) LIKE '%". HelpMoKo::clense(session('v_search')) ."%'");
             });
         }
 
