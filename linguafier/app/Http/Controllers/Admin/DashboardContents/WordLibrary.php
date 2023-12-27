@@ -69,6 +69,10 @@ class WordLibrary extends Controller
         return Inertia::render('Admin/DashboardContents/WordLibrary/Add', [
             'pageUser'=>'Special',
             'adminPage'=>"Word",
+            'variationDrop'=>$this->getVariation(),
+            'attributeDrop'=>$this->getAttribute(),
+            'rarityDrop'=>$this->getRarity(),
+            'languageDrop'=>$this->getLanguage(),
         ]);
     }
     public function modify_ui(Request $request, $id){
@@ -76,6 +80,10 @@ class WordLibrary extends Controller
             'pageUser'=>'Special',
             'adminPage'=>"Word",
             'data'=>Word::find($id),
+            'variationDrop'=>$this->getVariation(),
+            'attributeDrop'=>$this->getAttribute(),
+            'rarityDrop'=>$this->getRarity(),
+            'languageDrop'=>$this->getLanguage(),
         ]);
     }
 
@@ -171,8 +179,51 @@ class WordLibrary extends Controller
 
         return redirect()->back()->with(['v_search'=>$request->v_search, 'v_sort'=>$request->v_sort, 'v_filter'=>$toFilter]);
     }
-    public function search_attribute(Request $request){
+    public function search_data(Request $request){
+        //Check for Variation
+        if(!$request->has('v_searchVariation') || !$request->filled('v_searchVariation'))
+            goto Next1;
+        $request->validate([
+            'v_searchVariation' => 'nullable|max:256',
+        ], [
+            'v_searchVariation.max'=>'Search Limit Reached My Friend.'
+        ]);
+        return redirect()->back()->with("v_searchVariation", $request->v_searchVariation);
 
+        Next1:
+        //CHeck for Attribute
+        if(!$request->has('v_searchAttribute') || !$request->filled('v_searchAttribute'))
+            goto Next2;
+        $request->validate([
+            'v_searchAttribute' => 'nullable|max:256',
+        ], [
+            'v_searchAttribute.max'=>'Search Limit Reached My Friend.'
+        ]);
+        return redirect()->back()->with("v_searchAttribute", $request->v_searchAttribute);
+
+        Next2:
+        //Check for Rarity
+        if(!$request->has('v_searchRarity') || !$request->filled('v_searchRarity'))
+            goto Next3;
+        $request->validate([
+            'v_searchRarity' => 'nullable|max:256',
+        ], [
+            'v_searchRarity.max'=>'Search Limit Reached My Friend.'
+        ]);
+        return redirect()->back()->with("v_searchRarity", $request->v_searchRarity);
+
+        Next3:
+        //Check for Language
+        if(!$request->has('v_searchLanguage') || !$request->filled('v_searchLanguage'))
+            goto Next4;
+        $request->validate([
+            'v_searchLanguage' => 'nullable|max:256',
+        ], [
+            'v_searchLanguage.max'=>'Search Limit Reached My Friend.'
+        ]);
+        return redirect()->back()->with("v_searchLanguage", $request->v_searchLanguage);
+
+        Next4:
     }
     public function add_submit(Request $request){
 
@@ -197,25 +248,25 @@ class WordLibrary extends Controller
         //Search
         if(session('v_search') ){
             $data = $data->where( function($query){
-                $query = $query->orWhereRaw("LOWER(word.keyname) LIKE '%". HelpMoKo::clense(session('v_search')) ."%'")
-                    // ->orWhereRaw("LOWER(rarity.name) LIKE '%". HelpMoKo::clense(session('v_search')) ."%'")
-                    ->orWhereRaw("LOWER(rarity.level) LIKE '%". HelpMoKo::clense(session('v_search')) ."%'")
-                    // ->orWhereRaw("LOWER(language.name) LIKE '%". HelpMoKo::clense(session('v_search')) ."%'")
+                $query = $query->orWhereRaw("LOWER(word.keyname) LIKE '%". HelpMoKo::cleanse(session('v_search')) ."%'")
+                    // ->orWhereRaw("LOWER(rarity.name) LIKE '%". HelpMoKo::cleanse(session('v_search')) ."%'")
+                    ->orWhereRaw("LOWER(rarity.level) LIKE '%". HelpMoKo::cleanse(session('v_search')) ."%'")
+                    // ->orWhereRaw("LOWER(language.name) LIKE '%". HelpMoKo::cleanse(session('v_search')) ."%'")
                     ;
                 //Get the Variation First
                 $Variation = Variation::all();
                 for($i = 0; $i < count($Variation); $i++){//Then Check each of those here
                     $ref = $Variation->id;
-                    $query = $query->orWhereRaw("LOWER(JSON_VALUE(definition, `$.$ref.name`)) LIKE '%".  HelpMoKo::clense(session('v_search')) ."%'" )
-                        ->orWhereRaw("LOWER(JSON_VALUE(word.definition, `$.$ref.definition`)) LIKE '%".  HelpMoKo::clense(session('v_search')) ."%'" )
-                        ->orWhereRaw("LOWER(JSON_VALUE(word.variation, `$.$ref`)) LIKE '%".  HelpMoKo::clense(session('v_search')) ."%'" )
-                        ->orWhereRaw("LOWER(JSON_VALUE(word.pronounciation, `$.$ref.simple`)) LIKE '%".  HelpMoKo::clense(session('v_search')) ."%'" )
-                        ->orWhereRaw("LOWER(JSON_VALUE(word.pronounciation, `$.$ref.original`)) LIKE '%".  HelpMoKo::clense(session('v_search')) ."%'" )
-                        // ->orWhereRaw("LOWER(CAST(JSON_EXTRACT(relationyms, `$.$ref.synonyms`) as CHAR)) LIKE '%".  HelpMoKo::clense(session('v_search')) ."%'")
-                        // ->orWhereRaw("LOWER(CAST(JSON_EXTRACT(relationyms, `$.$ref.antonyms`) as CHAR)) LIKE '%".  HelpMoKo::clense(session('v_search')) ."%'")
-                        // ->orWhereRaw("LOWER(CAST(JSON_EXTRACT(relationyms, `$.$ref.homonyms`) as CHAR)) LIKE '%".  HelpMoKo::clense(session('v_search')) ."%'")
-                        // ->orWhereRaw("LOWER(CAST(JSON_EXTRACT(examples, `$.$ref`) as CHAR)) LIKE '%".  HelpMoKo::clense(session('v_search')) ."%'")
-                        // ->orWhereRaw("LOWER(CAST(JSON_EXTRACT(examples, `$.$ref`) as CHAR)) LIKE '%".  HelpMoKo::clense(session('v_search')) ."%'")
+                    $query = $query->orWhereRaw("LOWER(JSON_VALUE(definition, `$.$ref.name`)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'" )
+                        ->orWhereRaw("LOWER(JSON_VALUE(word.definition, `$.$ref.definition`)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'" )
+                        ->orWhereRaw("LOWER(JSON_VALUE(word.variation, `$.$ref`)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'" )
+                        ->orWhereRaw("LOWER(JSON_VALUE(word.pronounciation, `$.$ref.simple`)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'" )
+                        ->orWhereRaw("LOWER(JSON_VALUE(word.pronounciation, `$.$ref.original`)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'" )
+                        // ->orWhereRaw("LOWER(CAST(JSON_EXTRACT(relationyms, `$.$ref.synonyms`) as CHAR)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'")
+                        // ->orWhereRaw("LOWER(CAST(JSON_EXTRACT(relationyms, `$.$ref.antonyms`) as CHAR)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'")
+                        // ->orWhereRaw("LOWER(CAST(JSON_EXTRACT(relationyms, `$.$ref.homonyms`) as CHAR)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'")
+                        // ->orWhereRaw("LOWER(CAST(JSON_EXTRACT(examples, `$.$ref`) as CHAR)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'")
+                        // ->orWhereRaw("LOWER(CAST(JSON_EXTRACT(examples, `$.$ref`) as CHAR)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'")
                         ;
                 }
                 //
@@ -272,6 +323,54 @@ class WordLibrary extends Controller
         $data = $data->paginate(15)->onEachSide(2);
 
         return $data;
+    }
+    protected function getVariation(){
+        $data = Variation::select('id','name');
+        //Requirement
+
+        //Search
+        if( session('v_searchVariation') ){
+            $data = $data->where( function($query){
+                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchVariation'))."%'");
+            });
+        }
+        return $data->limit(15)->get();
+    }
+    protected function getAttribute(){
+        $data = Attribute::select('id','name');
+        //Requirement
+
+        //Search
+        if( session('v_searchAttribute') ){
+            $data = $data->where( function($query){
+                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchAttribute'))."%'");
+            });
+        }
+        return $data->limit(15)->get();
+    }
+    protected function getRarity(){
+        $data = Rarity::select('id','name');
+        //Requirement
+
+        //Search
+        if( session('v_searchRarity') ){
+            $data = $data->where( function($query){
+                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchRarity'))."%'");
+            });
+        }
+        return $data->limit(15)->get();
+    }
+    protected function getLanguage(){
+        $data = Language::select('id','name');
+        //Requirement
+
+        //Search
+        if( session('v_searchLanguage') ){
+            $data = $data->where( function($query){
+                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchLanguage'))."%'");
+            });
+        }
+        return $data->limit(15)->get();
     }
     protected function quickValidate($type = "AddVariation", $type2="Image", $placeText = "word variation"){
         //**>> MAIN */

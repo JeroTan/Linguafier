@@ -44,7 +44,7 @@ class HelpMoKo{
         return $modifiedData;
     }
 
-    public static function clense($value){
+    public static function cleanse($value){
         return htmlspecialchars(addslashes(strtolower($value)));
     }
 

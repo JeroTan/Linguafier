@@ -328,9 +328,9 @@ class WordAttribution extends Controller
         //Search
         if(session('v_search') ){
             $data = $data->where( function($query){
-                $query->orWhereRaw("LOWER(name) LIKE '%". HelpMoKo::clense(session('v_search')) ."%'");
+                $query->orWhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_search')) ."%'");
                 if( session('c_pageSwitch') == "Rarity")
-                    $query->orWhereRaw("LOWER(level) LIKE '%". HelpMoKo::clense(session('v_search')) ."%'");
+                    $query->orWhereRaw("LOWER(level) LIKE '%". HelpMoKo::cleanse(session('v_search')) ."%'");
             });
         }
 

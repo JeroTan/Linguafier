@@ -291,7 +291,7 @@ class SpecialUser extends Controller
                 $query->orwhereRaw("LOWER(name) LIKE '%". addslashes(strtolower(session('v_search')))."%'");
             });
         }
-        return $data->get();
+        return $data->limit(15)->get();
     }
     protected function quickValidate($type = "add"){
         $rules = [

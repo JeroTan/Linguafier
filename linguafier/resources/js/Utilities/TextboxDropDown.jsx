@@ -18,6 +18,7 @@ export default function TextboxDropDown(Option){
     let dropData = Option.DropData ?? false;
     let siteVisit = Option.Request ?? "#";
     let siteData = Option.RequestKey ?? "v_search";
+    let withRef = Option.withRef ?? false;
 
     //*** USE STATE */
     const [c_textBox, s_textBox] = useState(undefined);
@@ -37,27 +38,37 @@ export default function TextboxDropDown(Option){
     function changeState(event){ //Check the site and try to input the data to Handler
         handler[1](event.target.value);
         s_dropBox(true);
-        let siteDataContainer = {};
-        siteDataContainer[siteData] = event.target.value;
-        router.post(siteVisit, siteDataContainer);//Send Request
+        requestDropData(event.target.value);//Send Request
     }
     if(errorBag){
         stateColor = 'red-400';
     }else{
         stateColor = 'black';
     }
-    function selectDropDown(data){
-        handler[1](data);
+    function selectDropDown(data){ // USE TO SELECT FROM DROPDOWN and once pick close all box and render textbox not editable
+        if(withRef){
+            handler[1](data);
+        }else{
+            handler[1](data.name);
+        }
+        textField.current.blur();
         s_dropBox(false);
         s_textBox(false);
     }
+    function requestDropData(search){
+        let siteDataContainer = {};
+        siteDataContainer[siteData] = search;
+        router.post(siteVisit, siteDataContainer);//Send Request
+    }
 
+    //** RENDER */
     return <>
-    <div className="relative"
+    <div tabIndex={0} className="relative"
         onFocus={()=>{
             s_textBox(true);
             if(dropTouch)
                 s_dropBox(true);
+            textField.current.focus();
         }}
         onBlur={(event)=>{
             if(event.currentTarget.contains(event.relatedTarget)){
@@ -80,14 +91,16 @@ export default function TextboxDropDown(Option){
                 pressFunc(event);
                 if (event.key === 'Enter') {
                     if(dropData.length > 0){
-                        handler[1](dropData[0].name);
+                        selectDropDown(dropData[0]);
+                    }else{
+                        s_textBox(false);
+                        s_dropBox(false);
+                        textField.current.blur();
                     }
-                    s_textBox(false);
-                    s_dropBox(false);
                 }
             }}
             placeholder={placeholder}
-            value={handler[0]}
+            value={withRef ? handler[0].name : handler[0]}
             readOnly={!c_textBox}
         />
         {
@@ -100,7 +113,7 @@ export default function TextboxDropDown(Option){
 
         { c_dropBox && dropData.length > 0 ? <div ref={dropField} tabIndex={0} className="absolute z-20 top-[36px] rounded border border-slate-700 border-t-4 bg-my-light min-w-[25rem] max-h-96 overflow-y-auto custom_scroll_2 flex flex-col gap-2" >
             { dropData.map((x, i)=>{
-                return <div key={i} className=" p-2 cursor-pointer border-b-2 border-slate-500 hover:bg-slate-700 hover:text-white" onClick={()=>{selectDropDown(x.name)}}>
+                return <div key={i} className=" p-2 cursor-pointer border-b-2 border-slate-500 hover:bg-slate-700 hover:text-white" onClick={()=>{selectDropDown(x)}}>
                     {x.name}
                 </div>
             }) }
