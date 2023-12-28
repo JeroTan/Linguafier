@@ -16,10 +16,6 @@
     "dependencies": {
         "@inertiajs/inertia-react": "^0.8.1",
         "@inertiajs/react": "^1.0.13",
-        "@vitejs/plugin-react": "^4.1.0",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
-        "slate": "^0.101.5",
-        "slate-react": "^0.101.5"
+        "@vitejs/plugin-react": "^4.1.0"
     }
 }

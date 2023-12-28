@@ -29,6 +29,7 @@ export default {
     'text-yellow-500',
     'sm:ml-3',
     'min-w-96',
+    'min-w-[24rem]',
   ],
   theme: {
     extend: {

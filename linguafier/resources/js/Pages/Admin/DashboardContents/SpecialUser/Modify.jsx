@@ -17,7 +17,7 @@ import { useEffect, useState } from "react"
 export default()=>{
     //** Use Page */
     const { errors, roles, data } = usePage().props;
-    console.log(data);
+
 
     //**>> Use State */
     const [v_username, e_username] = useState(data.username);

@@ -35,7 +35,6 @@ export default (Option)=>{
                         let [ ItemToMove ] = mirror.splice(index, 1);
                         mirror.splice(0, 0, ItemToMove);
                         mirror[0].Sort = mirror[0].Sort == 'ASC' ? 'DESC' : 'ASC';
-                        console.log(mirror);
                         return mirror;
                     })
                 }}>

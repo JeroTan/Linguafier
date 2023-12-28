@@ -105,7 +105,6 @@ export default function TextboxDropDownMultiple(Option){
                 });
             }
             else{
-                console.log(handler[0]);
                 return !handler[0].some((y, j)=>{
                     return x.name ==  y;
                 });
@@ -154,7 +153,7 @@ export default function TextboxDropDownMultiple(Option){
             <input
                 ref={textField}
                 type={`text`}
-                className={` outline-none focus:outline-none bg-white/0 `}
+                className={`shrink grow-0 outline-none focus:outline-none bg-white/0 `}
                 onChange={changeState}
                 onKeyDown={(event)=>{
                     pressFunc(event);
@@ -202,7 +201,7 @@ export default function TextboxDropDownMultiple(Option){
                     });
                 }
                 else{
-                    console.log(handler[0]);
+
                     return !handler[0].some((y, j)=>{
                         return x.name ==  y;
                     });

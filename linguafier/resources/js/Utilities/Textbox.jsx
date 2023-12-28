@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export default function Textbox(Option){
     //
@@ -13,7 +13,7 @@ export default function Textbox(Option){
     let errorBag = Option.Error ?? '';
     let pressFunc = Option.PressFunc ?? (()=>true);
     let minmax = Option.MinMax ?? [undefined, undefined];
-    let dynamic = Option.Dynamics ?? false;
+    let dynamic = Option.Dynamic ?? false;
 
 
     //** Functionality */
@@ -22,18 +22,13 @@ export default function Textbox(Option){
             handler[1](event.target.value);
             return true;
         }
-        function domainExpansion(energy, limitless, forge){ // Traverse through depth by 1 or infinitely;
+        function domainExpansion(energy, limitless, voided){ // Traverse through depth by 1 or infinitely;
             // THIS WILL REQUIRE A MASSIVE AMOUNT OF ENERGY BE CAREFUl
-            //energy is the Full Object; limitless is the array to traverse; forge is the value to insert
+            //energy is the Full Object; limitless is the array to traverse; voided is the value to insert
             if(limitless.length < 1){
-                return forge;
+                return voided;
             }
-            let newEnergy = energy[limitless[0]];
-            let newLimit = [];
-            limitless.forEach((x)=>{
-                newLimit[newLimit.length] = x;
-            })
-            energy[limitless[0]] = domainExpansion(newEnergy, newLimit, forge);
+            energy[limitless[0]] = domainExpansion(energy[limitless[0]], limitless.filter((x,i)=>i!=0) || [], voided);
             return energy;
         }
         handler[1]((prev)=>{
@@ -48,7 +43,7 @@ export default function Textbox(Option){
     }else{
         stateColor = 'black';
     }
-    function valueHandler(){
+    const valueHandler = useCallback(()=>{
         if(!dynamic)
             return handler[0];
 
@@ -57,20 +52,16 @@ export default function Textbox(Option){
             if(limitless.length == 1){
                 return energy[limitless[0]];
             }
-            let newEnergy = energy[limitless[0]];
-            let newLimit = [];
-            limitless.forEach((x)=>{
-                newLimit[newLimit.length] = x;
-            })
-            return domainExpansion(newEnergy, newLimit);
+            return domainExpansion(energy[limitless[0]], limitless.filter((x,i)=>i!=0) );
         }
-        return domainExpansion(handler[0], dynamic.split("."));
-    }
 
-    return <div>
+        return domainExpansion(handler[0], dynamic.split("."));
+    }, (Option.Handle));
+
+    return <div className={`${size}`}>
         <input
             type={type}
-            className={`${padding} ${size} rounded outline outline-1 outline-${stateColor} outline-offset-0 shadow-myBox3 shadow-${stateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${stateColor}/80  placeholder:font-light ${bgcolor} max-w-full shrink`}
+            className={`${padding} rounded outline outline-1 outline-${stateColor} outline-offset-0 shadow-myBox3 shadow-${stateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${stateColor}/80  placeholder:font-light ${bgcolor} w-full`}
             onChange={changeState}
             onKeyDown={pressFunc}
             placeholder={placeholder}

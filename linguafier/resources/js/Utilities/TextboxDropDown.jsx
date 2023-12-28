@@ -63,7 +63,7 @@ export default function TextboxDropDown(Option){
 
     //** RENDER */
     return <>
-    <div tabIndex={0} className="relative"
+    <div tabIndex={0} className={`relative flex flex-wrap ${size}`}
         onFocus={()=>{
             s_textBox(true);
             if(dropTouch)
@@ -85,7 +85,7 @@ export default function TextboxDropDown(Option){
         <input
             ref={textField}
             type={type}
-            className={`${padding} ${size} rounded outline outline-1 outline-${stateColor} outline-offset-0 shadow-myBox3 shadow-${stateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${stateColor}/80  placeholder:font-light ${bgcolor} max-w-full shrink ${c_textBox ? "" :"cursor-pointer hover:outline-4 bg-gray-300"}`}
+            className={`${padding} w-full rounded outline outline-1 outline-${stateColor} outline-offset-0 shadow-myBox3 shadow-${stateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${stateColor}/80  placeholder:font-light ${bgcolor} shrink grow-0 ${c_textBox ? "" :"cursor-pointer hover:outline-4 bg-gray-300"}`}
             onChange={changeState}
             onKeyDown={(event)=>{
                 pressFunc(event);
@@ -105,7 +105,7 @@ export default function TextboxDropDown(Option){
         />
         {
             errorBag ?
-            <div>
+            <div className="block">
                 <small className='font-light text-red-500'>{errorBag}</small>
             </div>
             : ''
