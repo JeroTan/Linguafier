@@ -1,51 +1,14 @@
 //HOOKS
 import { useCallback, useEffect, useMemo, useState, useRef, createContext, useContext } from 'react'
+import parse from "html-react-parser";
 // Import the Slate editor factory.
 
 // UTILITIES
-import Button from './Button'
-import TextEditorRenderer from './TextEditorRenderer';
 
-//Create Context
-export const G_Data = createContext();
-
-//ExtraFunc/Comp
-function TextEditorPlate(Option){
-    //** Use Context */
-    const {TextNode, MainEditor, Padding, Size, StateColor, BgColor  } = useContext(G_Data);
-
-    //** Render */
-    return <div
-        tabIndex={0}
-        ref={MainEditor}
-        className={`relative ${Padding} ${Size} rounded outline outline-1 outline-${StateColor} outline-offset-0 shadow-myBox3 shadow-${StateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${StateColor}/80  placeholder:font-light ${BgColor}  shrink min-h-[30px]`}
-        onInput={(event)=>{
-            //console.log(event);
-            console.log(window.getSelection());///////////////////////////////////////////////////
-        }}
-        onKeyDown={(event)=>{
-            //console.log(event.key);
-            if(event.key){
-
-            }
-        }}
-        onKeyUp={(event)=>{
-            //console.log(event);
-        }}
-        contentEditable
-        style={{
-            wordBreak: 'break-all',
-            overflowWrap: 'break-word',
-
-        }}
-    >
-        {Option.children}
-    </div>
-}
 
 
 //Main
-export default function TextEditor(Option) {
+export default function TextEditorSimple(Option) {
     //** STRUCT */
     let Handler = Option.Handle;
     let ErrorBag = Option.ErrorBag;
@@ -54,7 +17,6 @@ export default function TextEditor(Option) {
     let BgColor = Option.BgColor ?? "bg-white";
 
     //**>> Use State */
-    const [v_textNode, e_textNode] = useState([{type:"text", content:"ff"}]);
 
     //**<< Use State */
 
@@ -89,7 +51,20 @@ export default function TextEditor(Option) {
             restructPrev = domainExpansion( restructPrev, Dynamic.split("."), value );
             return restructPrev;
         });
-    }, [Option.Dynamic, Option.Handle]);
+    }, [Option.Dynamic]);
+
+    const ShowHandler = useMemo(()=>{
+        if(!Dynamic)
+            return Handler[0];
+
+        function domainExpansion(energy, limitless){
+            if(limitless.length == 1){
+                return energy[limitless[0]];
+            }
+            return domainExpansion(energy[limitless[0]], limitless.filter((x,i)=>i!=0));
+        }
+        return domainExpansion(Handler[0], Dynamic.split("."));
+    }, []);
 
     const StateColor = useMemo((value)=>{
         if(ErrorBag){
@@ -99,11 +74,6 @@ export default function TextEditor(Option) {
         }
     }, [ErrorBag]);
 
-    const renderedContent = useMemo(()=>{
-        return <TextEditorPlate>
-            <TextEditorRenderer TextNode={v_textNode} />
-        </TextEditorPlate>;
-    }, [v_textNode]);
 
     //**<< MEMOIZONE
 
@@ -111,16 +81,54 @@ export default function TextEditor(Option) {
     const MainEditor = useRef();
 
     //** REENDER */
-    return <G_Data.Provider value={{
-        TextNode:[v_textNode, e_textNode],
-        MainEditor:MainEditor,
-        Padding: Padding,
-        Size: Size,
-        StateColor: StateColor,
-        BgColor: BgColor,
-    }}>
-        {renderedContent}
-    </G_Data.Provider>
+    return <div className={`flex ${Size}`}>
+        <div
+            id='textEditor'
+            tabIndex={0}
+            ref={MainEditor}
+            className={`shrink grow-0 ${Padding} w-full rounded outline outline-1 outline-${StateColor} outline-offset-0 shadow-myBox3 shadow-${StateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${StateColor}/80  placeholder:font-light ${BgColor} min-h-[30px] empty:before:content-[attr(placeholderHere)] empty:before:text-slate-400 empty:before:font-light`}
+            onInput={(event)=>{
+                //console.log(event);
+                //console.log(event.target.innerHTML);///////////////////////////////////////////////////
+                UpdateHandler(event.target.innerHTML);
+                //console.log(event.target.innerHTML);
+            }}
+            placeholderHere={Placeholder}
+            onKeyDown={(event)=>{
+                // if (event.key === '`' && event.ctrlKey) {
+                //     event.preventDefault()
+                // }
+            }}
+            onPaste={(event)=>{
+
+                let d = event.clipboardData;
+                console.log(d.types);
+                if(!d.types.some(x=>x=="Files")){
+                    let regex = /\bstyle\s*=\s*(['"])(.*?)\1/gm
+                    let sanitizeData = String(d.getData("text/plain"));
+                    sanitizeData = sanitizeData.replace(regex, "");
+                    const selection = window.getSelection();
+                    if (!selection.rangeCount) return false;
+                    selection.deleteFromDocument();
+                    selection.getRangeAt(0).insertNode(document.createTextNode(sanitizeData));
+                    //selection.addRange(1);
+                    selection.collapseToEnd();
+                    MainEditor.current.click();
+                    event.preventDefault();
+                }
+            }}
+            contentEditable
+            style={{
+                wordBreak: 'break-all',
+                overflowWrap: 'break-word',
+
+            }}
+            suppressContentEditableWarning={true}
+            spellCheck
+        >
+            {parse(ShowHandler)}
+        </div>
+    </div>
 }
 
 /*

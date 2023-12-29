@@ -73,6 +73,12 @@ class WordLibrary extends Controller
             'attributeDrop'=>$this->getAttribute(),
             'rarityDrop'=>$this->getRarity(),
             'languageDrop'=>$this->getLanguage(),
+            'synonymsDrop'=>$this->getSynonyms(),
+            'antonymsDrop'=>$this->getAntonyms(),
+            'homonymsDrop'=>$this->getHomonyms(),
+            'tailDrop'=>$this->getTail(),
+            'sideDrop'=>$this->getSide(),
+            'headDrop'=>$this->getHead(),
         ]);
     }
     public function modify_ui(Request $request, $id){
@@ -84,6 +90,9 @@ class WordLibrary extends Controller
             'attributeDrop'=>$this->getAttribute(),
             'rarityDrop'=>$this->getRarity(),
             'languageDrop'=>$this->getLanguage(),
+            'synonymsDrop'=>$this->getSynonyms(),
+            'antonymsDrop'=>$this->getAntonyms(),
+            'homonymsDrop'=>$this->getHomonyms(),
         ]);
     }
 
@@ -224,6 +233,73 @@ class WordLibrary extends Controller
         return redirect()->back()->with("v_searchLanguage", $request->v_searchLanguage);
 
         Next4:
+        //Check for Synonyms
+        if(!$request->has('v_searchSynonyms') || !$request->filled('v_searchSynonyms'))
+            goto Next5;
+        $request->validate([
+            'v_searchSynonyms' => 'nullable|max:256',
+        ], [
+            'v_searchSynonyms.max'=>'Search Limit Reached My Friend.'
+        ]);
+        return redirect()->back()->with("v_searchSynonyms", $request->v_searchSynonyms);
+
+        Next5:
+        //Check for Antonyms
+        if(!$request->has('v_searchAntonyms') || !$request->filled('v_searchAntonyms'))
+            goto Next6;
+        $request->validate([
+            'v_searchAntonyms' => 'nullable|max:256',
+        ], [
+            'v_searchAntonyms.max'=>'Search Limit Reached My Friend.'
+        ]);
+        return redirect()->back()->with("v_searchAntonyms", $request->v_searchAntonyms);
+
+        Next6:
+        //Check for Homonyms
+        if(!$request->has('v_searchHomonyms') || !$request->filled('v_searchHomonyms'))
+            goto Next7;
+        $request->validate([
+            'v_searchHomonyms' => 'nullable|max:256',
+        ], [
+            'v_searchHomonyms.max'=>'Search Limit Reached My Friend.'
+        ]);
+        return redirect()->back()->with("v_searchHomonyms", $request->v_searchHomonyms);
+
+        Next7:
+        //Check for Tail
+        if(!$request->has('v_searchTail') || !$request->filled('v_searchTail'))
+            goto Next8;
+        $request->validate([
+            'v_searchTail' => 'nullable|max:256',
+        ], [
+            'v_searchTail.max'=>'Search Limit Reached My Friend.'
+        ]);
+        return redirect()->back()->with("v_searchTail", $request->v_searchTail);
+
+        Next8:
+        //Check for Side
+        if(!$request->has('v_searchSide') || !$request->filled('v_searchSide'))
+            goto Next9;
+        $request->validate([
+            'v_searchSide' => 'nullable|max:256',
+        ], [
+            'v_searchSide.max'=>'Search Limit Reached My Friend.'
+        ]);
+        return redirect()->back()->with("v_searchSide", $request->v_searchSide);
+
+        Next9:
+        //Check for Head
+        if(!$request->has('v_searchHead') || !$request->filled('v_searchHead'))
+            goto Next10;
+        $request->validate([
+            'v_searchHead' => 'nullable|max:256',
+        ], [
+            'v_searchHead.max'=>'Search Limit Reached My Friend.'
+        ]);
+        return redirect()->back()->with("v_searchHead", $request->v_searchHead);
+
+        Next10:
+
     }
     public function add_submit(Request $request){
 
@@ -372,6 +448,80 @@ class WordLibrary extends Controller
         }
         return $data->limit(15)->get();
     }
+    protected function getSynonyms(){
+        $data = Word::select('id', 'keyname as name');
+        //Requirement
+
+        //Search
+        if( session('v_searchSynonyms') ){
+            $data = $data->where( function($query){
+                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchSynonyms'))."%'");
+            });
+        }
+        return $data->limit(15)->get();
+    }
+    protected function getAntonyms(){
+        $data = Word::select('id', 'keyname as name');
+        //Requirement
+
+        //Search
+        if( session('v_searchAntonyms') ){
+            $data = $data->where( function($query){
+                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchAntonyms'))."%'");
+            });
+        }
+        return $data->limit(15)->get();
+    }
+    protected function getHomonyms(){
+        $data = Word::select('id', 'keyname as name');
+        //Requirement
+
+        //Search
+        if( session('v_searchHomonyms') ){
+            $data = $data->where( function($query){
+                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchHomonyms'))."%'");
+            });
+        }
+        return $data->limit(15)->get();
+    }
+    protected function getTail(){
+        $data = Word::select('id', 'keyname as name');
+        //Requirement
+
+        //Search
+        if( session('v_searchTail') ){
+            $data = $data->where( function($query){
+                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchTail'))."%'");
+            });
+        }
+        return $data->limit(15)->get();
+    }
+    protected function getSide(){
+        $data = Word::select('id', 'keyname as name');
+        //Requirement
+
+        //Search
+        if( session('v_searchSide') ){
+            $data = $data->where( function($query){
+                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchSide'))."%'");
+            });
+        }
+        return $data->limit(15)->get();
+    }
+    protected function getHead(){
+        $data = Word::select('id', 'keyname as name');
+        //Requirement
+
+        //Search
+        if( session('v_searchHead') ){
+            $data = $data->where( function($query){
+                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchHead'))."%'");
+            });
+        }
+        return $data->limit(15)->get();
+    }
+
+
     protected function quickValidate($type = "AddVariation", $type2="Image", $placeText = "word variation"){
         //**>> MAIN */
         $rules = [

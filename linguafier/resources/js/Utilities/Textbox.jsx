@@ -58,7 +58,7 @@ export default function Textbox(Option){
         return domainExpansion(handler[0], dynamic.split("."));
     }, (Option.Handle));
 
-    return <div className={`${size}`}>
+    return <div className={`${size} inline-block`}>
         <input
             type={type}
             className={`${padding} rounded outline outline-1 outline-${stateColor} outline-offset-0 shadow-myBox3 shadow-${stateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${stateColor}/80  placeholder:font-light ${bgcolor} w-full`}

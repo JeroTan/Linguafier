@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo, useCallback } from "react";
 
 //UTILTIES
 import Icon from "./Icon";
@@ -11,7 +11,9 @@ export default function FIleInput(Option){
     let Progress = Option.Progress;
     let Size = Option.Size ?? 100;
     let Accept = Option.Accept ?? "image/*";
-    let errorBag = Option.Error ?? '';
+    let ErrorBag = Option.Error ?? '';
+    let Dynamic = Option.Dynamic ?? false;
+
 
 
     //** STYLE */
@@ -28,6 +30,31 @@ export default function FIleInput(Option){
     const inputRef = useRef();
 
     //** Functionality */
+    const e_domainExpansion = useCallback((energy, limitless, voided)=>{// Traverse through depth by 1 or infinitely;
+        // THIS WILL REQUIRE A MASSIVE AMOUNT OF ENERGY(memory) BE CAREFUL;
+        // energy - the Full Object/Array; Limitless is the array to traverse; Voided is the value to insert at the end of limitless;
+        if(limitless.length < 1){
+            return voided;
+        }
+        //-------------------------------------Traverse Next Arr/Obj---Reduce the limitless by 1----ValueNeededToInsert
+        energy[limitless[0]] = e_domainExpansion(energy[limitless[0]], limitless.filter((x,i)=>i!=0) || [], voided);
+        return energy;
+    }, []);
+    const v_domainExpansion = useCallback((energy, limitless)=>{// Traverse through depth by 1 or infinitely;
+        // THIS WILL REQUIRE A MASSIVE AMOUNT OF ENERGY(memory) BE CAREFUL;
+        // energy - the Full Object/Array; Limitless is the array to traverse;
+        if(limitless.length == 1){
+            return energy[limitless[0]]
+        }
+        //----------------Traverse Next Arr/Obj---Reduce the limitless by 1----
+        v_domainExpansion(energy[limitless[0]], limitless.filter((x,i)=>i!=0) || []);
+        return energy;
+    }, []);
+    const HandlerFixed = useMemo(()=>{
+        if(!Dynamic)
+            return Handler[0];
+        return v_domainExpansion(Handler[0], Dynamic.split('.'));
+    }, [Dynamic, Handler[0]]);
     function UploadDesign(){
         return <div className={`aspect-square rounded outline outline-1 outline-${StateColor} outline-offset-0 shadow-myBox3 cursor-pointer bg-my-green hover:outline-4 hover:brightness-105 border-2 border-slate-700 border-dashed  flex flex-col justify-center items-center  delay-75`}
             onClick={()=>{
@@ -43,13 +70,20 @@ export default function FIleInput(Option){
         return <div className={`group relative aspect-square rounded outline outline-1 outline-${StateColor} hover:outline-slate-800 hover:outline-4 outline-offset-0 shadow-myBox3 bg-my-light cursor-pointer delay-75`}
         style={UploadStyle} >
             <div className="w-full h-full absolute break-words delay-75 opacity-0 group-hover:opacity-100 text-slate-500 overflow-hidden">
-                { Handler[0].name.length < Size*.25 ? Handler[0].name : Handler[0].name.slice(0, Size*.25)+"..." }
+                { HandlerFixed.name.length < Size*.25 ? HandlerFixed.name : HandlerFixed.name.slice(0, Size*.25)+"..." }
             </div>
             <div className="w-full h-full absolute flex justify-center items-center delay-75 opacity-0 group-hover:opacity-100 overflow-hidden" >
                 <Icon Name="eye" OutClass="w-10 h-10" InClass="fill-my-green" />
             </div>
             <div className="absolute rounded opacity-25 group-hover:opacity-100 delay-75 hover:drop-shadow-myDrop1" style={{left:`${Size-2}px`, bottom:`${Size}px`}} onClick={()=>{
-                Handler[1]("");
+                if(!Dynamic){
+                    Handler[1]("");
+                }else{
+                    Handler[1](prev=>{
+                        return structuredClone(e_domainExpansion(prev, Dynamic.split('.'), ""));
+                    });
+                }
+
                 e_prevFile("");
             }}>
                 <Icon Name="close" OutClass={`w-5 h-5`} />
@@ -59,7 +93,6 @@ export default function FIleInput(Option){
             }}/>
         </div>
     }
-
     function PopUpDesign(){
         return <div className="relative h-full w-fit mt-3">
             <img className="w-full h-full object-contain" src={d_prevFile} />
@@ -67,15 +100,22 @@ export default function FIleInput(Option){
     }
 
     return <div>
-        { Handler[0] && d_prevFile ? PreviewDesign() : UploadDesign() }
+        { HandlerFixed && d_prevFile ? PreviewDesign() : UploadDesign() }
         <input ref={inputRef} type="file" className={`hidden`}  onChange={(event)=>{
-            Handler[1](event.target.files[0]);
+            if(!Dynamic){
+                Handler[1](event.target.files[0]);
+            }else{
+                Handler[1](prev=>{
+                    return structuredClone(e_domainExpansion(prev, Dynamic.split('.'), event.target.files[0]));
+                });
+            }
+
             e_prevFile(URL.createObjectURL(event.target.files[0]));
         }} accept={Accept} />
         {
-            errorBag ?
+            ErrorBag ?
             <div>
-                <small className='font-light text-red-500'>{errorBag}</small>
+                <small className='font-light text-red-500'>{ErrorBag}</small>
             </div>
             : ''
         }
