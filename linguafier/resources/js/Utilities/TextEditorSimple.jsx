@@ -11,7 +11,7 @@ import parse from "html-react-parser";
 export default function TextEditorSimple(Option) {
     //** STRUCT */
     let Handler = Option.Handle;
-    let ErrorBag = Option.ErrorBag;
+    let ErrorBag = Option.Error;
     let Padding = Option.Padding ?? "py-1 px-4";
     let Size = Option.Size ?? "min-w-[24rem]";
     let BgColor = Option.BgColor ?? "bg-white";
@@ -19,6 +19,9 @@ export default function TextEditorSimple(Option) {
     //**>> Use State */
 
     //**<< Use State */
+
+    //** Use Ref */
+    const MainEditor = useRef();
 
     //**>> MEMOIZONE
     const Placeholder = useMemo(()=>{
@@ -28,6 +31,13 @@ export default function TextEditorSimple(Option) {
     const Dynamic = useMemo(()=>{
         return Option.Dynamic ?? false;
     }, [Option.Dynamic]);
+
+    const v_domainExpansion = useCallback((energy, limitless)=>{
+        if(limitless.length == 1){
+            return energy[limitless[0]];
+        };
+        return v_domainExpansion(energy[limitless[0]], limitless.filter((x,i)=>i!=0));
+    }, []);
 
     const UpdateHandler = useCallback((value)=>{ // Insert the New Value to handler when stuff gets updated
         if(!Dynamic){
@@ -53,20 +63,7 @@ export default function TextEditorSimple(Option) {
         });
     }, [Option.Dynamic]);
 
-    const ShowHandler = useMemo(()=>{
-        if(!Dynamic)
-            return Handler[0];
-
-        function domainExpansion(energy, limitless){
-            if(limitless.length == 1){
-                return energy[limitless[0]];
-            }
-            return domainExpansion(energy[limitless[0]], limitless.filter((x,i)=>i!=0));
-        }
-        return domainExpansion(Handler[0], Dynamic.split("."));
-    }, []);
-
-    const StateColor = useMemo((value)=>{
+    const StateColor = useMemo(()=>{
         if(ErrorBag){
             return 'red-400';
         }else{
@@ -77,23 +74,37 @@ export default function TextEditorSimple(Option) {
 
     //**<< MEMOIZONE
 
-    //** Use Ref */
-    const MainEditor = useRef();
+
+
+    //** Use Effect */
+    useEffect(()=>{
+        let handlerTemp = Handler[0];
+        if(Dynamic)
+            handlerTemp = v_domainExpansion(Handler[0], Dynamic.split("."));
+
+        if(MainEditor.current != undefined){
+            if(handlerTemp != MainEditor.current.innerHTML){
+                MainEditor.current.innerHTML = handlerTemp;
+            }
+        };
+
+    }, [Handler[0]]);
+
 
     //** REENDER */
-    return <div className={`flex ${Size}`}>
+    return <div className={`flex flex-col ${Size}`}>
         <div
             id='textEditor'
             tabIndex={0}
             ref={MainEditor}
-            className={`shrink grow-0 ${Padding} w-full rounded outline outline-1 outline-${StateColor} outline-offset-0 shadow-myBox3 shadow-${StateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${StateColor}/80  placeholder:font-light ${BgColor} min-h-[30px] empty:before:content-[attr(placeholderHere)] empty:before:text-slate-400 empty:before:font-light`}
+            className={`shrink grow-0 ${Padding} w-full rounded outline outline-1 outline-${StateColor} outline-offset-0 shadow-myBox3 shadow-${StateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${StateColor}/80  placeholder:font-light ${BgColor} min-h-[30px] empty:before:content-[attr(placeholder-here)] empty:before:text-slate-400 empty:before:font-light`}
             onInput={(event)=>{
                 //console.log(event);
                 //console.log(event.target.innerHTML);///////////////////////////////////////////////////
                 UpdateHandler(event.target.innerHTML);
                 //console.log(event.target.innerHTML);
             }}
-            placeholderHere={Placeholder}
+            placeholder-here={Placeholder}
             onKeyDown={(event)=>{
                 // if (event.key === '`' && event.ctrlKey) {
                 //     event.preventDefault()
@@ -102,7 +113,6 @@ export default function TextEditorSimple(Option) {
             onPaste={(event)=>{
 
                 let d = event.clipboardData;
-                console.log(d.types);
                 if(!d.types.some(x=>x=="Files")){
                     let regex = /\bstyle\s*=\s*(['"])(.*?)\1/gm
                     let sanitizeData = String(d.getData("text/plain"));
@@ -126,8 +136,15 @@ export default function TextEditorSimple(Option) {
             suppressContentEditableWarning={true}
             spellCheck
         >
-            {parse(ShowHandler)}
+
         </div>
+        {
+            ErrorBag ?
+            <div className=''>
+                <small className='font-light text-red-500'>{ErrorBag}</small>
+            </div>
+            : ''
+        }
     </div>
 }
 

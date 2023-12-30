@@ -18,7 +18,7 @@ export default function TextboxDropDown(Option){
     let dropData = Option.DropData ?? false;
     let siteVisit = Option.Request ?? "#";
     let siteData = Option.RequestKey ?? "v_search";
-    let withRef = Option.withRef ?? false;
+    let withRef = Option.WithRef ?? false;
 
     //*** USE STATE */
     const [c_textBox, s_textBox] = useState(undefined);
@@ -75,7 +75,7 @@ export default function TextboxDropDown(Option){
                 return true;
             }
             if(selectSkip == true && dropData.length > 0){
-                handler[1](dropData[0].name);
+                selectDropDown(dropData[0]);
             }
             s_textBox(false);
             s_dropBox(false);

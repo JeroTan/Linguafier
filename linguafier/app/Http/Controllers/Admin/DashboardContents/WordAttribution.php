@@ -389,7 +389,7 @@ class WordAttribution extends Controller
             'v_image.required'=>'Image is required.',
             'v_image.file'=>'The data that you have uploaded is not a file.',
             'v_image.mimes'=>'The data that you have uploaded is not a valid filetypes.',
-            'v_image.max'=>"File is too large, please upload less 8mb only.",
+            'v_image.max'=>"File is too large, please upload less than 8mb only.",
         ];
         $colorRule = [
             "required",

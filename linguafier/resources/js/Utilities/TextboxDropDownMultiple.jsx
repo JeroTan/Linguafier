@@ -32,7 +32,6 @@ export default function TextboxDropDownMultiple(Option){
     let handler = Option.Handle;
     let placeholder = Option.Placeholder ?? '';
     let bgcolor = Option.Color ?? '';
-    let stateColor = 'black'
     let errorBag = Option.Error ?? '';
     let pressFunc = Option.PressFunc ?? (()=>true);
     let dropTouch = Option.DropTouch ?? true;
@@ -51,6 +50,7 @@ export default function TextboxDropDownMultiple(Option){
     const [c_containerSize, s_containerSize] = useState([0,0]);
     const [c_textBox, s_textBox] = useState(undefined);
     const [c_dropBox, s_dropBox] = useState(false); //Use to tell if dropdown should be shown in the bottom of selection box
+    const [c_stateColor, s_stateColor] = useState('black');
 
     //*** USE REF */
     const textField = useRef();
@@ -61,9 +61,9 @@ export default function TextboxDropDownMultiple(Option){
     }, [c_textBox])
     useEffect(()=>{
         if(errorBag){
-            stateColor = 'red-400';
+            s_stateColor('red-400');
         }else{
-            stateColor = 'black';
+            s_stateColor('black');
         }
     }, [errorBag]);
 
@@ -93,7 +93,7 @@ export default function TextboxDropDownMultiple(Option){
         if(!dynamic)
             return handler[0];
         return v_domainExpansion(handler[0], dynamic.split('.'));
-    }, [dynamic, handler[0]]);
+    }, [dynamic, handler[0], handler]);
     function changeState(event){ //Check the site and try to input the data to Handler
         e_inputText(event.target.value)
         s_dropBox(true);
@@ -181,7 +181,7 @@ export default function TextboxDropDownMultiple(Option){
 
         >
         <div
-            className={`${padding}  rounded outline outline-1 outline-${stateColor} outline-offset-0 shadow-myBox3 shadow-${stateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${stateColor}/80  placeholder:font-light ${bgcolor} flex flex-wrap gap-y-1 gap-x-2 shrink ${c_textBox ? "" :"cursor-pointer hover:outline-4 bg-gray-300"}`}
+            className={`${padding}  rounded outline outline-1 outline-${c_stateColor} outline-offset-0 shadow-myBox3 shadow-${c_stateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${c_stateColor}/80 ${bgcolor} flex flex-wrap gap-y-1 gap-x-2 shrink ${c_textBox ? "" :"cursor-pointer hover:outline-4 bg-gray-300"}`}
 
         >
 
@@ -195,7 +195,7 @@ export default function TextboxDropDownMultiple(Option){
             <input
                 ref={textField}
                 type={`text`}
-                className={` shrink w-full grow-0 outline-none focus:outline-none bg-white/0 placeholder:text-zinc-400 ${c_textBox ? "" :"cursor-pointer"}`}
+                className={` shrink w-full grow-0 outline-none focus:outline-none bg-white/0 placeholder:font-light placeholder:text-zinc-400 ${c_textBox ? "" :"cursor-pointer"}`}
                 onChange={changeState}
                 onKeyDown={(event)=>{
                     pressFunc(event);

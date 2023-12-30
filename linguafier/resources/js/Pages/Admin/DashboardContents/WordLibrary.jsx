@@ -106,7 +106,7 @@ export default ()=>{
 
     const [v_selectId, e_selectId] = useState('');
 
-    const [c_dataLoading, e_dataLoading] = useState(false);
+    const [c_dataLoading, e_dataLoading] = useState(true);
     //**<< Use State */
 
     //**>> Use Effect */

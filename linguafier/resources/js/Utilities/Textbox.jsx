@@ -1,20 +1,30 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export default function Textbox(Option){
-    //
-
+    //** Struct */
     let type = Option.Type ?? "text" ;
     let padding = Option.Padding ?? "py-1 px-4";
     let size = Option.Size ?? "";
     let handler = Option.Handle;
     let placeholder = Option.Placeholder ?? '';
     let bgcolor = Option.Color ?? '';
-    let stateColor = 'black'
     let errorBag = Option.Error ?? '';
     let pressFunc = Option.PressFunc ?? (()=>true);
     let minmax = Option.MinMax ?? [undefined, undefined];
     let dynamic = Option.Dynamic ?? false;
 
+    //** Use State */
+    const [c_stateColor, e_stateColor] = useState('black');
+
+
+    //** Use Effect */
+    useEffect(()=>{
+        if(errorBag){
+            e_stateColor('red-400');
+        }else{
+            e_stateColor('black');
+        }
+    }, [errorBag]);
 
     //** Functionality */
     function changeState(event){
@@ -38,11 +48,7 @@ export default function Textbox(Option){
         });
 
     }
-    if(errorBag){
-        stateColor = 'red-400';
-    }else{
-        stateColor = 'black';
-    }
+
     const valueHandler = useCallback(()=>{
         if(!dynamic)
             return handler[0];
@@ -61,7 +67,7 @@ export default function Textbox(Option){
     return <div className={`${size} inline-block`}>
         <input
             type={type}
-            className={`${padding} rounded outline outline-1 outline-${stateColor} outline-offset-0 shadow-myBox3 shadow-${stateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${stateColor}/80  placeholder:font-light ${bgcolor} w-full`}
+            className={`${padding} rounded outline outline-1 outline-${c_stateColor} outline-offset-0 shadow-myBox3 shadow-${c_stateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${c_stateColor}/80  placeholder:font-light ${bgcolor} w-full`}
             onChange={changeState}
             onKeyDown={pressFunc}
             placeholder={placeholder}

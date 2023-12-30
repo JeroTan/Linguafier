@@ -93,6 +93,9 @@ class WordLibrary extends Controller
             'synonymsDrop'=>$this->getSynonyms(),
             'antonymsDrop'=>$this->getAntonyms(),
             'homonymsDrop'=>$this->getHomonyms(),
+            'tailDrop'=>$this->getTail(),
+            'sideDrop'=>$this->getSide(),
+            'headDrop'=>$this->getHead(),
         ]);
     }
 
@@ -302,7 +305,7 @@ class WordLibrary extends Controller
 
     }
     public function add_submit(Request $request){
-
+        $this->quickValidate($request);
     }
     public function modify_submit(Request $request, $id){
 
@@ -455,7 +458,7 @@ class WordLibrary extends Controller
         //Search
         if( session('v_searchSynonyms') ){
             $data = $data->where( function($query){
-                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchSynonyms'))."%'");
+                $query->orwhereRaw("LOWER(keyname) LIKE '%". HelpMoKo::cleanse(session('v_searchSynonyms'))."%'");
             });
         }
         return $data->limit(15)->get();
@@ -467,7 +470,7 @@ class WordLibrary extends Controller
         //Search
         if( session('v_searchAntonyms') ){
             $data = $data->where( function($query){
-                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchAntonyms'))."%'");
+                $query->orwhereRaw("LOWER(keyname) LIKE '%". HelpMoKo::cleanse(session('v_searchAntonyms'))."%'");
             });
         }
         return $data->limit(15)->get();
@@ -479,7 +482,7 @@ class WordLibrary extends Controller
         //Search
         if( session('v_searchHomonyms') ){
             $data = $data->where( function($query){
-                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchHomonyms'))."%'");
+                $query->orwhereRaw("LOWER(keyname) LIKE '%". HelpMoKo::cleanse(session('v_searchHomonyms'))."%'");
             });
         }
         return $data->limit(15)->get();
@@ -491,7 +494,7 @@ class WordLibrary extends Controller
         //Search
         if( session('v_searchTail') ){
             $data = $data->where( function($query){
-                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchTail'))."%'");
+                $query->orwhereRaw("LOWER(keyname) LIKE '%". HelpMoKo::cleanse(session('v_searchTail'))."%'");
             });
         }
         return $data->limit(15)->get();
@@ -503,7 +506,7 @@ class WordLibrary extends Controller
         //Search
         if( session('v_searchSide') ){
             $data = $data->where( function($query){
-                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchSide'))."%'");
+                $query->orwhereRaw("LOWER(keyname) LIKE '%". HelpMoKo::cleanse(session('v_searchSide'))."%'");
             });
         }
         return $data->limit(15)->get();
@@ -515,99 +518,148 @@ class WordLibrary extends Controller
         //Search
         if( session('v_searchHead') ){
             $data = $data->where( function($query){
-                $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchHead'))."%'");
+                $query->orwhereRaw("LOWER(keyname) LIKE '%". HelpMoKo::cleanse(session('v_searchHead'))."%'");
             });
         }
         return $data->limit(15)->get();
     }
 
 
-    protected function quickValidate($type = "AddVariation", $type2="Image", $placeText = "word variation"){
-        //**>> MAIN */
+    protected function quickValidate($request, $type = "Add"){
+        /**
+         * Rules Included:
+         * - Keyname
+         * - Language
+         * - Variation
+         * - Defintion(validatorOnly)
+         * - Pronounciation(validatorOnly)
+         * - Examples(validatorOnly)
+         * - Rarity
+         * - Attributes
+         * - Relationyns
+         * - Heirarchy Map
+         * - Origin
+         * - Image
+         * - Sources
+         */
+        dd($request->all());
+        $variationIds = implode(",", array_map(function($n){
+            return $n['id'];
+        }, $request->v_variation  ));
+
+
         $rules = [
-            'v_name'=>[
-                "required",
-                "regex:/^[a-zA-Z0-9\,\.\s]*$/",
-                "max:48",
+            'v_keyname'=>[
+                'required',
+                'regex:/^[a-zA-Z0-9\,\.\s]*$/',
+                'max:64',
             ],
+            'v_language'=>'required|array|required_array_keys:id,name',
+            'v_language.id'=>'required|exists:language,id',
+            'v_language.name'=>'required|exists:language,name',
+
+            'v_variation'=>'required|array|min:1',
+            'v_variation.*'=>'required|array|required_array_keys:id,name',
+            'v_variation.*.id'=>'required|exists:variation,id',
+            'v_variation.*.name'=>'required|exists:variation,name',
+
+            'v_definition'=>"required|array|required_array_keys:$variationIds",
+            'v_definition.*'=>"required|string|not_regex:/<script\b[^>]*>[\s\S]*?<\/script\s*>/",
+
+            'v_pronounciation'=>"required|array|required_array_keys:$variationIds",
+            'v_pronounciation.*'=>"required|array|required_array_keys:simple,original",
+            'v_pronounciation.*.simple'=>"nullable|string",
+            'v_pronounciation.*.original'=>"nullable|string",
+
+            'v_example'=>"required|array|required_array_keys:$variationIds",
+            'v_example.*'=>"nullable|array|max:10",
+            'v_example.*.*'=>"required|string",
+
+            'v_rarity'=>"required|array|required_array_keys:id,name",
+            'v_rarity.id'=>"required|exists:rarity,id",
+            'v_rarity.name'=>"required|exists:rarity,name",
+
+            'v_attributes'=>"required|array|min:1",
+            'v_attributes.*'=>"required|array|required_array_keys:id,name",
+            'v_attributes.*.id'=>"required|exists:attribute,id",
+            'v_attributes.*.name'=>"required|exists:attribute,name",
+
+            'v_relationyms'=>"required|array|required_array_keys:synonyms,antonyms,homonyms",
+            'v_relationyms.*'=>"nullable|array",
+            'v_relationyms.*.*'=>"array|required_array_keys:id,name",
+            'v_relationyms.*.*.id'=>"required|exists:word,id",
+            'v_relationyms.*.*.name'=>"required|exists:word,keyname",
+
+            'v_heirarchymap'=>"required|array|required_array_keys:head,side,tail",
+            'v_heirarchymap.*'=>"nullable|array",
+            'v_heirarchymap.*.*'=>"required|array|required_array_keys:id,name",
+            'v_heirarchymap.*.*.id'=>"required|exists:word,id",
+            'v_heirarchymap.*.*.name'=>"required|exists:word,keyname",
+
+            'v_origin'=>"nullable|string|not_regex:/<script\b[^>]*>[\s\S]*?<\/script\s*>/",
+
+            'v_images'=>"required|array|max:3",
+            'v_images.*'=>[],
+
+            'v_sources'=>"nullable|array|max:100",
+            'v_sources.*'=>"required|string",
         ];
         $messages = [
-            "v_name.required"=>"Name of the ".$placeText." is required.",
-            "v_name.regex"=>"Name of the ".$placeText." must contain only letters and number.",
-            "v_name.max"=>"Name of the ".$placeText." character limit reached. The maximum is 48 characters.",
-            "v_name.unique"=>"Name of the ".$placeText." is already existed in the system.",
-        ];
-        //**<< MAIN */
+            'v_keyname.required'=>"Keyname is required.",
+            'v_keyname.regex'=>"Keyname must contain only letters and number.",
+            'v_keyname.max'=>"Keyname character limit reached. The maximum is 64 characters.",
 
-        //**>> Add-On */
-        $ruleOptionName = "";
-        switch($type){
-            case "AddVariation": case "AddAttribute": case "AddRarity" : case "AddLanguage":
-                $ruleOptionName = "unique:variation,name";
-            break;
-            case "ModifyVariation": case "ModifyAttribute": case "ModifyRarity": case "ModifyLanguage":
-                $ruleOptionName = "unique:variation,name,".request()->route('id');
-            break;
-        }
-        array_push($rules['v_name'], $ruleOptionName);
-        $imageRule = [
-            "required",
-            "file",
-            "mimes:jpeg,jpg,png,gif,bimp,tiff,webp,svg",
-            "max:8192",
+            'v_language.*.required'=>"Language is required.",
+            'v_language.*.exists'=>"Invalid input data detected.",
+
+            'v_variation.required'=>'Variation is required.',
+            'v_variation.array'=>'Invalid input data detected.',
+            'v_variation.min'=>'Variation is required.',
+
+            'v_definition.*.required'=>"Definition is required.",
+            'v_definition.*.string'=>"Invalid input data detected.",
+            'v_definition.*.not_regex'=>"Invalid input data detected.",
+
+            'v_pronounciation.*.*.string'=>"Invalid input data detected.",
+
+            'v_example.*.*.required'=>"Example should not be empty.",
+            'v_example.*.*.string'=>"Invalid input data detected.",
+
+            'v_rarity.*.required'=>"Rarity is required.",
+            'v_rarity.*.exists'=>"Invalid input data detected.",
+
+            'v_attributes.required'=>"Attribute is required.",
+            'v_attributes.array'=>"Invalid input data detected.",
+            'v_attributes.min'=>"Attribute is required.",
+
+            'v_relationyms.*.array'=>"Invalid input data detected.",
+
+            'v_heirarchymap.*.array'=>"Invalid input data detected.",
+
+            'v_origin.string'=>"Invalid input data detected.",
+            'v_origin.not_regex'=>"Invalid input data detected.",
+
+            //Images if ever,
+
+            'v_soruces.*.required'=>"Input is required.",
+            'v_sources.*.string'=>"Invalid input data detected.",
         ];
-        $imageMessage = [
-            'v_image.required'=>'Image is required.',
-            'v_image.file'=>'The data that you have uploaded is not a file.',
-            'v_image.mimes'=>'The data that you have uploaded is not a valid filetypes.',
-            'v_image.max'=>"File is too large, please upload less 8mb only.",
-        ];
-        $colorRule = [
-            "required",
-            "regex:/^#([0-9a-fA-F]{6})$/"
-        ];
-        $colorMessage = [
-            'v_color.required'=>'Color is required.',
-            'v_color.regex'=>'Invalid color, please use hex code only.',
-        ];
-        $numberRule = [
-            "required",
-            "numeric",
-            "min:0",
-            "max:100",
-        ];
-        $numberMessage = [
-            'v_level.required'=>"Level is required.",
-            'v_level.numeric'=>"Level must be a number.",
-            "v_level.min"=>"Level should not be less than 0.",
-            'v_level.max'=>"Level should not be more than 100.",
-        ];
-        //**<< Add-On */
-        switch($type){
-            case "AddVariation":
-                $rules['v_image'] = $imageRule;
-                $messages = $messages + $imageMessage;
-            break;
-            case "AddAttribute":
-                $rules['v_image'] = $imageRule;
-                $messages = $messages + $imageMessage;
-                $rules['v_color'] = $colorRule;
-                $messages = $messages + $colorMessage;
-            break;
-            case "AddRarity":  case "ModifyRarity":
-                $rules['v_level'] = $numberRule;
-                $messages = $messages + $numberMessage;
-                $rules['v_color'] = $colorRule;
-                $messages = $messages + $colorMessage;
-            break;
-            case "ModifyVariation": case "ModifyAttribute":
-                if($type2 == 'Image'){
-                    $rules['v_image'] = $imageRule;
-                    $messages = $messages + $imageMessage;
-                }
-            break;
-        }
-        return [$rules, $messages];
+
+        //Insert Additional
+        if($type == 'Add'){
+            $rules['v_images.*'] = [
+                "nullable",
+                "file",
+                "mimes:jpeg,jpg,png,gif,bimp,tiff,webp,svg",
+                "max:8192"
+            ];
+            $messages['v_images.*.file'] = "Image is not a valid file.";
+            $messages['v_images.*.mimes'] = "Image is not a valid file.";
+            $messages['v_images.*.max'] = "File is too large, please upload less than 8mb only.";
+        };
+
+        $request->validate($rules, $messages);
+        //dd($rules, $messages);
     }
     protected function successReturn($name, $type = "create"){
         $flashData = [
