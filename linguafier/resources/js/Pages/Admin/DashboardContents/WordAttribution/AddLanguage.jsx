@@ -59,7 +59,7 @@ export default ()=>{
         <PopFlash Switch={[v_popFlash, e_popFlash]} Button={{0:[
             {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/word_attribution?pgsw=Language'), Color:'bg-my-green'  },
             {'Name': "Add Again!", "Func":()=>{e_popFlash(false); resetData();}, Color:'bg-slate-400'  },
-        ]}} />
+        ]}} CloseFunc={()=>router.get('/admin/dashboard/word_attribution?pgsw=Language')} />
     </AdminMainUI>
 
 }

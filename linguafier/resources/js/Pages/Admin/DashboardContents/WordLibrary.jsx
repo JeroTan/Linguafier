@@ -9,12 +9,12 @@ import PopLoading from '../../../Utilities/PopLoading';
 import ImageFlash from '../../../Utilities/ImageFlash';
 
 //HOOKS
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useState, useMemo, useCallback } from 'react';
 import { usePage, router } from '@inertiajs/react';
 
 export default ()=>{
     //** Use Page */
-    const { data, storageWord, variationData, attributeData, rarityData, languageData } = usePage().props;
+    const { data, storageVariation, storageAttribute, variationData, attributeData, rarityData, languageData } = usePage().props;
 
     //** STRUCT */
     const popContent = {
@@ -84,7 +84,6 @@ export default ()=>{
             Type:"checklist",
             Data:languageData.map((x)=>({Name:x.name, Ref:x.id, Value:false})) ?? [],
         },
-
         {
             Name: "Modified Time",
             Ref:"word.modified_time",
@@ -129,9 +128,67 @@ export default ()=>{
         e_dataLoading(true);
         router.post('/admin/dashboard/word_library/changeContents', { "v_search": v_search, 'v_sort':v_sort, "v_filter":v_filter  }, );
     }
-    function ItemPlate(){
-        return [];
-    }
+    const ItemPlate = useCallback(()=>{
+        return data.data.map((x, i)=>{
+            // Design for Name
+            let t_Name = <div className='sm:w-64 w-full shrink-0 grow'>
+                <h3 className='text-xl text-my-green font-bold'>{x.keyname}</h3>
+            </div>;
+            // Design for Variation
+            let variationData = JSON.parse(x.variation);
+            let t_Variation = <div className='w-full shrink flex flex-col gap-1'>
+                {variationData.map((y, j)=>{
+                    return <div key={j} className=' rounded border-2 border-slate-600 w-fit px-2 py-1 flex gap-2 items-center bg-slate-400 text-white'>
+                        <ImageFlash Src={storageVariation+y.image} Size={`20px`} />
+                        <small>{y.name}</small>
+                    </div>
+                }) }
+            </div>
+            // Design for Attribute
+            let attributeData = JSON.parse(x.attributes);
+            let t_Attribute = <div className='w-full shrink flex flex-wrap gap-1'>
+                {attributeData.map((y, j)=>{
+                    return <div key={j} className='rounded-full w-fit h-fit px-2 py-1 flex gap-2 items-center ' style={{backgroundColor: y.color}}>
+                        <ImageFlash Src={storageAttribute+y.image} Size={`20px`} Round={`rounded-full`} />
+                        <small className='text-white mix-blend-difference'>{y.name}</small>
+                    </div>
+                }) }
+            </div>
+
+            // Design for Rarity
+            let t_Rarity = <div className='w-full shrink flex flex-col gap-1'>
+                <div className=''>
+                    {x.rarity_name}
+                </div>
+                <div className='flex flex-wrap gap-1'>
+                    { Array(x.rarity_level).fill(0).map((y,j)=>{
+                        return <div key={j} className=''>
+                            <Icon Name={'star'} OutClass={"w-5 h-5"} InStyle={{fill:x.rarity_color}} />
+                        </div>
+                    }) }
+                </div>
+            </div>
+
+            // Design for Button
+            let t_Button = <div className='flex flex-wrap pb-1 pr-1 flex-col gap-2'>
+                <Button Icon="edit" Size="w-fit h-fit" Padding="px-2 py-1" Click={()=>{
+                    router.get(`/admin/dashboard/word_library/modify/${x.id}`);
+                }} />
+                <Button Icon="delete" Size="w-fit h-fit" Padding="px-2 py-1" Click={()=>{
+                    e_selectId(x.id);
+                    e_popPick('WarningDelete');
+                    e_popSwitch(true);
+                }} />
+            </div>
+            return <div className='w-full flex sm:flex-nowrap flex-wrap gap-1' key={i}>
+                {t_Name}
+                {t_Variation}
+                {t_Attribute}
+                {t_Rarity}
+                {t_Button}
+            </div>
+        });
+    }, [data, data.data]);
     //**<< Functionality */
 
     return <AdminMainUI>

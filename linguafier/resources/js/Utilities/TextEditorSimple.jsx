@@ -124,6 +124,7 @@ export default function TextEditorSimple(Option) {
                     //selection.addRange(1);
                     selection.collapseToEnd();
                     MainEditor.current.click();
+                    UpdateHandler(event.target.innerHTML);
                     event.preventDefault();
                 }
             }}

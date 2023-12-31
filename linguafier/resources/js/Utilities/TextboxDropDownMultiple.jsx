@@ -155,7 +155,9 @@ export default function TextboxDropDownMultiple(Option){
     function requestDropData(search){
         let siteDataContainer = {};
         siteDataContainer[siteData] = search;
-        router.post(siteVisit, siteDataContainer);//Send Request
+        router.post(siteVisit, siteDataContainer, {
+            preserveScroll: true,
+        });//Send Request
     }
 
     //** RENDER */

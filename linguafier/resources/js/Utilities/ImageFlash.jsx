@@ -15,6 +15,8 @@ export default function ImageFlash(Option){
     let Ratio = Option.Ratio ?? "1/1";
     let Fit = Option.Fit ?? "cover";
     let Pop = Option.Pop ?? false;
+    let Border = Option.Border ?? false;
+    let Round = Option.Round ?? "rounded"
 
 
     //** Use State */
@@ -28,7 +30,7 @@ export default function ImageFlash(Option){
     }
 
     return <>
-        <div className={`relative ${Outline?"outline":""} ${Active?"hover:outline-4 cursor-pointer delay-75":""} group rounded border-2 relative overflow-hidden`}
+        <div className={`relative ${Outline?"outline":""} ${Active?"hover:outline-4 cursor-pointer delay-75":""} group ${Round} ${Border ? 'border-2' : ""} relative overflow-hidden`}
         style={{outlineColor: ((Outline!==true&&Outline!==false)?Outline:'#AAAAAA'), outlineWidth:"2px", width: Size, aspectRatio: Ratio}}>
             {
                 Pop ?<div className="w-full h-full absolute flex justify-center items-center delay-75 opacity-0 group-hover:opacity-100 overflow-hidden" >

@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 export default (Option)=>{
     //** STRUCT */
     let popButton = Option.Button;
+    let CloseFunc = Option.CloseFunc;
 
     //** Use Page */
     const { popFlash } = usePage().props;
@@ -34,5 +35,5 @@ export default (Option)=>{
         }
     }, [popFlash]);
 
-    return <Pop Switch={[ v_switch, e_switch ]} Pick={0} Content={ {0:v_flashData} } Type={v_flashData.popType}/>
+    return <Pop Switch={[ v_switch, e_switch ]} Pick={0} Content={ {0:v_flashData} } Type={v_flashData.popType} CloseFunc={CloseFunc}/>
 }

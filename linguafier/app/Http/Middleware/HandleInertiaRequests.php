@@ -42,6 +42,7 @@ class HandleInertiaRequests extends Middleware
             'storage' => url('/storage')."/",
             'storageVariation' => url('/storage/word_variation')."/",
             'storageAttribute' => url('/storage/word_attribute')."/",
+            'storageWordLibrary' => url('/storage/word_library')."/",
             'specialAccount' => fn () => session('SpecialAccount') ?? null,
             // 'flash' => fn () => $request->session()->all() ?? null,
         ]);

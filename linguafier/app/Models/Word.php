@@ -12,6 +12,16 @@ class Word extends Model
     protected $table = 'word';
     protected $primaryKey = 'id';
     protected $keyType = ['id','string'];
+    // protected $casts = [
+    //     'variation'=>'array',
+    //     'definition'=>'array',
+    //     'pronounciation'=>'array',
+    //     'examples'=>'array',
+    //     'attributes'=>'array',
+    //     'relationyms'=>'array',
+    //     'heirarchy_map'=>'array',
+    //     'sources'=>'array',
+    // ];
     public $incrementing = false;
     public $timestamps = false;
 

@@ -109,7 +109,7 @@ export default function AddRoles(){
         <PopFlash Switch={[v_popFlash, e_popFlash]} Button={{0:[
             {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/roles'), Color:'bg-my-green'  },
             {'Name': "Add Again!", "Func":"close", Color:'bg-slate-400'  },
-        ]}} />
+        ]}} CloseFunc={()=>router.get('/admin/dashboard/roles')} />
 
     </AdminMainUI>
 }

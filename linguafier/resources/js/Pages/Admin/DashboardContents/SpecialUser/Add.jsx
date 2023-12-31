@@ -81,7 +81,7 @@ export default()=>{
         <PopFlash Switch={[v_popFlash, e_popFlash]} Button={{0:[
             {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/special_user'), Color:'bg-my-green'  },
             {'Name': "Add Again!", "Func":"close", Color:'bg-slate-400'  },
-        ]}} />
+        ]}} CloseFunc={()=>router.get('/admin/dashboard/special_user')}/>
 
     </AdminMainUI>
 }

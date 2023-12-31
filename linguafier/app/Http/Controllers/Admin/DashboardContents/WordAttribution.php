@@ -141,7 +141,7 @@ class WordAttribution extends Controller
         $newVariation = new Variation;
         $newVariation->id = HelpMoKo::generateID('OnlyMeChanics', 8);
         $newVariation->name = $request->v_name;
-        $newVariation->image = $this->uploadReturnFile($request->v_image, "word_variation/" ,$newVariation->name);
+        $newVariation->image = $this->uploadReturnFile($request->v_image, "word_variation/" ,$newVariation->id);
         $newVariation->save();
 
         //Return Success
@@ -156,7 +156,7 @@ class WordAttribution extends Controller
         $newAttribute = new Attribute;
         $newAttribute->id = HelpMoKo::generateID('OnlyMeChanics', 8);
         $newAttribute->name = $request->v_name;
-        $newAttribute->image = $this->uploadReturnFile($request->v_image, "word_attribute/" ,$newAttribute->name);
+        $newAttribute->image = $this->uploadReturnFile($request->v_image, "word_attribute/" ,$newAttribute->id);
         $newAttribute->color = $request->v_color;
         $newAttribute->save();
 
@@ -210,7 +210,7 @@ class WordAttribution extends Controller
         $variation = Variation::find($id);
         if($includeImage){
             $this->deleteImage("word_variation/", trim($variation->image, ".png"));
-            $variation->image = $this->uploadReturnFile($request->v_image,  "word_variation/", $request->v_name);
+            $variation->image = $this->uploadReturnFile($request->v_image,  "word_variation/", $request->id);
         }
         $variation->name = $request->v_name;
         $variation->save();
@@ -235,7 +235,7 @@ class WordAttribution extends Controller
         $attribute = Attribute::find($id);
         if($includeImage){
             $this->deleteImage("word_variation/", trim($attribute->image, ".png"));
-            $attribute->image = $this->uploadReturnFile($request->v_image,  "word_attribute/", $request->v_name);
+            $attribute->image = $this->uploadReturnFile($request->v_image,  "word_attribute/", $request->id);
         }
         $attribute->name = $request->v_name;
         $attribute->color = $request->v_color;

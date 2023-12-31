@@ -39,19 +39,20 @@ return new class extends Migration
         Schema::create('word', function($table){
             $table->string('id', 32)->primary();
             $table->text('keyname');
-            $table->json('defintion')->nullable();
-            $table->json('variation')->nullable();
-            $table->string('rarity_id', 16)->nullable();
-                $table->foreign('rarity_id')->references('id')->on('rarity')->nullOnDelete()->cascadeOnUpdate();
             $table->string('language_id', 16)->nullable();
                 $table->foreign('language_id')->references('id')->on('language')->nullOnDelete()->cascadeOnUpdate();
+            $table->json('variation')->nullable();
+            $table->json('definition')->nullable();
             $table->json('pronounciation')->nullable();
+            $table->json('examples')->nullable();
+            $table->string('rarity_id', 16)->nullable();
+                $table->foreign('rarity_id')->references('id')->on('rarity')->nullOnDelete()->cascadeOnUpdate();
             $table->json('attributes')->nullable();
             $table->json('relationyms')->nullable();
             $table->json('heirarchy_map')->nullable();
-            $table->json('examples')->nullable();
+
             $table->text('origin')->nullable();
-            $table->json('image')->nullable(); //Max of 3
+            $table->json('images')->nullable(); //Max of 3
             $table->json('sources')->nullable();
             $table->timestamp('created_time');
             $table->dateTime('modified_time');

@@ -15,6 +15,7 @@ export default function Pop(Option){
     let Title = (Content.Title ?? Option.Title) ?? "";
     let Message = (Content.Message ?? Option.Message) ?? "";
     let popButton = (Content.Button ?? Option.Button) ?? [];
+    let CloseFunc = (Content.CloseFunc ?? Option.CloseFunc) ?? (()=>true);
     let Switch = Option.Switch;
     let CloseOutside = Option.CloseOutside ?? true;
 
@@ -66,6 +67,7 @@ export default function Pop(Option){
 
     //** Functionality */
     function close(){
+        CloseFunc();
         Switch[1](false);
     }
 

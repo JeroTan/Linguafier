@@ -22,7 +22,7 @@ import { router, usePage } from "@inertiajs/react";
 export default ()=>{
     //** Use Page */
     const { errors, variationDrop, attributeDrop, rarityDrop, languageDrop, synonymsDrop, antonymsDrop, homonymsDrop, headDrop, sideDrop, tailDrop } = usePage().props;
-    //console.log(errors);
+    // console.log(errors);
     //** STRUCT */
 
     //**>> Use State */
@@ -179,7 +179,7 @@ export default ()=>{
                                     </div>
                                     <div className="flex flex-col gap-1 xs:w-auto w-full">
                                         <small className=" font-light text-slate-600">Original <span className="text-slate-400">(optional)</span></small>
-                                        <Textbox Handle={[v_pronounciation, e_pronounciation]} Dynamic={`${x.id}.orignal`} Size="sm:w-96 w-full" Error={errors[`v_pronounciation.${x.id}.original`]} />
+                                        <Textbox Handle={[v_pronounciation, e_pronounciation]} Dynamic={`${x.id}.original`} Size="sm:w-96 w-full" Error={errors[`v_pronounciation.${x.id}.original`]} />
                                     </div>
                                 </div>
                                 {/* Examples */}
@@ -326,34 +326,33 @@ export default ()=>{
             {/* Buttons */}
             <div className="mt-16 flex flex-wrap sm:gap-5 gap-2">
                 <Button Name="Create" Click={()=>{
-                    let toPass = {
-                        _method: "post",
-
-                        v_keyname:v_keyname,
-                        v_language:v_language,
-                        v_variation:v_variation,
-                        v_definition:v_definition,
-                        v_pronounciation:v_pronounciation,
-                        v_example:v_example,
-                        v_rarity:v_rarity,
-                        v_attributes:v_attributes,
-                        v_relationyms:{
+                    /**
+                     * MY best BET is convert every non file types as json
+                     * and just parse it back to Array on php
+                     */
+                    router.post('/admin/dashboard/word_library/add_submit', {
+                        v_keyname:JSON.stringify(v_keyname),
+                        v_language:JSON.stringify(v_language),
+                        v_variation:JSON.stringify(v_variation),
+                        v_definition:JSON.stringify(v_definition),
+                        v_pronounciation:JSON.stringify(v_pronounciation),
+                        v_example:JSON.stringify(v_example),
+                        v_rarity:JSON.stringify(v_rarity),
+                        v_attributes:JSON.stringify(v_attributes),
+                        v_relationyms:JSON.stringify({
                             synonyms: v_relationyms.synonyms[0],
                             antonyms: v_relationyms.antonyms[0],
                             homonyms: v_relationyms.homonyms[0],
-                        },
-                        v_heirarchymap:{
+                        }),
+                        v_heirarchymap:JSON.stringify({
                             tail:v_heirarchymap.tail[0],
                             side:v_heirarchymap.side[0],
                             head:v_heirarchymap.head[0],
-                        },
-                        v_origin:v_origin,
-                        v_sources:v_sources,
-                        v_images:v_images,
-                    };
-                    console.log(v_variation);
-                    console.log(toPass);
-                    router.post('/admin/dashboard/word_library/add_submit', toPass, { onFinish:()=>{
+                        }),
+                        v_origin:JSON.stringify(v_origin),
+                        v_sources:JSON.stringify(v_sources),
+                        v_images:v_images,//Image
+                    }, { onFinish:()=>{
                         e_popLoading(false);
                     },forceFormData: true });
                     e_popLoading(true);
@@ -368,7 +367,7 @@ export default ()=>{
         <PopFlash Switch={[v_popFlash, e_popFlash]} Button={{0:[
             {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/word_library'), Color:'bg-my-green'  },
             {'Name': "Add Again!", "Func":()=>{e_popFlash(false);resetData();}, Color:'bg-slate-400'  },
-        ]}} />
+        ]}} CloseFunc={()=>router.get('/admin/dashboard/word_library')} />
 
     </AdminMainUI>
 }

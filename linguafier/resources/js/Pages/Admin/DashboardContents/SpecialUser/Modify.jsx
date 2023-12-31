@@ -59,7 +59,7 @@ export default()=>{
         },
         ConfirmSubmit:{
             Title: `Confirm Modifications`,
-            Message: `Click "Yes" to modify the role.`,
+            Message: `Click "Yes" to modify this account.`,
             Type: 'notice',
             Button : [
                 {
@@ -151,9 +151,8 @@ export default()=>{
         <Pop Switch={[v_popSwitch, e_popSwitch]} Content={popContent} Pick={v_popPick} />
         <PopLoading Switch={[v_popLoading, e_popLoading]} />
         <PopFlash Switch={[v_popFlash, e_popFlash]} Button={{0:[
-            {'Name': "Good!", "Func":()=>router.get('/admin/dashboard/special_user'), Color:'bg-my-green'  },
-            {'Name': "Add Again!", "Func":"close", Color:'bg-slate-400'},
-        ]}} />
+                {'Name': "Okay", "Func":"close", Color:'bg-slate-400'  },
+        ],}} />
 
     </AdminMainUI>
 }

@@ -12,6 +12,11 @@ class UserWord extends Model
     protected $table = 'userword';
     protected $primaryKey = 'id';
     protected $keyType = ['id','string'];
+    // protected $casts = [
+    //     'definition'=>'array',
+    //     'examples'=>'array',
+    //     'image'=>'array',
+    // ];
     public $incrementing = false;
     public $timestamps = false;
 

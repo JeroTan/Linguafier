@@ -9,7 +9,7 @@ export default function Textbox(Option){
     let placeholder = Option.Placeholder ?? '';
     let bgcolor = Option.Color ?? '';
     let errorBag = Option.Error ?? '';
-    let pressFunc = Option.PressFunc ?? (()=>true);
+    let pressFunc = Option.PressFunc ?? 'noEnter';
     let minmax = Option.MinMax ?? [undefined, undefined];
     let dynamic = Option.Dynamic ?? false;
 
@@ -69,7 +69,25 @@ export default function Textbox(Option){
             type={type}
             className={`${padding} rounded outline outline-1 outline-${c_stateColor} outline-offset-0 shadow-myBox3 shadow-${c_stateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${c_stateColor}/80  placeholder:font-light ${bgcolor} w-full`}
             onChange={changeState}
-            onKeyDown={pressFunc}
+            onKeyDown={(event)=>{
+                if(typeof pressFunc === "function" ){
+                    pressFunc(event);
+                    return true;
+                }
+                switch(pressFunc){
+                    case 'noEnter':{
+                        if(event.key == 'Enter'){
+                            event.preventDefault();
+                        }
+                    break;}
+                    default:{
+
+                    }
+                }
+
+
+
+            }}
             placeholder={placeholder}
             value={valueHandler()}
             min={minmax[0]}

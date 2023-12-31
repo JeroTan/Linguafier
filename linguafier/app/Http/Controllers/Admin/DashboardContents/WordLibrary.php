@@ -11,9 +11,11 @@ use App\Models\Variation;
 use App\Models\Word;
 use Exception;
 use HelpMoKo;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Testing\Exceptions\InvalidArgumentException;
 use Illuminate\Validation\Rule;
 use PHPUnit\Event\Code\Throwable;
 use Intervention\Image\ImageManager as Image;
@@ -109,85 +111,102 @@ class WordLibrary extends Controller
         ], [
             'v_search.max'=>'Search Limit Reached My Friend.'
         ]);
-
         //Filter | Range | Checklist | Radio | Text - This will streamline the validation of Filter
         $toFilter = [];
-        try{
-            foreach($this->filterKey() as $key => $val){
-                $Data = $request->v_filter[$key]['Data'];
-                $toFilter[$key] = [$val[0], $val[1], []];
-                if(isset($val[3]))
-                    $toFilter[$key][3] = $val[3];
+        $filterRule = [
+            'v_filter'=>'required|array|size:'.count($this->filterKey()),
+            'v_filter.*'=>'required|array|size:4|required_array_keys:Name,Ref,Type,Data',
+            'v_filter.*.Name'=>'string',
+            'v_filter.*.Ref'=>[
+                'required',
+                'string',
+                Rule::in( array_map(function($val){
+                    return $val[0];
+                }, $this->filterKey()) ),
+            ],
+            'v_filter.*.Type'=>[
+                'required',
+                'string',
+                'in:radio,checklist,range,range_date',
+            ],
+        ];
+        $request->validate($filterRule);
+        foreach($this->filterKey() as $key => $val){
+            $Data = $request->v_filter[$key]['Data'];
+            $toFilter[$key] = [$val[0], $val[1], []];
+            if(isset($val[3]))//check if the key has 4 value for other options
+                $toFilter[$key][3] = $val[3];
 
-                if($val[1] == "radio"){
-                    $toFilter[$key][2] = $Data["Selected"];
-                }elseif($val[1] == "checklist"){
-                    foreach($val[2] as $key2 => $val2){
-                        if($Data[$key2]["Value"] == true){
-                            array_push($toFilter[$key][2], $val2);
-                        }
-                    }
+            if($val[1] == "radio"){
+                $toFilter[$key][2] = $Data["Selected"];
 
-                }elseif($val[1] == "range"){
-                    if(!$Data['Min']){
-                        $Data['Min']="0";
+            }elseif($val[1] == "checklist"){
+                foreach($val[2] as $key2 => $val2){
+                    if($Data[$key2]["Value"] == true){
+                        array_push($toFilter[$key][2], $val2);
                     }
-                    if(!$Data['Max']){
-                        $Data['Max']="999999999999999";
-                    }
-                    $rangeValidation = Validator::make(
-                        [ 'Min'=>$Data["Min"],
-                            'Max'=>$Data["Max"] ],
-                        [ 'Min'=>"required|numeric|between:".$val[2][0].",".$val[2][1]."|lte:".$Data["Max"],
-                            'Max'=>"required|numeric|between:".$val[2][0].",".$val[2][1]."|gte:".$Data["Min"],  ],
-                    );
-                    if($rangeValidation->fails()){
-                        $Data['Min'] = $val[2][0];
-                        $Data['Max'] = $val[2][1];
-                    }
-                    $toFilter[$key][2] = ["Min"=>$Data['Min'], "Max"=>$Data['Max'] ];
-                }elseif($val[1] == "range_date"){
-                    if(!$Data['Min']){
-                        $Data['Min']="0001-01-01T12:00";
-                    }
-                    if(!$Data['Max']){
-                        $Data['Max']="9999-12-31T12:59";
-                    }
-                    $rangeValidation = Validator::make(
-                        [ 'Min'=>$Data["Min"],
-                            'Max'=>$Data["Max"], ],
-                        [ 'Min'=>"required|date|before_or_equal:".$Data['Max'],
-                            'Max'=>"required|date|after_or_equal:".$Data['Min'], ]  );
-                    if($rangeValidation->fails()){
-                        //return redirect()->back()->withErrors($rangeValidation);
-                        $Data['Min']="0001-01-01T12:00";
-                        $Data['Max']="9999-12-31T12:59";
-                    }
-                    $toFilter[$key][2] = ["Min"=>$Data['Min'], "Max"=>$Data['Max'] ];
                 }
+
+            }elseif($val[1] == "range"){
+                if(!$Data['Min'] || $Data['Min'] <= 0){
+                    $Data['Min'] =  $val[2][0] ? $val[2][0] : "0";
+                }
+                if(!$Data['Max'] || $Data['Max'] <= 0){
+                    $Data['Max'] = $val[2][1] ? $val[2][1] : "999999999999999";
+                }
+                $rangeValidation = Validator::make(
+                    [ 'Min'=>$Data["Min"],
+                        'Max'=>$Data["Max"] ],
+                    [ 'Min'=>"required|numeric|between:".$val[2][0].",".$val[2][1],
+                        'Max'=>"required|numeric|between:".$val[2][0].",".$val[2][1],  ],
+                );
+                if($rangeValidation->fails()){
+                    $Data['Min'] = $val[2][0];
+                    $Data['Max'] = $val[2][1];
+                }
+                $toFilter[$key][2] = ["Min"=>$Data['Min'], "Max"=>$Data['Max'] ];
+            }elseif($val[1] == "range_date"){
+                if(!$Data['Min']){
+                    $Data['Min']="0001-01-01T12:00";
+                }
+                if(!$Data['Max']){
+                    $Data['Max']="9999-12-31T12:59";
+                }
+                $rangeValidation = Validator::make(
+                    [ 'Min'=>$Data["Min"],
+                        'Max'=>$Data["Max"], ],
+                    [ 'Min'=>"required|date|before_or_equal:".$Data['Max'],
+                        'Max'=>"required|date|after_or_equal:".$Data['Min'], ]  );
+                if($rangeValidation->fails()){
+                    //return redirect()->back()->withErrors($rangeValidation);
+                    $Data['Min']="0001-01-01T12:00";
+                    $Data['Max']="9999-12-31T12:59";
+                }
+                $toFilter[$key][2] = ["Min"=>$Data['Min'], "Max"=>$Data['Max'] ];
             }
-        }catch(Throwable $e){
-            return redirect()->back()->withErrors($e);
         }
 
 
         //Sort - Check if the key is correct and the value should be ASC or DESC
-        $sortVerify = [];
-        $sortRule = [];
-        try{
-            foreach($request->v_sort as $key => $val){
-                if( !in_array($val['Ref'], $this->sortKey()) )
-                    throw new Exception("Tampered JSON");
-                $sortVerify[$val['Ref']] = $val['Sort'];
-                $sortRule[$val['Ref']] = 'required|in:ASC,DESC';
-            }
-        }catch(Throwable $e){
-            return redirect()->back()->withErrors($e);
-        }
-        $sortValidate = Validator::make($sortVerify, $sortRule );
-        if($sortValidate->fails()){
-            return redirect()->back()->withErrors($sortValidate);
-        }
+        $sortRule =[
+            'v_sort'=>'required|array|size:'.count($this->sortKey()),
+            'v_sort.*'=>'required|array|size:3|required_array_keys:Name,Ref,Sort',
+            'v_sort.*.Name'=>[
+                'required',
+                'string',
+            ],
+            'v_sort.*.Ref'=>[
+                'required',
+                'string',
+                Rule::in($this->sortKey()),
+            ],
+            'v_sort.*.Sort'=>[
+                'required',
+                'string',
+                Rule::in(['ASC', 'DESC']),
+            ],
+        ];
+        $request->validate($sortRule);
 
         return redirect()->back()->with(['v_search'=>$request->v_search, 'v_sort'=>$request->v_sort, 'v_filter'=>$toFilter]);
     }
@@ -305,9 +324,47 @@ class WordLibrary extends Controller
 
     }
     public function add_submit(Request $request){
-        $this->quickValidate($request);
+        // Validate and get the Remake Data
+        $remake = $this->quickValidate($request);
+        if($remake instanceof RedirectResponse)
+            return $remake;
+        //dd($remake);
+
+        //Proceed to Store and Create Data
+        $newWord = new Word;
+        $newWord->id = HelpMoKo::generateID('OnlyMeChanics', 10);
+        $newWord->keyname = $remake['v_keyname'];
+        $newWord->language_id = $remake['v_language']['id'];
+        $newWord->variation = $remake['v_variation'];
+        $newWord->definition = $remake['v_definition'];
+        $newWord->pronounciation = $remake['v_pronounciation'];
+        $newWord->examples = $remake['v_example'];
+        $newWord->rarity_id = $remake['v_rarity']['id'];
+        $newWord->attributes = $remake['v_attributes'];
+        $newWord->relationyms = $remake['v_relationyms'];
+        $newWord->heirarchy_map = $remake['v_heirarchymap'];
+        $newWord->origin = $remake['v_origin'];
+        $imagesCollecter = [];
+        foreach($remake['v_images']  as $key => $val ){//Images
+            if($val)
+                $imagesCollecter[count($imagesCollecter)] = $this->uploadReturnImage($val, "word_library/" , $newWord->id."_".HelpMoKo::generateID('OnlyMeChanics'),);
+        }
+        $newWord->images = json_encode($imagesCollecter);
+        $newWord->sources = $remake['v_sources'];
+        $newWord->modified_time = now();
+        $newWord->save();
+
+        //Update Word Dependencies here
+        $this->updateWordDependency($newWord->id);
+
+        //Return Succes
+        $this->successReturn($newWord->keyname, "add");
+
     }
     public function modify_submit(Request $request, $id){
+
+    }
+    public function update_submit(Request $request, $id){ //Update the dependencies of Word
 
     }
     public function delete(Request $request, $id){
@@ -327,27 +384,27 @@ class WordLibrary extends Controller
         //Search
         if(session('v_search') ){
             $data = $data->where( function($query){
-                $query = $query->orWhereRaw("LOWER(word.keyname) LIKE '%". HelpMoKo::cleanse(session('v_search')) ."%'")
+                $query->orWhereRaw("LOWER(word.keyname) LIKE '%". HelpMoKo::cleanse(session('v_search')) ."%'");
                     // ->orWhereRaw("LOWER(rarity.name) LIKE '%". HelpMoKo::cleanse(session('v_search')) ."%'")
-                    ->orWhereRaw("LOWER(rarity.level) LIKE '%". HelpMoKo::cleanse(session('v_search')) ."%'")
+                    // ->orWhereRaw("LOWER(rarity.level) LIKE '%". HelpMoKo::cleanse(session('v_search')) ."%'")
                     // ->orWhereRaw("LOWER(language.name) LIKE '%". HelpMoKo::cleanse(session('v_search')) ."%'")
-                    ;
+                    // ;
                 //Get the Variation First
-                $Variation = Variation::all();
-                for($i = 0; $i < count($Variation); $i++){//Then Check each of those here
-                    $ref = $Variation->id;
-                    $query = $query->orWhereRaw("LOWER(JSON_VALUE(definition, `$.$ref.name`)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'" )
-                        ->orWhereRaw("LOWER(JSON_VALUE(word.definition, `$.$ref.definition`)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'" )
-                        ->orWhereRaw("LOWER(JSON_VALUE(word.variation, `$.$ref`)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'" )
-                        ->orWhereRaw("LOWER(JSON_VALUE(word.pronounciation, `$.$ref.simple`)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'" )
-                        ->orWhereRaw("LOWER(JSON_VALUE(word.pronounciation, `$.$ref.original`)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'" )
+                // $Variation = Variation::all();
+                // for($i = 0; $i < count($Variation); $i++){//Then Check each of those here
+                //     $ref = $Variation->id;
+                //     $query = $query->orWhereRaw("LOWER(JSON_VALUE(definition, `$.$ref.name`)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'" )
+                //         ->orWhereRaw("LOWER(JSON_VALUE(word.definition, `$.$ref.definition`)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'" )
+                //         ->orWhereRaw("LOWER(JSON_VALUE(word.variation, `$.$ref`)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'" )
+                //         ->orWhereRaw("LOWER(JSON_VALUE(word.pronounciation, `$.$ref.simple`)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'" )
+                //         ->orWhereRaw("LOWER(JSON_VALUE(word.pronounciation, `$.$ref.original`)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'" )
                         // ->orWhereRaw("LOWER(CAST(JSON_EXTRACT(relationyms, `$.$ref.synonyms`) as CHAR)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'")
                         // ->orWhereRaw("LOWER(CAST(JSON_EXTRACT(relationyms, `$.$ref.antonyms`) as CHAR)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'")
                         // ->orWhereRaw("LOWER(CAST(JSON_EXTRACT(relationyms, `$.$ref.homonyms`) as CHAR)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'")
                         // ->orWhereRaw("LOWER(CAST(JSON_EXTRACT(examples, `$.$ref`) as CHAR)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'")
                         // ->orWhereRaw("LOWER(CAST(JSON_EXTRACT(examples, `$.$ref`) as CHAR)) LIKE '%".  HelpMoKo::cleanse(session('v_search')) ."%'")
-                        ;
-                }
+                        // ;
+                // }
                 //
             });
         };
@@ -363,15 +420,21 @@ class WordLibrary extends Controller
             - Attributes - SelectionDrop
         */
         if(session('v_filter') ){
+            //dd(session('v_filter'));
             foreach(session('v_filter') as $key=>$val){
                 switch($val[1]){
                     case 'radio':
-                            $data = $data->where($val[0], $val[2]);
+                        if(empty($val[2]))
+                            break;
+                        $data = $data->where($val[0], $val[2]);
                     break;
                     case 'checklist':
+                        if(empty($val[2]))
+                            break;
+
                         if(isset($val[3])){
                             if($val[3] == 'wildcard'){
-                                $data->where( function($q) use ($val){
+                                $data = $data->where( function($q) use ($val){
                                     foreach($val[2] as $key2=>$val2){
                                         $q = $q->orWhere($val[0], 'LIKE', '%' . $val2 . '%');
                                     }
@@ -398,8 +461,33 @@ class WordLibrary extends Controller
                 $data = $data->orderBy($val, 'ASC');
             }
         }
+
         // GET
         $data = $data->paginate(15)->onEachSide(2);
+
+        // Add Ons and Update
+        foreach($data->items() as $key => $val){
+            $this->updateWordDependency($val->id);
+            //Insert Variation Image
+            $getVariation = json_decode($val->variation, true);
+            if( count($getVariation) ){
+                foreach($getVariation as $key2 => $val2){
+                    $variationOrig = Variation::find($val2['id']);
+                    $getVariation[$key2]['image'] = $variationOrig->image;
+                }
+            }
+            $data->items()[$key]->variation = json_encode($getVariation);
+            //Insert Attribute Color and Image
+            $getAttribute = json_decode($val->attributes, true);
+            if( count($getAttribute) ){
+                foreach($getAttribute as $key2 => $val2){
+                    $attributeOrig = Attribute::find($val2['id']);
+                    $getAttribute[$key2]['image'] = $attributeOrig->image;
+                    $getAttribute[$key2]['color'] = $attributeOrig->color;
+                }
+            }
+            $data->items()[$key]->attributes = json_encode($getAttribute);
+        }
 
         return $data;
     }
@@ -413,7 +501,7 @@ class WordLibrary extends Controller
                 $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchVariation'))."%'");
             });
         }
-        return $data->limit(15)->get();
+        return $data->orderBy('name', 'ASC')->limit(15)->get();
     }
     protected function getAttribute(){
         $data = Attribute::select('id','name');
@@ -425,7 +513,7 @@ class WordLibrary extends Controller
                 $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchAttribute'))."%'");
             });
         }
-        return $data->limit(15)->get();
+        return $data->orderBy('name', 'ASC')->limit(15)->get();
     }
     protected function getRarity(){
         $data = Rarity::select('id','name');
@@ -437,7 +525,7 @@ class WordLibrary extends Controller
                 $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchRarity'))."%'");
             });
         }
-        return $data->limit(15)->get();
+        return $data->orderBy('name', 'ASC')->limit(15)->get();
     }
     protected function getLanguage(){
         $data = Language::select('id','name');
@@ -449,7 +537,7 @@ class WordLibrary extends Controller
                 $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchLanguage'))."%'");
             });
         }
-        return $data->limit(15)->get();
+        return $data->orderBy('name', 'ASC')->limit(15)->get();
     }
     protected function getSynonyms(){
         $data = Word::select('id', 'keyname as name');
@@ -461,7 +549,7 @@ class WordLibrary extends Controller
                 $query->orwhereRaw("LOWER(keyname) LIKE '%". HelpMoKo::cleanse(session('v_searchSynonyms'))."%'");
             });
         }
-        return $data->limit(15)->get();
+        return $data->orderBy('name', 'ASC')->limit(15)->get();
     }
     protected function getAntonyms(){
         $data = Word::select('id', 'keyname as name');
@@ -473,7 +561,7 @@ class WordLibrary extends Controller
                 $query->orwhereRaw("LOWER(keyname) LIKE '%". HelpMoKo::cleanse(session('v_searchAntonyms'))."%'");
             });
         }
-        return $data->limit(15)->get();
+        return $data->orderBy('name', 'ASC')->limit(15)->get();
     }
     protected function getHomonyms(){
         $data = Word::select('id', 'keyname as name');
@@ -485,7 +573,7 @@ class WordLibrary extends Controller
                 $query->orwhereRaw("LOWER(keyname) LIKE '%". HelpMoKo::cleanse(session('v_searchHomonyms'))."%'");
             });
         }
-        return $data->limit(15)->get();
+        return $data->orderBy('name', 'ASC')->limit(15)->get();
     }
     protected function getTail(){
         $data = Word::select('id', 'keyname as name');
@@ -497,7 +585,7 @@ class WordLibrary extends Controller
                 $query->orwhereRaw("LOWER(keyname) LIKE '%". HelpMoKo::cleanse(session('v_searchTail'))."%'");
             });
         }
-        return $data->limit(15)->get();
+        return $data->orderBy('name', 'ASC')->limit(15)->get();
     }
     protected function getSide(){
         $data = Word::select('id', 'keyname as name');
@@ -509,7 +597,7 @@ class WordLibrary extends Controller
                 $query->orwhereRaw("LOWER(keyname) LIKE '%". HelpMoKo::cleanse(session('v_searchSide'))."%'");
             });
         }
-        return $data->limit(15)->get();
+        return $data->orderBy('name', 'ASC')->limit(15)->get();
     }
     protected function getHead(){
         $data = Word::select('id', 'keyname as name');
@@ -521,7 +609,7 @@ class WordLibrary extends Controller
                 $query->orwhereRaw("LOWER(keyname) LIKE '%". HelpMoKo::cleanse(session('v_searchHead'))."%'");
             });
         }
-        return $data->limit(15)->get();
+        return $data->orderBy('name', 'ASC')->limit(15)->get();
     }
 
 
@@ -542,11 +630,41 @@ class WordLibrary extends Controller
          * - Image
          * - Sources
          */
-        dd($request->all());
+        //** JSON CHECK FIRST Since it is a FormData */
+        $request->validate([
+            'v_keyname'=>"required|json",
+            'v_language'=>"required|json",
+            'v_variation'=>"required|json",
+            'v_definition'=>"required|json",
+            'v_pronounciation'=>"required|json",
+            'v_example'=>"required|json",
+            'v_rarity'=>"required|json",
+            'v_attributes'=>"required|json",
+            'v_relationyms'=>"required|json",
+            'v_heirarchymap'=>"required|json",
+            'v_origin'=>"required|json",
+            'v_sources'=>"required|json",
+        ]);
+        //** Decode JSON */
+        $remake = [
+            "v_keyname" => json_decode($request->v_keyname, true),
+            "v_language" => json_decode($request->v_language, true),
+            "v_variation" => json_decode($request->v_variation, true),
+            "v_definition" => json_decode($request->v_definition, true),
+            "v_pronounciation" => json_decode($request->v_pronounciation, true),
+            "v_example" => json_decode($request->v_example, true),
+            "v_rarity" => json_decode($request->v_rarity, true),
+            "v_attributes" => json_decode($request->v_attributes, true),
+            "v_relationyms" => json_decode($request->v_relationyms, true),
+            "v_heirarchymap" => json_decode($request->v_heirarchymap, true),
+            "v_origin" => json_decode($request->v_origin, true),
+            "v_sources" => json_decode($request->v_sources, true),
+            "v_images"=>$request->v_images,
+        ];
+
         $variationIds = implode(",", array_map(function($n){
             return $n['id'];
-        }, $request->v_variation  ));
-
+        }, $remake['v_variation']  ));
 
         $rules = [
             'v_keyname'=>[
@@ -601,7 +719,7 @@ class WordLibrary extends Controller
             'v_images'=>"required|array|max:3",
             'v_images.*'=>[],
 
-            'v_sources'=>"nullable|array|max:100",
+            'v_sources'=>"array|max:100",
             'v_sources.*'=>"required|string",
         ];
         $messages = [
@@ -641,7 +759,9 @@ class WordLibrary extends Controller
 
             //Images if ever,
 
-            'v_soruces.*.required'=>"Input is required.",
+            'v_sources.array'=>"Invalid input data detected.",
+            'v_sources.max'=>"Only maximum of 100 data can be inputted.",
+            'v_soruces.0.required'=>"Input is required.",
             'v_sources.*.string'=>"Invalid input data detected.",
         ];
 
@@ -657,27 +777,46 @@ class WordLibrary extends Controller
             $messages['v_images.*.mimes'] = "Image is not a valid file.";
             $messages['v_images.*.max'] = "File is too large, please upload less than 8mb only.";
         };
+        // dd($messages, $rules);
 
-        $request->validate($rules, $messages);
+        $validated = Validator::make($remake, $rules, $messages);
+        $validated->setAttributeNames([
+           'v_sources.*'=>"Source",
+        ]);
+        if($validated->fails()){
+            return redirect()->back()->withErrors($validated);
+        }else{
+
+            $remake['v_variation'] = json_encode($remake['v_variation']);
+            $remake['v_definition'] = json_encode($remake['v_definition']);
+            $remake['v_pronounciation'] = json_encode($remake['v_pronounciation']);
+            $remake['v_example'] = json_encode($remake['v_example']);
+            $remake['v_attributes'] = json_encode($remake['v_attributes']);
+            $remake['v_relationyms'] = json_encode($remake['v_relationyms']);
+            $remake['v_heirarchymap'] = json_encode($remake['v_heirarchymap']);
+            $remake['v_sources'] = json_encode($remake['v_sources']);
+            return $remake;
+        }
         //dd($rules, $messages);
     }
-    protected function successReturn($name, $type = "create"){
+
+    protected function successReturn($name, $type = "add"){
         $flashData = [
             'Type'=>'success',
             'Title'=>match($type){
-                "create"=>'Created Successfully',
+                "add"=>'Created Successfully',
                 "modify"=>'Modified Succesfully',
                 "delete"=>'Removed Successfully'
             },
             'Message'=>match($type){
-                "create"=>"A new word \"".$name."\" was added to the magic system.",
+                "add"=>"A new word \"".$name."\" was added to the magic system.",
                 "modify"=>"The word \"".$name."\" was modified in the magic system.",
                 "delete"=>"The word \"".$name."\" was removed from the magic system.",
             },
         ];
         return redirect()->back()->with( 'popFlash', $flashData);
     }
-    protected function uploadReturnFile($image, $path, $name, $type="jpeg", $size = [2048, 2048]){
+    protected function uploadReturnImage($image, $path, $name, $type="jpeg", $size = [2048, 2048]){
         $name = $name."_".HelpMoKo::generateID('OnlyMeChanics');
         $image = $this->refineImage($image, $size);
         $this->deleteImage($path, $name);
@@ -697,5 +836,96 @@ class WordLibrary extends Controller
         $Image = $Image->scale($size[0], $size[1]);
         $Image = $Image->toPng();
         return $Image;
+    }
+    protected function updateWordDependency($id){
+        $word = Word::find($id);
+        //Update Variation
+        $word->variation = json_decode($word->variation, true);
+        if( count($word->variation) ){
+            $Variation = Variation::class;
+            $word->variation = array_filter($word->variation, function($val)use($Variation){
+                $exist = $Variation::find($val['id']);
+                if($exist)
+                    return true;
+                return false;
+            });
+            foreach($word->variation as $key => $val){
+                $variation = Variation::find($val['id']);
+                if($val['name'] != $variation->name){
+                    $word->variation[$key]['name'] = $variation->name;
+                }
+            }
+        }
+        $word->variation = json_encode($word->variation);
+
+        //Update Attributes
+        $word->attributes = json_decode($word->attributes, true);
+        if( count($word->attributes)){
+            $Attribute = Attribute::class;
+            $word->attributes = array_filter($word->attributes, function($val)use($Attribute){
+                $exist = $Attribute::find($val['id']);
+                if($exist)
+                    return true;
+                return false;
+            });
+            foreach($word->attributes as $key =>$val){
+                $attributes = Attribute::find($val['id']);
+                if($val['name'] != $attributes->name){
+                    $word->attributes[$key]['name'] = $attributes->name;
+                }
+            };
+        }
+        $word->attributes = json_encode($word->attributes);
+
+        //Update Relationyms
+        $Word = Word::class;
+        $wordCheck = function($val)use($Word){
+            $exist = $Word::find($val['id']);
+            if($exist)
+                return true;
+            return false;
+        };
+        $wordUpdate = function($val)use($Word){
+            $thisword = $Word::find($val['id']);
+            if($val['name'] != $thisword->keyname){
+                $val['name'] = $thisword->keyname;
+                return $val;
+            }
+        };
+        $word->relationyms = json_decode($word->relationyms, true);
+        if( count($word->relationyms['synonyms']) ){
+            $word->relationyms['synonyms'] = array_filter($word->relationyms['synonyms'], $wordCheck);
+            $word->relationyms['synonyms'] = array_map($wordUpdate, $word->relationyms['synonyms']);
+        }
+        if( count($word->relationyms['antonyms']) ){
+            $word->relationyms['antonyms'] = array_filter($word->relationyms['antonyms'], $wordCheck);
+            $word->relationyms['antonyms'] = array_map($wordUpdate, $word->relationyms['antonyms']);
+        }
+        if( count($word->relationyms['homonyms']) ){
+            $word->relationyms['homonyms'] = array_filter($word->relationyms['homonyms'], $wordCheck);
+            $word->relationyms['homonyms'] = array_map($wordUpdate, $word->relationyms['homonyms']);
+        }
+        $word->relationyms = json_encode($word->relationyms);
+
+        $word->heirarchy_map = json_decode($word->heirarchy_map, true);
+        if( count($word->heirarchy_map['tail']) ){
+            $word->heirarchy_map['tail'] = array_filter($word->heirarchy_map['tail'], $wordCheck);
+            $word->heirarchy_map['tail'] = array_map($wordUpdate, $word->heirarchy_map['tail']);
+        }
+        if( count($word->heirarchy_map['side'])){
+            $word->heirarchy_map['side'] = array_filter($word->heirarchy_map['side'], $wordCheck);
+            $word->heirarchy_map['side'] = array_map($wordUpdate, $word->heirarchy_map['side']);
+        }
+        if( count($word->heirarchy_map['head'])){
+            $word->heirarchy_map['head'] = array_filter($word->heirarchy_map['head'], $wordCheck);
+            $word->heirarchy_map['head'] = array_map($wordUpdate, $word->heirarchy_map['head']);
+        }
+        $word->heirarchy_map = json_encode($word->heirarchy_map);
+
+        $word->modified_time = now();
+        $word->save();
+
+
+
     }
 }

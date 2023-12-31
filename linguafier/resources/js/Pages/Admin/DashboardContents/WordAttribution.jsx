@@ -46,7 +46,7 @@ export default ()=>{
                         Language:"delete_language",
                     }
                     router.post(`/admin/dashboard/word_attribution/${deleteWhere[c_pageSwitch]}/${v_selectId}`,{},{
-                        onFinish:()=>e_popLoading(false)
+                        onFinish:()=>{e_popLoading(false); changeContents()}
                     });
                     e_popLoading(true);
                     e_popSwitch(false);
@@ -132,7 +132,7 @@ export default ()=>{
                 let imageLink = (c_pageSwitch == "Variation" ? storageVariation : storageAttribute) + x.image;
                 let outlineLink = (c_pageSwitch == "Variation" ? true : x.color);
                 t_Image = <div className='w-full shrink flex flex-wrap gap-1'>
-                    <ImageFlash Src={imageLink} Outline={outlineLink} Pop={true} Active={true} />
+                    <ImageFlash Src={imageLink} Outline={outlineLink} Pop={true} Active={true} Border={true} />
                 </div>
             }
             // Design for Rarity
