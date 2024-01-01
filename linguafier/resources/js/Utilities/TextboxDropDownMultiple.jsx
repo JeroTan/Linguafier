@@ -90,7 +90,7 @@ export default function TextboxDropDownMultiple(Option){
         return energy;
     }, []);
     let handlerFixed = useMemo(()=>{ //Use This to get the handler[0] of the the with combination of dynamic
-        if(!dynamic)
+        if(dynamic === false)
             return handler[0];
         return v_domainExpansion(handler[0], dynamic.split('.'));
     }, [dynamic, handler[0], handler]);
@@ -100,7 +100,7 @@ export default function TextboxDropDownMultiple(Option){
         requestDropData(event.target.value);//Send Request
     }
     function selectDropDown(data){ // USE TO SELECT FROM DROPDOWN; Unlike with the other textbox drop down, this one will not close the textbox and dropbox
-        if(!dynamic){
+        if(dynamic === false){
             handler[1](prev=>{
                 prev[prev.length] = withRef ? data : data.name;
                 return structuredClone(prev);
@@ -118,7 +118,7 @@ export default function TextboxDropDownMultiple(Option){
     function removeSelected(index){
         handler[1](prev=>{
             let newData = [];
-            if(!dynamic){
+            if(dynamic === false){
                 for(let i = 0; i < prev.length; i++){
                     if(index == i)
                         continue;

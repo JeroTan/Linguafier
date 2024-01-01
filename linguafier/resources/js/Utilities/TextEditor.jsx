@@ -68,7 +68,7 @@ export default function TextEditor(Option) {
     }, [Option.Dynamic]);
 
     const UpdateHandler = useCallback((value)=>{ // Insert the New Value to handler when stuff gets updated
-        if(!Dynamic){
+        if(Dynamic === false){
             Handler[1](value);
             return true;
         }

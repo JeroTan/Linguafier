@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo, useCallback } from "react";
+import { useRef, useState, useEffect, useMemo, useCallback } from "react";
 
 //UTILTIES
 import Icon from "./Icon";
@@ -14,28 +14,27 @@ export default function FIleInput(Option){
     let ErrorBag = Option.Error ?? '';
     let Dynamic = Option.Dynamic ?? false;
 
+    // console.log(Option.Preview);
+    // console.log(Handler[0]);
 
-
-    //** STYLE */
-    let UploadStyle = {
-        width:Size+"px",
-    }
-
-
-    //** Use State */
-    const [d_prevFile, e_prevFile] = Option.Preview ?? useState(undefined);
-    const [c_popSwitch, e_popSwitch] =  useState(false);
-
-    //** Use Ref */
-    const inputRef = useRef();
-
-    //** Functionality */
+    //**>> Helper */
+    const intergerCheckUp = useCallback((str)=>{
+        return !isNaN(parseInt(str, 10)) && /^\d+$/.test(str);
+    }, []);
     const e_domainExpansion = useCallback((energy, limitless, voided)=>{// Traverse through depth by 1 or infinitely;
         // THIS WILL REQUIRE A MASSIVE AMOUNT OF ENERGY(memory) BE CAREFUL;
         // energy - the Full Object/Array; Limitless is the array to traverse; Voided is the value to insert at the end of limitless;
         if(limitless.length < 1){
             return voided;
         }
+        if(energy === null || energy === undefined){
+            if(intergerCheckUp(limitless[0])){
+                energy = [];
+            }else{
+                energy = {};
+            }
+        }
+
         //-------------------------------------Traverse Next Arr/Obj---Reduce the limitless by 1----ValueNeededToInsert
         energy[limitless[0]] = e_domainExpansion(energy[limitless[0]], limitless.filter((x,i)=>i!=0) || [], voided);
         return energy;
@@ -50,11 +49,34 @@ export default function FIleInput(Option){
         v_domainExpansion(energy[limitless[0]], limitless.filter((x,i)=>i!=0) || []);
         return energy;
     }, []);
+    //**<< Helper */
+
+
+    //** STYLE */
+    let UploadStyle = {
+        width:Size+"px",
+    }
+
+    //** Use State */
+    const [d_prevFile, e_prevFile] = Option.Preview ?? useState(Dynamic === false ? undefined : e_domainExpansion(undefined, Dynamic.split('.'), undefined));
+    const [c_popSwitch, e_popSwitch] =  useState(false);
+
+    //** Use Ref */
+    const inputRef = useRef();
+
+    //** Functionality */
+
     const HandlerFixed = useMemo(()=>{
-        if(!Dynamic)
+        if(Dynamic === false)
             return Handler[0];
         return v_domainExpansion(Handler[0], Dynamic.split('.'));
     }, [Dynamic, Handler[0]]);
+    const PreviewFixed = useMemo(()=>{
+        // console.log(d_prevFile);
+        if(Dynamic === false)
+            return d_prevFile;
+        return v_domainExpansion(d_prevFile, Dynamic.split('.'));
+    }, [d_prevFile]);
     function UploadDesign(){
         return <div className={`aspect-square rounded outline outline-1 outline-${StateColor} outline-offset-0 shadow-myBox3 cursor-pointer bg-my-green hover:outline-4 hover:brightness-105 border-2 border-slate-700 border-dashed  flex flex-col justify-center items-center  delay-75`}
             onClick={()=>{
@@ -76,41 +98,52 @@ export default function FIleInput(Option){
                 <Icon Name="eye" OutClass="w-10 h-10" InClass="fill-my-green" />
             </div>
             <div className="absolute rounded opacity-25 group-hover:opacity-100 delay-75 hover:drop-shadow-myDrop1" style={{left:`${Size-2}px`, bottom:`${Size}px`}} onClick={()=>{
-                if(!Dynamic){
+                if(Dynamic === false){
                     Handler[1]("");
+                    e_prevFile("");
                 }else{
                     Handler[1](prev=>{
                         return structuredClone(e_domainExpansion(prev, Dynamic.split('.'), ""));
                     });
+                    e_prevFile(prev=>{
+                        prev = structuredClone(prev);
+                        return e_domainExpansion(prev, Dynamic.split('.'), "");
+                    });
                 }
 
-                e_prevFile("");
             }}>
                 <Icon Name="close" OutClass={`w-5 h-5`} />
             </div>
-            <img className="w-full h-full object-cover group-hover:opacity-20 delay-75" src={d_prevFile ? d_prevFile: "#"} onClick={()=>{
+            <img className="w-full h-full object-cover group-hover:opacity-20 delay-75" src={PreviewFixed ? PreviewFixed: "#"} onClick={()=>{
                 e_popSwitch(true);
             }}/>
         </div>
     }
     function PopUpDesign(){
         return <div className="relative h-full w-fit mt-3">
-            <img className="w-full h-full object-contain" src={d_prevFile} />
+            <img className="w-full h-full object-contain" src={PreviewFixed} />
         </div>
     }
 
+
+    //** RENDER */
     return <div>
-        { HandlerFixed && d_prevFile ? PreviewDesign() : UploadDesign() }
+        { HandlerFixed && PreviewFixed ? PreviewDesign() : UploadDesign() }
         <input ref={inputRef} type="file" className={`hidden`}  onChange={(event)=>{
-            if(!Dynamic){
+
+            if(Dynamic === false){
                 Handler[1](event.target.files[0]);
+                e_prevFile(URL.createObjectURL(event.target.files[0]));
             }else{
+
                 Handler[1](prev=>{
                     return structuredClone(e_domainExpansion(prev, Dynamic.split('.'), event.target.files[0]));
                 });
+                e_prevFile( prev=>{
+                    prev = structuredClone(prev);
+                    return  e_domainExpansion(prev, Dynamic.split('.'), URL.createObjectURL(event.target.files[0]));
+                } );
             }
-
-            e_prevFile(URL.createObjectURL(event.target.files[0]));
         }} accept={Accept} />
         {
             ErrorBag ?

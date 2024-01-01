@@ -28,7 +28,7 @@ export default function Textbox(Option){
 
     //** Functionality */
     function changeState(event){
-        if(!dynamic){
+        if(dynamic === false){
             handler[1](event.target.value);
             return true;
         }
@@ -50,7 +50,7 @@ export default function Textbox(Option){
     }
 
     const valueHandler = useCallback(()=>{
-        if(!dynamic)
+        if(dynamic === false)
             return handler[0];
 
         function domainExpansion(energy, limitless){ // Traverse through depth by 1 or infinitely;

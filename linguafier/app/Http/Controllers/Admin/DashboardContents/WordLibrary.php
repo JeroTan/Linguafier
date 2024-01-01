@@ -84,10 +84,40 @@ class WordLibrary extends Controller
         ]);
     }
     public function modify_ui(Request $request, $id){
+        //Manip data Before sending to the
+        $this->updateWordDependency($id);
+        $data = Word::find($id);
+        $language_data = Language::find($data->language_id);
+        $data->language = ['name'=>$language_data->name, 'id'=>$data->language_id];
+        $data->variation = json_decode($data->variation, true);
+        $data->definition = json_decode($data->definition, true);
+        $data->pronounciation = json_decode($data->pronounciation, true);
+        $data->example = json_decode($data->examples, true);
+        $rarity_data = Rarity::find($data->rarity_id);
+        $data->rarity = ['name'=>$rarity_data->name, 'id'=>$data->rarity_id];
+        $data->attributes = json_decode($data->attributes, true);
+        $data->relationyms = json_decode($data->relationyms, true);
+        $data->heirarchymap = json_decode($data->heirarchy_map, true);
+        $data->images = json_decode($data->images, true);
+        $data->previmages = array_map(function($val){
+            return asset('storage/word_library/'.$val);
+        }, $data->images);
+        $data->sources = json_decode($data->sources, true);
+        if(count($data->images)){
+            $data->images = array_map(function($val){
+                return [
+                    'name'=>$val
+                ];
+            }, $data->images);
+        }else{
+            $data->images = [""];
+            $data->previmages = [""];
+        }
+
         return Inertia::render('Admin/DashboardContents/WordLibrary/Modify', [
             'pageUser'=>'Special',
             'adminPage'=>"Word",
-            'data'=>Word::find($id),
+            'data'=>$data,
             'variationDrop'=>$this->getVariation(),
             'attributeDrop'=>$this->getAttribute(),
             'rarityDrop'=>$this->getRarity(),
@@ -326,9 +356,7 @@ class WordLibrary extends Controller
     public function add_submit(Request $request){
         // Validate and get the Remake Data
         $remake = $this->quickValidate($request);
-        if($remake instanceof RedirectResponse)
-            return $remake;
-        //dd($remake);
+        // dd($remake);
 
         //Proceed to Store and Create Data
         $newWord = new Word;
@@ -347,7 +375,7 @@ class WordLibrary extends Controller
         $imagesCollecter = [];
         foreach($remake['v_images']  as $key => $val ){//Images
             if($val)
-                $imagesCollecter[count($imagesCollecter)] = $this->uploadReturnImage($val, "word_library/" , $newWord->id."_".HelpMoKo::generateID('OnlyMeChanics'),);
+                $imagesCollecter[count($imagesCollecter)] = $this->uploadReturnImage($val, "word_library/" , $newWord->id);
         }
         $newWord->images = json_encode($imagesCollecter);
         $newWord->sources = $remake['v_sources'];
@@ -362,13 +390,74 @@ class WordLibrary extends Controller
 
     }
     public function modify_submit(Request $request, $id){
+        // Validate
+        $remake = $this->quickValidate($request, 'Modify');
 
-    }
-    public function update_submit(Request $request, $id){ //Update the dependencies of Word
+        //Proceed to Store and Create Data
+        $word = Word::find($id);
+        $word->keyname = $remake['v_keyname'];
+        $word->language_id = $remake['v_language']['id'];
+        $word->variation = $remake['v_variation'];
+        $word->definition = $remake['v_definition'];
+        $word->pronounciation = $remake['v_pronounciation'];
+        $word->examples = $remake['v_example'];
+        $word->rarity_id = $remake['v_rarity']['id'];
+        $word->attributes = $remake['v_attributes'];
+        $word->relationyms = $remake['v_relationyms'];
+        $word->heirarchy_map = $remake['v_heirarchymap'];
+        $word->origin = $remake['v_origin'];
+        $imagesCollecter = [];
+        foreach($remake['v_images']  as $key => $val ){//Images
+            if($val === 'delete'){
+                foreach( json_decode($word->images, true) as $key2 => $val2){
+                    if($key2 >= $key){
+                        $this->deleteImage('word_library/', trim($val2, ".jpeg"));
+                    }
+                }
+            }elseif($val === 'retain'){
+                $imagesCollecter[count($imagesCollecter)] = $val;
+            }
+            else
+                $imagesCollecter[count($imagesCollecter)] = $this->uploadReturnImage($val, "word_library/" , $word->id);
+        };
+        $word->images = json_encode($imagesCollecter);
+        $word->sources = $remake['v_sources'];
+        $word->modified_time = now();
+        $word->save();
 
+        //Update Word Dependencies here
+        $this->updateWordDependency($word->id);
+
+        //Return Succes
+        $this->successReturn($word->keyname, "modify");
     }
     public function delete(Request $request, $id){
+        //Get the copy data of its id
+        $word = Word::find($id);
 
+        //Delete its images
+        foreach(json_decode($word->images, true) as $key => $val){
+            $this->deleteImage('word_library/', trim($val, '.jpeg'));
+        }
+
+        //Delete the data
+        Word::destroy($id);
+
+        //Delete its content from user created copies
+
+        //Delete its content from other dependencies and update each use the json search to search for it or use id:
+        $wordDependencies = Word::where(function($query)use($word){
+            $query->orWhere('relationyms', 'LIKE', '%' . "\"id\":\"$word->id\"" . '%')
+                ->orWhere('heirarchy_map', 'LIKE', '%' . "\"id\":\"$word->id\"" . '%')
+            ;
+        })->get();
+
+        foreach($wordDependencies as $key => $val){
+            $this->updateWordDependency($val->id);
+        }
+
+        //Return Succes
+        $this->successReturn($word->keyname, "delete");
     }
 
 
@@ -776,6 +865,27 @@ class WordLibrary extends Controller
             $messages['v_images.*.file'] = "Image is not a valid file.";
             $messages['v_images.*.mimes'] = "Image is not a valid file.";
             $messages['v_images.*.max'] = "File is too large, please upload less than 8mb only.";
+        }elseif($type == 'Modify'){
+            $rules['v_images.*'] = Rule::forEach(function ( $value, $attribute) {
+                $checkIfString = Validator::make(['value'=>$value], ['value'=>'nullable|string']);
+                if($checkIfString->fails()){
+                    return [
+                        "nullable",
+                        "file",
+                        "mimes:jpeg,jpg,png,gif,bimp,tiff,webp,svg",
+                        "max:8192"
+                    ];
+                }else{
+                    return [
+                        "nullable",
+                        "string",
+                    ];
+                }
+            });
+            $messages['v_images.*.string'] = "Image is not valid.";
+            $messages['v_images.*.file'] = "Image is not a valid file.";
+            $messages['v_images.*.mimes'] = "Image is not a valid file.";
+            $messages['v_images.*.max'] = "File is too large, please upload less than 8mb only.";
         };
         // dd($messages, $rules);
 
@@ -783,21 +893,34 @@ class WordLibrary extends Controller
         $validated->setAttributeNames([
            'v_sources.*'=>"Source",
         ]);
-        if($validated->fails()){
-            return redirect()->back()->withErrors($validated);
-        }else{
+        //dd($validated);
+        $validated->validate();
 
-            $remake['v_variation'] = json_encode($remake['v_variation']);
-            $remake['v_definition'] = json_encode($remake['v_definition']);
-            $remake['v_pronounciation'] = json_encode($remake['v_pronounciation']);
-            $remake['v_example'] = json_encode($remake['v_example']);
-            $remake['v_attributes'] = json_encode($remake['v_attributes']);
-            $remake['v_relationyms'] = json_encode($remake['v_relationyms']);
-            $remake['v_heirarchymap'] = json_encode($remake['v_heirarchymap']);
-            $remake['v_sources'] = json_encode($remake['v_sources']);
-            return $remake;
+
+        $remake['v_variation'] = json_encode($remake['v_variation']);
+        $remake['v_definition'] = json_encode($remake['v_definition']);
+        $remake['v_pronounciation'] = json_encode($remake['v_pronounciation']);
+        $remake['v_example'] = json_encode($remake['v_example']);
+        $remake['v_attributes'] = json_encode($remake['v_attributes']);
+        $remake['v_relationyms'] = json_encode($remake['v_relationyms']);
+        $remake['v_heirarchymap'] = json_encode($remake['v_heirarchymap']);
+        $remake['v_sources'] = json_encode($remake['v_sources']);
+
+        if($type == "Modify" ){
+            $remake['v_images'] = array_map(function($val){
+                if($val == ""){
+                    return "delete";
+                }
+                elseif( Validator::make(['val'=>$val], ['val'=>'file'])->fails() ){
+                    return "retain";
+                }
+                else{
+                    return $val;
+                }
+            }, $remake['v_images']);
         }
-        //dd($rules, $messages);
+
+        return $remake;
     }
 
     protected function successReturn($name, $type = "add"){
@@ -839,6 +962,8 @@ class WordLibrary extends Controller
     }
     protected function updateWordDependency($id){
         $word = Word::find($id);
+        if(!$word)
+            return false;
         //Update Variation
         $word->variation = json_decode($word->variation, true);
         if( count($word->variation) ){
@@ -880,6 +1005,7 @@ class WordLibrary extends Controller
         //Update Relationyms
         $Word = Word::class;
         $wordCheck = function($val)use($Word){
+            // dd($val);
             $exist = $Word::find($val['id']);
             if($exist)
                 return true;
@@ -891,36 +1017,38 @@ class WordLibrary extends Controller
                 $val['name'] = $thisword->keyname;
                 return $val;
             }
+            return $val;
         };
-        $word->relationyms = json_decode($word->relationyms, true);
-        if( count($word->relationyms['synonyms']) ){
-            $word->relationyms['synonyms'] = array_filter($word->relationyms['synonyms'], $wordCheck);
-            $word->relationyms['synonyms'] = array_map($wordUpdate, $word->relationyms['synonyms']);
+        $temp = json_decode($word->relationyms, true);
+        if( count($temp['synonyms']) ){
+            $temp['synonyms'] = array_filter($temp['synonyms'], $wordCheck);
+            $temp['synonyms'] = array_map($wordUpdate, $temp['synonyms']);
         }
-        if( count($word->relationyms['antonyms']) ){
-            $word->relationyms['antonyms'] = array_filter($word->relationyms['antonyms'], $wordCheck);
-            $word->relationyms['antonyms'] = array_map($wordUpdate, $word->relationyms['antonyms']);
+        if( count($temp['antonyms']) ){
+            // dd($temp['antonyms']);
+            $temp['antonyms'] = array_filter($temp['antonyms'], $wordCheck);
+            $temp['antonyms'] = array_map($wordUpdate, $temp['antonyms']);
         }
-        if( count($word->relationyms['homonyms']) ){
-            $word->relationyms['homonyms'] = array_filter($word->relationyms['homonyms'], $wordCheck);
-            $word->relationyms['homonyms'] = array_map($wordUpdate, $word->relationyms['homonyms']);
+        if( count($temp['homonyms']) ){
+            $temp['homonyms'] = array_filter($temp['homonyms'], $wordCheck);
+            $temp['homonyms'] = array_map($wordUpdate, $temp['homonyms']);
         }
-        $word->relationyms = json_encode($word->relationyms);
+        $word->relationyms = json_encode($temp);
 
-        $word->heirarchy_map = json_decode($word->heirarchy_map, true);
-        if( count($word->heirarchy_map['tail']) ){
-            $word->heirarchy_map['tail'] = array_filter($word->heirarchy_map['tail'], $wordCheck);
-            $word->heirarchy_map['tail'] = array_map($wordUpdate, $word->heirarchy_map['tail']);
+        $temp = json_decode($word->heirarchy_map, true);
+        if( count($temp['tail']) ){
+            $temp['tail'] = array_filter($temp['tail'], $wordCheck);
+            $temp['tail'] = array_map($wordUpdate, $temp['tail']);
         }
-        if( count($word->heirarchy_map['side'])){
-            $word->heirarchy_map['side'] = array_filter($word->heirarchy_map['side'], $wordCheck);
-            $word->heirarchy_map['side'] = array_map($wordUpdate, $word->heirarchy_map['side']);
+        if( count($temp['side'])){
+            $temp['side'] = array_filter($temp['side'], $wordCheck);
+            $temp['side'] = array_map($wordUpdate, $temp['side']);
         }
-        if( count($word->heirarchy_map['head'])){
-            $word->heirarchy_map['head'] = array_filter($word->heirarchy_map['head'], $wordCheck);
-            $word->heirarchy_map['head'] = array_map($wordUpdate, $word->heirarchy_map['head']);
+        if( count($temp['head'])){
+            $temp['head'] = array_filter($temp['head'], $wordCheck);
+            $temp['head'] = array_map($wordUpdate, $temp['head']);
         }
-        $word->heirarchy_map = json_encode($word->heirarchy_map);
+        $word->heirarchy_map = json_encode($temp);
 
         $word->modified_time = now();
         $word->save();

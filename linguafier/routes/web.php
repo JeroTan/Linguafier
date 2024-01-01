@@ -71,9 +71,9 @@ Route::prefix('/admin')->group(function(){
             Route::get('/add', [WordLibrary::class, 'add_ui']);
             Route::post('/search_data', [WordLibrary::class, 'search_data']);
             Route::post('/add_submit', [WordLibrary::class, 'add_submit']);
-            Route::get('/modify/{id}', [WordLibrary::class, 'modify_ui']);
-            Route::post('/modify_submit/{id}', [WordLibrary::class, 'modify_submit']);
-            Route::post('/delete/{id}', [WordLibrary::class, 'delete']);
+            Route::get('/modify/{id}', [WordLibrary::class, 'modify_ui'])->middleware($checkId);
+            Route::post('/modify_submit/{id}', [WordLibrary::class, 'modify_submit'])->middleware($checkId);
+            Route::post('/delete/{id}', [WordLibrary::class, 'delete'])->middleware($checkId);
         });
 
         Route::prefix('/word_attribution')->group(function(){

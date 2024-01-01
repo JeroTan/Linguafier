@@ -40,7 +40,7 @@ export default function TextEditorSimple(Option) {
     }, []);
 
     const UpdateHandler = useCallback((value)=>{ // Insert the New Value to handler when stuff gets updated
-        if(!Dynamic){
+        if(Dynamic === false){
             Handler[1](value);
             return true;
         }
