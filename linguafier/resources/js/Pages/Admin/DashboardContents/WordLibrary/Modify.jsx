@@ -33,14 +33,14 @@ export default ()=>{
     const [ v_rarity, e_rarity] = useState(data.rarity);
     const [ v_attributes, e_attributes] = useState(data.attributes);
     const v_relationyms = {
-        synonyms:useState(data.relationyms.synonyms),
-        antonyms:useState(data.relationyms.antonyms),
-        homonyms:useState(data.relationyms.homonyms),
+        synonyms:useState(structuredClone(data.relationyms.synonyms)),
+        antonyms:useState(structuredClone(data.relationyms.antonyms)),
+        homonyms:useState(structuredClone(data.relationyms.homonyms)),
     }
     const v_heirarchymap = {
-        tail: useState(data.heirarchymap.tail),
-        side: useState(data.heirarchymap.side),
-        head: useState(data.heirarchymap.head),
+        tail: useState(structuredClone(data.heirarchymap.tail)),
+        side: useState(structuredClone(data.heirarchymap.side)),
+        head: useState(structuredClone(data.heirarchymap.head)),
     };
     const [v_origin, e_origin] = useState(data.origin);
     const [v_images, e_images] = useState(data.images);
@@ -191,11 +191,31 @@ export default ()=>{
         }else{
             e_disabled(false);
         }
-    }, [v_keyname, v_language, v_variation, v_definition, v_pronounciation, v_example, v_rarity, v_attributes, v_relationyms.synonyms, v_relationyms.antonyms, v_relationyms.homonyms, v_heirarchymap.tail, v_heirarchymap.side, v_heirarchymap.head, v_origin, v_images, v_prevImages, v_sources,]);
+    }, [v_keyname, v_language, v_variation, v_definition, v_pronounciation, v_example, v_rarity, v_attributes, v_relationyms.synonyms[0], v_relationyms.antonyms[0], v_relationyms.homonyms[0], v_heirarchymap.tail[0], v_heirarchymap.side[0], v_heirarchymap.head[0], v_origin, v_images, v_prevImages, v_sources,]);
     //**<< Use Effect */
 
     //** Functionality */
     function isUnchange(){
+        let trueNess = (
+            v_keyname == data.keyname &&
+            v_language.id == data.language?.id &&
+            JSON.stringify(v_variation) == JSON.stringify(data.variation) &&
+            JSON.stringify(v_definition) ==  JSON.stringify(data.definition) &&
+            JSON.stringify(v_pronounciation) == JSON.stringify(data.pronounciation) &&
+            JSON.stringify(v_example) == JSON.stringify(data.example) &&
+            v_rarity.id == data.rarity?.id &&
+            JSON.stringify(v_attributes) == JSON.stringify(data.attributes) &&
+            JSON.stringify(v_relationyms.synonyms[0]) == JSON.stringify(data.relationyms.synonyms) &&
+            JSON.stringify(v_relationyms.antonyms[0]) == JSON.stringify(data.relationyms.antonyms) &&
+            JSON.stringify(v_relationyms.homonyms[0]) == JSON.stringify(data.relationyms.homonyms) &&
+            JSON.stringify(v_heirarchymap.tail[0]) == JSON.stringify(data.heirarchymap.tail) &&
+            JSON.stringify(v_heirarchymap.head[0]) == JSON.stringify(data.heirarchymap.head) &&
+            JSON.stringify(v_heirarchymap.side[0]) == JSON.stringify(data.heirarchymap.side) &&
+            v_origin == data.origin &&
+            JSON.stringify(v_images) == JSON.stringify(data.images) &&
+            JSON.stringify(v_sources) == JSON.stringify(data.sources)
+        );
+        console.log(JSON.stringify(v_images), JSON.stringify(data.images));
         return (
             v_keyname == data.keyname &&
             v_language.id == data.language?.id &&
@@ -225,12 +245,12 @@ export default ()=>{
         e_variation(data.variation);
         e_rarity(data.rarity);
         e_attributes(data.attributes);
-        v_relationyms.synonyms[1](data.relationyms.synonyms);
-        v_relationyms.antonyms[1](data.relationyms.antonyms);
-        v_relationyms.homonyms[1](data.relationyms.homonyms);
-        v_heirarchymap.tail[1](data.heirarchymap.tail);
-        v_heirarchymap.side[1](data.heirarchymap.side);
-        v_heirarchymap.head[1](data.heirarchymap.head);
+        v_relationyms.synonyms[1](structuredClone(data.relationyms.synonyms));
+        v_relationyms.antonyms[1](structuredClone(data.relationyms.antonyms));
+        v_relationyms.homonyms[1](structuredClone(data.relationyms.homonyms));
+        v_heirarchymap.tail[1](structuredClone(data.heirarchymap.tail));
+        v_heirarchymap.side[1](structuredClone(data.heirarchymap.side));
+        v_heirarchymap.head[1](structuredClone(data.heirarchymap.head));
         e_origin(data.origin);
         e_images(data.images);
         e_prevImages(data.previmages);
@@ -377,7 +397,12 @@ export default ()=>{
             {/* Heirarchy */}
             <div className="my-5"></div>
             <div className="flex flex-wrap gap-1">
-                <label className="w-full">Heirarchy Mapping: </label>
+                <div className="flex w-full gap-2 flex-wrap">
+                    <label className="">Heirarchy Mapping: </label>
+                    <Button Name="Preview" Icon="eye" Padding={`px-1`} Click={()=>{
+                        true;
+                    }}/>
+                </div>
                 <small className=" font-light text-slate-600 w-full">Ancestor <span className="text-slate-400">(optional)</span></small>
                 <TextboxDropDownMultiple Handle={[v_heirarchymap.tail[0], v_heirarchymap.tail[1]]} Placeholder="No Selected. . ." Error={errors[`v_heirarchymap.tail`]} DropData={tailDrop} Request={`/admin/dashboard/word_library/search_data`} RequestKey={"v_searchTail"} WithRef={true} Size={`sm:ml-3 ${v_heirarchymap.tail[0].length > 0 ?"":"w-96"}`} />
                 <small className=" font-light text-slate-600 w-full">Same League <span className="text-slate-400">(optional)</span></small>
