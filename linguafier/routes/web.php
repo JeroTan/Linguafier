@@ -12,6 +12,7 @@ use App\Http\Controllers\User\Login as UserLogin;
 use App\Http\Controllers\User\Dashboard as UserDashboard;
 
 use App\Http\Controllers\Homepage;
+use App\Http\Controllers\Resources\HeirarchyMapNodes;
 use App\Http\Middleware\CheckId;
 use App\Http\Middleware\NotOwnerAllowed;
 use App\Http\Middleware\SpecAccNoSelf;
@@ -29,6 +30,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', Homepage::class);
+
+Route::post('/getAllMapNodes',  [HeirarchyMapNodes::class, 'requestMap']);
 
 
 Route::prefix('/user')->group(function(){

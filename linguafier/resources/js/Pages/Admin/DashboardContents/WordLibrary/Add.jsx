@@ -11,6 +11,7 @@ import TextboxDropDown from "../../../../Utilities/TextboxDropDown";
 import Icon from "../../../../Utilities/Icon";
 import TextEditor from "../../../../Utilities/TextEditor";
 import TextEditorSimple from "../../../../Utilities/TextEditorSimple";
+import HeirarchyMap from "../../../../Utilities/HeirarchyMap";
 
 
 // HOOKS
@@ -46,6 +47,12 @@ export default ()=>{
         side: useState([]),
         head: useState([]),
     };
+    const v_heirarchymapPreview = useState({
+        tail: [],
+        side: [],
+        head: [],
+    });
+    const v_heirarchymapPreviewSwitch = useState(false);
     const [v_origin, e_origin] = useState("");
     const [v_images, e_images] = useState([""]);
     const [v_sources, e_sources] = useState([]);
@@ -96,6 +103,14 @@ export default ()=>{
         };
 
     }, [v_images]);
+    useEffect(()=>{
+        v_heirarchymapPreview[1](prev=>{
+            prev.tail = v_heirarchymap.tail[0];
+            prev.side = v_heirarchymap.side[0];
+            prev.head = v_heirarchymap.head[0];
+            return structuredClone(prev);
+        });
+    }, [v_heirarchymap.tail[0], v_heirarchymap.side[0], v_heirarchymap.head[0]]);
     //**<< Use Effect */
 
     //** Functionality */
@@ -259,6 +274,7 @@ export default ()=>{
                     <Button Name="Preview" Icon="eye" Padding={`px-1`} Click={()=>{
                         true;
                     }}/>
+                    <HeirarchyMap Handle={v_heirarchymapPreview} PopSwitch={v_heirarchymapPreviewSwitch} OffMapSwitch={true}/>
                 </div>
                 <small className=" font-light text-slate-600 w-full">Ancestor <span className="text-slate-400">(optional)</span></small>
                 <TextboxDropDownMultiple Handle={[v_heirarchymap.tail[0], v_heirarchymap.tail[1]]} Placeholder="No Selected. . ." Error={errors[`v_heirarchymap.tail`]} DropData={tailDrop} Request={`/admin/dashboard/word_library/search_data`} RequestKey={"v_searchTail"} WithRef={true} Size={`sm:ml-3 ${v_heirarchymap.tail[0].length > 0 ?"":"w-96"}`} />

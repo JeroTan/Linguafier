@@ -84,6 +84,7 @@ class WordLibrary extends Controller
         ]);
     }
     public function modify_ui(Request $request, $id){
+
         //Manip data Before sending to the
         $this->updateWordDependency($id);
         $data = Word::find($id);

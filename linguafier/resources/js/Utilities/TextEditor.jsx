@@ -21,7 +21,7 @@ function TextEditorPlate(Option){
         className={`relative ${Padding} ${Size} rounded outline outline-1 outline-${StateColor} outline-offset-0 shadow-myBox3 shadow-${StateColor} delay-100 focus:outline-2 focus:outline-offset-2 focus:outline-${StateColor}/80  placeholder:font-light ${BgColor}  shrink min-h-[30px]`}
         onInput={(event)=>{
             //console.log(event);
-            console.log(window.getSelection());///////////////////////////////////////////////////
+            // console.log(window.getSelection());///////////////////////////////////////////////////
         }}
         onKeyDown={(event)=>{
             //console.log(event.key);

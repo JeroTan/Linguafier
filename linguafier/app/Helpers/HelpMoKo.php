@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Word;
 use Illuminate\Support\Facades\Hash;
 
 class HelpMoKo{
@@ -46,6 +47,10 @@ class HelpMoKo{
 
     public static function cleanse($value){
         return htmlspecialchars(addslashes(strtolower($value)));
+    }
+
+    public static function getMap(){
+
     }
 
 }
