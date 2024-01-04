@@ -63,6 +63,7 @@ export default function Pop(Option){
     //Design of UI
     const dialogStyling = {
         width: s_Width,
+        overscrollBehavior: `contain`,
     }
 
     //** Functionality */

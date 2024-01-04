@@ -297,11 +297,11 @@ export default function ColorPicker(Option){
                             if(c_picking){
                                 pickColor(e);
                             }
-                        }} onMouseDown={()=>{
+                        }} onPointerDown={()=>{
                             e_picking(true);
-                        }} onMouseUp={()=>{
+                        }} onPointerUp={()=>{
                             e_picking(false);
-                        }} onMouseLeave={()=>{
+                        }} onPointerLeave={()=>{
                             e_picking(false);
                         }} onClick={(e)=>{
                             pickColor(e);
