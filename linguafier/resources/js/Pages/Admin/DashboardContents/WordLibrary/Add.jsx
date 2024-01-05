@@ -272,9 +272,9 @@ export default ()=>{
                 <div className="flex w-full gap-2 flex-wrap">
                     <label className="">Heirarchy Mapping: </label>
                     <Button Name="Preview" Icon="eye" Padding={`px-1`} Click={()=>{
-                        true;
+                        v_heirarchymapPreviewSwitch[1](prev=>!prev);
                     }}/>
-                    <HeirarchyMap Handle={v_heirarchymapPreview} PopSwitch={v_heirarchymapPreviewSwitch} OffMapSwitch={true}/>
+                    <HeirarchyMap Handle={v_heirarchymapPreview} RootName={v_keyname} PopSwitch={v_heirarchymapPreviewSwitch} OffMapSwitch={true}/>
                 </div>
                 <small className=" font-light text-slate-600 w-full">Ancestor <span className="text-slate-400">(optional)</span></small>
                 <TextboxDropDownMultiple Handle={[v_heirarchymap.tail[0], v_heirarchymap.tail[1]]} Placeholder="No Selected. . ." Error={errors[`v_heirarchymap.tail`]} DropData={tailDrop} Request={`/admin/dashboard/word_library/search_data`} RequestKey={"v_searchTail"} WithRef={true} Size={`sm:ml-3 ${v_heirarchymap.tail[0].length > 0 ?"":"w-96"}`} />

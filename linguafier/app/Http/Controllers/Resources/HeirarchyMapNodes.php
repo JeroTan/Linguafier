@@ -52,6 +52,7 @@ class HeirarchyMapNodes extends Controller
 
             //This is where recurssion happens to get its link data here
             $mirrorVal[$direction] = $this->getMoreWord( $depth-1, json_decode($wordRef['heirarchy_map'], true)[$direction], $direction );
+            $mirrorVal['open'] = false; //This is for frontend;
 
             //Finally collect all the data and modify it in the $data[$key]
             $data[$key] = $mirrorVal;
