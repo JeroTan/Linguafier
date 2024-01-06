@@ -6,7 +6,7 @@ import Loading from "./Loading";
 // Hooks
 import { useState, useEffect, useContext, createContext, useRef, useMemo, useCallback, Fragment } from "react";
 import { router, usePage, Link } from "@inertiajs/react";
-import { Stage, Layer, Star, Circle, Text, Line, Rect, Group } from 'react-konva';
+import { Stage, Layer, Star, Circle, Text, Line, Rect, Group, Path } from 'react-konva';
 
 //** Create Context */
 export const G_Data = createContext();
@@ -70,7 +70,7 @@ export default function HeirarchyMap(Option){
             getAllMapNodes: HandlerFixed,
         }, { preserveScroll: true,
         onFinish:(visit)=>{
-            console.log('here');
+
         }} );
     }, [HandlerFixed]);
     //**<< Helper */
@@ -164,7 +164,7 @@ function MapDesign(){
         s_moreCurr(prev=>{
             prev.head = getAllMapNodes.head;
             prev.tail = getAllMapNodes.tail;
-            prev.side ={ data:getAllMapNodes.side,counter:0  };
+            prev.side ={ data:getAllMapNodes.side, counter:0  };
             return structuredClone(prev);
         });
     }, [getAllMapNodes]);
@@ -214,7 +214,7 @@ function MapDesign(){
         });
         return BG;
     }, [...mapSize, c_movement, c_scale]);
-    const ForegroundFill = useCallback(()=>{
+    const ForegroundFill = useMemo(()=>{
         //A function that will traverse through the depth of data
         //Initial iteration won't have button because it is a root
         //Energy is the actual data and direction is either head or tail; limitless will tell what key per depth is us
@@ -230,8 +230,8 @@ function MapDesign(){
                 ThisComponents[ThisComponents.length] = <BoxWord
                     X={mapLoc[0]}
                     Y={mapLoc[1]+(downPush*i)}
-                    key={`${limitless.length}_${limitless[limitless.length-1]}_${i}`}
-                    ID={`${limitless.length}_${limitless[limitless.length-1]}_${i}`}
+                    key={`${direction}_${limitless.length}_${limitless[limitless.length-1]}_${i}`}
+                    ID={`${energy[i].id}`}
                     Type={direction}
                     Location={i}
                     Limitless={limitless}
@@ -251,6 +251,42 @@ function MapDesign(){
 
             return ThisComponents;
         }
+
+        function domainExpansionII(energy, limitless=0){
+            let ThisComponents = [];
+            let downPush = 30+70;
+            //let limit = 10;
+            //let currentCounter = parseInt(Math.floor(limitless/limit));
+
+
+            if( energy.data.length <= 0 || (limitless)>=energy.data.length  /*|| ((energy.counter+1) * limit) > limitless*/ ){
+                return ThisComponents;
+            }
+            // let sideState = 'none';
+            // if( !((limitless+1)/limit).toString().includes('.') ){
+            //     if(energy.counter > currentCounter){
+            //         sideState = 'close';
+            //     }
+            //     else{
+            //         sideState = 'more';
+            //     }
+            // }
+            ThisComponents = [
+                <BoxWord
+                    Y={downPush*(limitless+1)}
+                    key={`side_${limitless}`}
+                    ID={`${energy.data[limitless].id}`}
+                    Type={'side'}
+                    //Location={currentCounter}
+                    Text={energy.data[limitless].name==""?"<>":energy.data[limitless].name}
+                    SideExist={ (energy.data.length - 1) > limitless }
+                    // SideState={ /*sideState*/ 'none' }
+                />,
+                ...domainExpansionII(energy, limitless+1),
+            ]
+
+            return ThisComponents;
+        }
         let AllComponents = [
             <BoxWord
                 X={0}
@@ -265,11 +301,16 @@ function MapDesign(){
         ];
 
         /**
-         * Please
+         * Please Add the Side Next
          */
 
-        return [AllComponents, ...domainExpansionI(c_moreCurr.head, 'head', [320, 0]), ...domainExpansionI(c_moreCurr.tail, 'tail', [-320, 0])];
-    }, [RootName, c_moreCurr, ...mapSize, c_movement, c_scale]);
+        return [
+            AllComponents,
+            ...domainExpansionI(c_moreCurr.head, 'head', [320, 0]),
+            ...domainExpansionI(c_moreCurr.tail, 'tail', [-320, 0]),
+            ...domainExpansionII(c_moreCurr.side),
+        ];
+    }, [RootName, c_moreCurr]);
     //**<< LayeredComponents */
 
 
@@ -399,7 +440,7 @@ function MapDesign(){
                         scaleY={  c_scale * (mapSize[1]/800) }
 
                     >
-                        {ForegroundFill()}
+                        {ForegroundFill}
                     </Group>
 
                 </G_ForeGroundData.Provider>
@@ -433,8 +474,8 @@ function BoxWord(Option){
     let TextContent = Option.Text ?? "Hello Words";
     let HeadCount = Option.HeadCount ?? 0;
     let TailCount = Option.TailCount ?? 0;
-    let SideExist = Option.SideCount ?? false;
-    let SideState = Option.SideState ?? 'more'; //more, close
+    let SideExist = Option.SideExist ?? false;
+    let SideState = Option.SideState ?? 'none'; //more, close
     let Location = Option.Location ?? 0; //Key Refernece;
     let Limitless = Option.Limitless ?? [0]; //Where does the root start;
     let ID = Option.ID ?? "1";
@@ -477,8 +518,6 @@ function BoxWord(Option){
             y={myY}
             onMouseEnter={Hovering}
             onMouseLeave={Hoverinot}
-            onPointerEnter={Hovering}
-            onPointerLeave={Hoverinot}
             listening={true}
             onClick={click}
             offset={{x: 30, y:15}}
@@ -516,8 +555,6 @@ function BoxWord(Option){
             y={myY}
             onMouseEnter={Hovering}
             onMouseLeave={Hoverinot}
-            onPointerEnter={Hovering}
-            onPointerLeave={Hoverinot}
             listening={true}
             onClick={click}
         >
@@ -581,6 +618,7 @@ function BoxWord(Option){
     const [ c_headMoreClick, s_headMoreClick ] = useState(Type=='root'? true:false);
     const [ c_tailMoreClick, s_tailMoreClick ] = useState(Type=='root'? true:false);
     const [ c_sideMoreClick, s_sideMoreClick ] = useState(false);
+    const [ c_redirectHover, s_redirectHover ] = useState(false);
     //**<< Use State */
 
     return <Group
@@ -591,11 +629,29 @@ function BoxWord(Option){
         offsetX={BoxWidth*.50}
     >
         <Group
-            onMouseEnter={Hovering}
-            onMouseLeave={Hoverinot}
-            onPointerEnter={Hovering}
-            onPointerLeave={Hoverinot}
+            onMouseEnter={()=>{
+                if(Type == 'root')
+                    return;
+
+                s_redirectHover(true);
+                Hovering();
+            }}
+            onMouseLeave={()=>{
+                if(Type == 'root')
+                    return;
+
+                s_redirectHover(false);
+                Hoverinot();
+            }}
             listening={true}
+            onClick={()=>{
+                if(Type == 'root')
+                    return;
+
+                //Once finish the actual route should be /words/${ID}
+                // router.get('/admin');
+                router.get(`/words/${ID}`)
+            }}
         >
             <Rect
                 width={BoxWidth}
@@ -731,11 +787,11 @@ function BoxWord(Option){
                 { SideState == 'more' && !c_sideMoreClick ? MoreButton('side', BoxWidth*.5, BoxHeight+30, ()=>{
                     s_sideMoreClick(true);
 
-                }) : <> </>}
-                { SideState == 'close' && !c_sideMoreClick ? CloseMoreButton('side', BoxWidth*.5, BoxHeight+30, ()=>{
-                    s_sideMoreClick(true);
+                }) : <></>}
+                { SideState == 'close' && c_sideMoreClick ? CloseMoreButton('side', BoxWidth*.5, BoxHeight+30, ()=>{
+                    s_sideMoreClick(false);
 
-                }) : <> </>}
+                }) : <></>}
             </> : ""}
             { !SideExist && Type == 'root'  ? <>
                 <Line
@@ -758,9 +814,6 @@ function BoxWord(Option){
 
 
 
-
-
-
             {Type =='side' ?
                 <Circle
                     x={BoxWidth*.5}
@@ -772,6 +825,7 @@ function BoxWord(Option){
                 />
             : <></>}
 
+            {Type != 'side' ?
             <Circle
                 x={BoxWidth}
                 y={BoxHeight*.5}
@@ -781,6 +835,7 @@ function BoxWord(Option){
                 stroke="black"
                 strokeWidth={.5}
             />
+            :<></>}
 
             {Type == 'root' || Type =='side' ?
                 <Circle
@@ -794,6 +849,7 @@ function BoxWord(Option){
                 />
             : <></>}
 
+            {Type != 'side' ?
             <Circle
                 y={BoxHeight*.5}
                 width={BoxHeight*.20}
@@ -802,6 +858,55 @@ function BoxWord(Option){
                 stroke="black"
                 strokeWidth={.5}
             />
+            :<></>}
+
+
+
+
+            {c_redirectHover ? <>
+                <Group
+                    y={-10}
+                    x={100}
+                    offsetX={74}
+                    opacity={.9}
+
+                >
+                    <Rect
+                        width={150}
+                        height={20}
+                        fill={'white'}
+                        cornerRadius={5}
+                        shadowEnabled={true}
+                        shadowBlur={2}
+                        shadowOffset={{x:0,y:1}}
+                        shadowOpacity={.2}
+                    />
+                    <Text
+                        width={150}
+                        height={20}
+                        fill="black"
+                        fontFamily="Lexend"
+                        fontSize={14}
+                        align="center"
+                        verticalAlign="middle"
+                        text="Redirect to the Word"
+                    />
+
+                    <Path
+                        x={75}
+                        y={20}
+                        scaleX={1.5}
+                        scaleY={1}
+                        offsetX={11}
+                        offsetY={8.5}
+                        data="M17 9V8H5v1h1v1h1v1h1v1h1v1h1v1h2v-1h1v-1h1v-1h1v-1h1V9"
+                        fill="white"
+                    />
+
+
+                </Group>
+            </> :<>
+            </>}
         </Group>
 
 

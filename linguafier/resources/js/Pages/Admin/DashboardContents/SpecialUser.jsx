@@ -141,7 +141,15 @@ export default ()=>{
         </div>
 
         {/* List Contents*/}
-        <ListContainer Name="List of System User" Search={[v_search, e_search, changeContents]} Sort={[v_sort, e_sort]} Filter={[v_filter, e_filter]} OtherButtons={[]}  Contents={ItemPlate()} />
+        <ListContainer
+            Name="List of System User"
+            Search={[v_search, e_search, changeContents]}
+            Sort={[v_sort, e_sort]}
+            Filter={[v_filter, e_filter]}
+            OtherButtons={[]}
+            Contents={ItemPlate()}
+            Pagination={data}
+        />
 
         {/* Pop */}
         <Pop Switch={[v_popSwitch, e_popSwitch]} Content={popContent} Pick={v_popPick} />

@@ -3,11 +3,41 @@ import AdminUI from './Utilities/AdminMainUI';
 import Icon from '../../Utilities/Icon';
 
 //Inertia / React
+import { useMemo, useCallback, Fragment } from 'react';
 import { usePage } from '@inertiajs/react';
 
 
 export default function Dashboard(){
-    const { asset, popFlash } = usePage().props;
+    const { asset, popFlash, getPrivileges } = usePage().props;
+
+    const pirvilegesGiven = useMemo(()=>{
+        let priv = JSON.parse(getPrivileges);
+        let list = [];
+        let privKey = Object.keys(priv);
+        for(let i = 0; i < privKey.length; i++){
+            if(!priv[privKey[i]])
+                continue;
+            list[list.length] = <Fragment key={i}>
+            <div className='px-2 py-1 rounded bg-my-green break-words drop-shadow-myDrop1 text-slate-100'>
+                {privKey[i]}
+            </div>
+            </Fragment>
+        }
+        if(!list.length){
+            list = [
+            <div key={1} className='px-2 py-1 italic'>
+                You currently have no privileges in your role.
+            </div>
+            ];
+        }
+        return <div className='flex flex-wrap gap-2 items-center mb-10'>
+            <div className='font-bold text-slate-700'>
+                Role Given:
+            </div>
+            {list}
+        </div>
+
+    }, [getPrivileges]);
 
     return <AdminUI>
         <h1 className='font-bold text-5xl'>
@@ -15,6 +45,9 @@ export default function Dashboard(){
         </h1>
         <small>Manage your magic system here</small>
         <div className='pb-10'></div>
+
+        {pirvilegesGiven}
+
 
         <div className='flex mb-5 gap-1'>
             <div>

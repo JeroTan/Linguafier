@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 
-class Homepage extends Controller
+class Dictionary extends Controller
 {
     public function __invoke(){
-        return Inertia::render('Homepage', [
+        return Inertia::render('Dictionary', [
             'pageUser'=>'User',
         ]);
     }

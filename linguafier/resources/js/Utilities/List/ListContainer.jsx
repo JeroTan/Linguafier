@@ -25,6 +25,7 @@ function NoItemBox(Option, NoItemMessage, NoItemSubMessage){
 
 export default (Option)=>{
     //** STRUCTURE */
+
     let Search = Option.Search;
     let ButtonProps = Option.ButtonProps ?? {};
     let OtherButtons = Option.OtherButtons ?? [];
@@ -32,7 +33,7 @@ export default (Option)=>{
     let NoItemMessage = Option.NoItemMessage ?? "Nothing Found!";
     let NotItemSubMessage = Option.NoItemSubMessage ?? "Please Add More Item to the List.";
     let Name = Option.Name ?? "List of Items";
-    let Pagination = Option.Pagination ?? false;
+    let PaginationData = Option.Pagination ?? false;
     let Sort = Option.Sort ?? false;
     let Filter = Option.Filter ?? false;
     let Loading = Option.Loading ?? undefined;
@@ -70,8 +71,8 @@ export default (Option)=>{
 
         </div>
         {
-            Pagination ? <div className="my-2">
-                <Pagination Link={Pagination}  />
+            typeof PaginationData === "object" ? <div className="my-2">
+                <Pagination Link={PaginationData}  />
             </div> :
             ""
         }

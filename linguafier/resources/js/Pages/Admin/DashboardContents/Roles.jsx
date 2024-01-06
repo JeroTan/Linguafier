@@ -118,7 +118,13 @@ export default ()=>{
         </div>
 
         {/* List Contents*/}
-        <ListContainer Name="List of Roles" Search={[v_search, e_search, changeContents]} ButtonProps={{}} OtherButtons={[]} Contents={ItemPlate()} />
+        <ListContainer
+            Name="List of Roles"
+            Search={[v_search, e_search, changeContents]}
+            ButtonProps={{}}
+            OtherButtons={[]}
+            Contents={ItemPlate()}
+        />
 
         {/* Pop */}
         <Pop Switch={[v_popSwitch, e_popSwitch]} Content={popContent} Pick={v_popPick} />

@@ -25,7 +25,7 @@ class WordLibrary extends Controller
 {
     //STRUCT
     protected function sortKey(){
-        return ['word.keyname', 'rarity_name', 'rarity_level', 'word.created_time', 'word.modified_time'];
+        return ['word.keyname', 'rarity.name', 'rarity.level', 'word.created_time', 'word.modified_time'];
     }
     protected function filterKey(){
         $variation = [];

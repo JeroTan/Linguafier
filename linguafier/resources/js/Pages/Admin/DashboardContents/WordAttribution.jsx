@@ -209,7 +209,15 @@ export default ()=>{
         </div>
 
         {/* List Contents*/}
-        <ListContainer Name="List of System User" Search={[v_search, e_search, changeContents]} Sort={[v_sort, e_sort]} OtherButtons={addButton()} Loading={[c_dataLoading, e_dataLoading]} Contents={ItemPlate()} />
+        <ListContainer
+            Name="List of System User"
+            Search={[v_search, e_search, changeContents]}
+            Sort={[v_sort, e_sort]}
+            OtherButtons={addButton()}
+            Loading={[c_dataLoading, e_dataLoading]}
+            Contents={ItemPlate()}
+            Pagination={{...data, add_get:['pgsw='+c_pageSwitch] }}
+        />
 
         {/* Pop */}
         <Pop Switch={[v_popSwitch, e_popSwitch]} Content={popContent} Pick={v_popPick} />

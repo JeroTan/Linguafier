@@ -48,8 +48,8 @@ export default ()=>{
     const [v_search, e_search] = useState('');
     const [ v_sort, e_sort] = useState([
         {Name:"Name", Ref:"word.keyname", Sort:"ASC"},
-        {Name:"Rarity", Ref:"rarity_name", Sort:"ASC"},
-        {Name:"Level", Ref:"rarity_level", Sort:"ASC"},
+        {Name:"Rarity", Ref:"rarity.name", Sort:"ASC"},
+        {Name:"Level", Ref:"rarity.level", Sort:"ASC"},
         {Name:"Created", Ref:"word.created_time", Sort:"ASC"},
         {Name:"Modified", Ref:"word.modified_time", Sort:"ASC"},
     ]);
@@ -118,15 +118,16 @@ export default ()=>{
     useEffect(()=>{
         changeContents();
     }, [v_sort, v_filter]);
-    useEffect(()=>{ //Stop the Loading Animation if the Render of data is done
-        e_dataLoading(false);
-    }, [data.data]);
     //**<< Use Effect */
 
     //**>> Functionality */
     function changeContents(){
         e_dataLoading(true);
-        router.post('/admin/dashboard/word_library/changeContents', { "v_search": v_search, 'v_sort':v_sort, "v_filter":v_filter  }, );
+        router.post('/admin/dashboard/word_library/changeContents', { "v_search": v_search, 'v_sort':v_sort, "v_filter":v_filter  }, {
+            onFinish:x=>{
+                e_dataLoading(false);
+            }
+        });
     }
     const ItemPlate = useCallback(()=>{
         return data.data.map((x, i)=>{
@@ -198,7 +199,15 @@ export default ()=>{
         </div>
 
         {/* List Contents*/}
-        <ListContainer Name="List of Words" Search={[v_search, e_search, changeContents]} Sort={[v_sort, e_sort]} Filter={[v_filter, e_filter]} Loading={[c_dataLoading, e_dataLoading]} Contents={ItemPlate()} />
+        <ListContainer
+            Name="List of Words"
+            Search={[v_search, e_search, changeContents]}
+            Sort={[v_sort, e_sort]}
+            Filter={[v_filter, e_filter]}
+            Loading={[c_dataLoading, e_dataLoading]}
+            Contents={ItemPlate()}
+            Pagination={data}
+        />
 
         {/* Pop */}
         <Pop Switch={[v_popSwitch, e_popSwitch]} Content={popContent} Pick={v_popPick} />

@@ -45,6 +45,7 @@ class HandleInertiaRequests extends Middleware
             'storageWordLibrary' => url('/storage/word_library')."/",
             'specialAccount' => fn () => session('SpecialAccount') ?? null,
             'getAllMapNodes' => fn () => $request->session()->get('getAllMapNodes'),
+            'getPrivileges' => fn ()=> $request->session()->get('SpecialAccount')['privilege'] ?? [],
             // 'flash' => fn () => $request->session()->all() ?? null,
         ]);
     }

@@ -8,13 +8,17 @@ use App\Http\Controllers\Admin\DashboardContents\WizardRanks;
 use App\Http\Controllers\Admin\DashboardContents\WordAttribution;
 use App\Http\Controllers\Admin\DashboardContents\WordLibrary;
 use App\Http\Controllers\Admin\DashboardContents\Roles;
+use App\Http\Controllers\Dictionary;
 use App\Http\Controllers\User\Login as UserLogin;
 use App\Http\Controllers\User\Dashboard as UserDashboard;
 
 use App\Http\Controllers\Homepage;
 use App\Http\Controllers\Resources\HeirarchyMapNodes;
+use App\Http\Controllers\Study;
+use App\Http\Controllers\Word;
 use App\Http\Middleware\CheckId;
 use App\Http\Middleware\NotOwnerAllowed;
+use App\Http\Middleware\PrivilegeEntry;
 use App\Http\Middleware\SpecAccNoSelf;
 use Illuminate\Support\Facades\Route;
 
@@ -30,9 +34,15 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', Homepage::class);
+Route::get('/dictionary', Dictionary::class);
+Route::get('/study', Study::class );
+
+Route::prefix('/word')->group(function(){
+    Route::get('/', Word::class);
+});
+
 
 Route::post('/getAllMapNodes',  [HeirarchyMapNodes::class, 'requestMap']);
-
 
 Route::prefix('/user')->group(function(){
     Route::get('/login', UserLogin::class)->middleware('UserAccLog:off')->name('user.login');
@@ -48,9 +58,11 @@ Route::prefix('/admin')->group(function(){
 
 
     Route::prefix('/dashboard')->middleware('SpecAccLog:on')->group(function(){
+        $privEnt = PrivilegeEntry::class.":";
+
         Route::get('/', AdminDashboard::class)->name('admin.dashboard');
 
-        Route::prefix('/special_user')->group(function(){
+        Route::prefix('/special_user')->middleware($privEnt."Manage Special User")->group(function(){
             $checkId  = CheckId::class.":admin.special_user,specialaccount";
             Route::get('/', SpecialUser::class)->name('admin.special_user');
             Route::post('/changeContents', [SpecialUser::class, "changeContents"]);
@@ -63,11 +75,15 @@ Route::prefix('/admin')->group(function(){
 
         });
 
-        Route::prefix('/overseer_wizard')->group(function(){
+        Route::prefix('/overseer_wizard')->middleware($privEnt."Manage Wizard")->group(function(){
             Route::get('/', OverseerWizard::class)->name('admin.overseer_wizard');
         });
 
-        Route::prefix('/word_library')->group(function(){
+        Route::prefix('/wizard_ranks')->middleware($privEnt."Manage Wizard Rank")->group(function(){
+            Route::get('/', WizardRanks::class)->name('admin.wizard_ranks');
+        });
+
+        Route::prefix('/word_library')->middleware($privEnt."Manage Word Library")->group(function(){
             $checkId = CheckId::class.":admin.word_library,word";
             Route::get('/', WordLibrary::class)->name('admin.word_library');
             Route::post('/changeContents', [WordLibrary::class, 'changeContents']);
@@ -79,7 +95,7 @@ Route::prefix('/admin')->group(function(){
             Route::post('/delete/{id}', [WordLibrary::class, 'delete'])->middleware($checkId);
         });
 
-        Route::prefix('/word_attribution')->group(function(){
+        Route::prefix('/word_attribution')->middleware($privEnt."Manage Word Attributes")->group(function(){
             $ctrl = WordAttribution::class;
             $checkId  = CheckId::class.":admin.word_attribution,";
             Route::get('/', $ctrl)->name('admin.word_attribution');
@@ -106,11 +122,7 @@ Route::prefix('/admin')->group(function(){
             Route::post('/delete_language/{id}', [$ctrl, 'delete_language'])->middleware($checkId."language");
         });
 
-        Route::prefix('/wizard_ranks')->group(function(){
-            Route::get('/', WizardRanks::class)->name('admin.wizard_ranks');
-        });
-
-        Route::prefix('/roles')->group(function(){
+        Route::prefix('/roles')->middleware($privEnt."Manage Roles")->group(function(){
             $checkId  = CheckId::class.":admin.roles,role";
             Route::get('/', Roles::class)->name('admin.roles');
             Route::post('/changeContents', [Roles::class, 'changeContents'])->name('admin.roles.contents');
