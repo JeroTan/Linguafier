@@ -27,6 +27,7 @@ export default ()=>{
     const [ v_language, e_language ] = useState(data.language);
 
     const [ v_variation, e_variation ] = useState(data.variation);
+    const [ v_varname, e_varname ] = useState(data.varname);
     const [ v_definition, e_definition] = useState(data.definition);
     const [ v_pronounciation, e_pronounciation] = useState(data.pronounciation);
     const [ v_example, e_example ] = useState(data.example);
@@ -101,6 +102,7 @@ export default ()=>{
                             v_keyname:JSON.stringify(v_keyname),
                             v_language:JSON.stringify(v_language),
                             v_variation:JSON.stringify(v_variation),
+                            v_varname: JSON.stringify(v_varname),
                             v_definition:JSON.stringify(v_definition),
                             v_pronounciation:JSON.stringify(v_pronounciation),
                             v_example:JSON.stringify(v_example),
@@ -150,6 +152,9 @@ export default ()=>{
             })
             return structuredClone(remake);
         };
+        e_varname(prev=>{
+            return remakes(prev, "");
+        });
         e_definition(prev=>{
             return remakes(prev, "");
         });
@@ -215,6 +220,7 @@ export default ()=>{
             v_keyname == data.keyname &&
             v_language.id == data.language?.id &&
             JSON.stringify(v_variation) == JSON.stringify(data.variation) &&
+            JSON.stringify(v_varname) == JSON.stringify(data.varname) &&
             JSON.stringify(v_definition) ==  JSON.stringify(data.definition) &&
             JSON.stringify(v_pronounciation) == JSON.stringify(data.pronounciation) &&
             JSON.stringify(v_example) == JSON.stringify(data.example) &&
@@ -231,29 +237,12 @@ export default ()=>{
             JSON.stringify(v_sources) == JSON.stringify(data.sources)
         );
         // console.log(JSON.stringify(v_images), JSON.stringify(data.images));
-        return (
-            v_keyname == data.keyname &&
-            v_language.id == data.language?.id &&
-            JSON.stringify(v_variation) == JSON.stringify(data.variation) &&
-            JSON.stringify(v_definition) ==  JSON.stringify(data.definition) &&
-            JSON.stringify(v_pronounciation) == JSON.stringify(data.pronounciation) &&
-            JSON.stringify(v_example) == JSON.stringify(data.example) &&
-            v_rarity.id == data.rarity?.id &&
-            JSON.stringify(v_attributes) == JSON.stringify(data.attributes) &&
-            JSON.stringify(v_relationyms.synonyms[0]) == JSON.stringify(data.relationyms.synonyms) &&
-            JSON.stringify(v_relationyms.antonyms[0]) == JSON.stringify(data.relationyms.antonyms) &&
-            JSON.stringify(v_relationyms.homonyms[0]) == JSON.stringify(data.relationyms.homonyms) &&
-            JSON.stringify(v_heirarchymap.tail[0]) == JSON.stringify(data.heirarchymap.tail) &&
-            JSON.stringify(v_heirarchymap.head[0]) == JSON.stringify(data.heirarchymap.head) &&
-            JSON.stringify(v_heirarchymap.side[0]) == JSON.stringify(data.heirarchymap.side) &&
-            v_origin == data.origin &&
-            JSON.stringify(v_images) == JSON.stringify(data.images) &&
-            JSON.stringify(v_sources) == JSON.stringify(data.sources)
-        )
+        return trueNess;
     }
     function resetData(){
         e_keyname(data.keyname);
         e_language(data.language);
+        e_varname(data.varname);
         e_definition(data.definition);
         e_pronounciation(data.pronounciation);
         e_example(data.example);
@@ -320,6 +309,12 @@ export default ()=>{
                             <div className="sm:rounded rounded-none bg-green-300 sm:border-r-2 border-b-2 border-black p-2">
                                 <div className="flex items-center gap-1">
                                     <Icon Name="right" OutClass={"w-3 h-3"} InClass={"fill-my-green"}/> <h6 className=" break-words">{x.name}</h6>
+                                </div>
+                                {/* Variation Word Name */}
+                                <div className="my-2"></div>
+                                <div className="flex flex-wrap gap-1">
+                                    <label className="basis-full">Variation Word: </label>
+                                    <Textbox Handle={[v_varname, e_varname]} Dynamic={`${x.id}`} Size="w-96" Placeholder={`Name of the word as a ${x.name}. . .`} Error={errors.v_varname} />
                                 </div>
                                 {/* Definition */}
                                 <div className="my-2"></div>

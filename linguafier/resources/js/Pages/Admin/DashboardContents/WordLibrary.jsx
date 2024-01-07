@@ -132,34 +132,45 @@ export default ()=>{
     const ItemPlate = useCallback(()=>{
         return data.data.map((x, i)=>{
             // Design for Name
-            let t_Name = <div className='sm:w-64 w-full shrink-0 grow'>
-                <h3 className='text-xl text-my-green font-bold'>{x.keyname}</h3>
+            let t_Name = <div className='lg:w-64 md:w-52 sm:w-56 w-full shrink-0 grow'>
+                <h3 className='text-xl text-my-green font-bold' style={{wordBreak: 'break-all',overflowWrap: 'break-word'}}>{x.keyname}</h3>
             </div>;
             // Design for Variation
             let variationData = JSON.parse(x.variation);
-            let t_Variation = <div className='w-full shrink flex flex-col gap-1'>
-                {variationData.map((y, j)=>{
-                    return <div key={j} className=' rounded border-2 border-slate-600 w-fit px-2 py-1 flex gap-2 items-center bg-slate-400 text-white'>
-                        <ImageFlash Src={storageVariation+y.image} Size={`20px`} />
-                        <small>{y.name}</small>
-                    </div>
-                }) }
+            let t_Variation = <div className='shrink relative'>
+                <small className='absolute top-[-7px]'>
+                    Variation:
+                </small>
+                <div className='flex flex-col gap-1 mt-3'>
+                    {variationData.map((y, j)=>{
+                        return <div key={j} className=' rounded border-2 border-slate-600 w-fit px-2 py-1 flex gap-2 items-center bg-slate-400 text-white'>
+                            <ImageFlash Src={storageVariation+y.image} Size={`20px`} />
+                            <small>{y.name}</small>
+                        </div>
+                    }) }
+                </div>
+
             </div>
             // Design for Attribute
             let attributeData = JSON.parse(x.attributes);
-            let t_Attribute = <div className='w-full shrink flex flex-wrap gap-1'>
-                {attributeData.map((y, j)=>{
-                    return <div key={j} className='rounded-full w-fit h-fit px-2 py-1 flex gap-2 items-center ' style={{backgroundColor: y.color}}>
-                        <ImageFlash Src={storageAttribute+y.image} Size={`20px`} Round={`rounded-full`} />
-                        <small className='text-white mix-blend-difference'>{y.name}</small>
-                    </div>
-                }) }
+            let t_Attribute = <div className='sm:w-full shrink relative'>
+                <small className='absolute top-[-7px]'>
+                    Attributes:
+                </small>
+                <div className='flex flex-wrap gap-1 mt-3'>
+                    {attributeData.map((y, j)=>{
+                        return <div key={j} className='rounded-full w-fit h-fit px-2 py-1 flex gap-2 items-center ' style={{backgroundColor: y.color}}>
+                            <ImageFlash Src={storageAttribute+y.image} Size={`20px`} Round={`rounded-full`} />
+                            <small className='text-white mix-blend-difference'>{y.name}</small>
+                        </div>
+                    }) }
+                </div>
             </div>
 
             // Design for Rarity
-            let t_Rarity = <div className='w-full shrink flex flex-col gap-1'>
+            let t_Rarity = <div className='w-full shrink flex sm:flex-col sm:items-start items-center flex-wrap gap-1 sm:translate-y-0 translate-y-[-7px] sm:mb-0 mb-2'>
                 <div className=''>
-                    {x.rarity_name}
+                    {x.rarity_name}<span className='sm:hidden inline'>:</span>
                 </div>
                 <div className='flex flex-wrap gap-1'>
                     { Array(x.rarity_level).fill(0).map((y,j)=>{
@@ -171,7 +182,7 @@ export default ()=>{
             </div>
 
             // Design for Button
-            let t_Button = <div className='flex flex-wrap pb-1 pr-1 flex-col gap-2'>
+            let t_Button = <div className='sm:w-auto w-full flex flex-wrap sm:justify-normal justify-end pb-1 pr-1 sm:flex-col flex-row gap-2'>
                 <Button Icon="edit" Size="w-fit h-fit" Padding="px-2 py-1" Click={()=>{
                     router.get(`/admin/dashboard/word_library/modify/${x.id}`);
                 }} />
@@ -181,11 +192,12 @@ export default ()=>{
                     e_popSwitch(true);
                 }} />
             </div>
-            return <div className='w-full flex sm:flex-nowrap flex-wrap gap-1' key={i}>
+            return <div className='w-full flex sm:flex-nowrap flex-wrap lg:gap-4 gap-1 gap-y-0' key={i}>
                 {t_Name}
+                {t_Rarity}
                 {t_Variation}
                 {t_Attribute}
-                {t_Rarity}
+
                 {t_Button}
             </div>
         });

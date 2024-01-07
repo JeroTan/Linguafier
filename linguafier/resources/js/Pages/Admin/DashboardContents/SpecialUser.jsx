@@ -114,7 +114,7 @@ export default ()=>{
                     <small><span className='text-yellow-500'>Created:</span> {x.created_time}</small>
                     <small><span className='text-orange-500'>Modified:</span> {x.modified_time}</small>
                 </div>
-                <div className='flex flex-wrap pb-1 pr-1 flex-col gap-2'>
+                <div className='sm:w-auto w-full flex flex-wrap sm:justify-normal justify-end pb-1 pr-1 sm:flex-col flex-row gap-2'>
                     { !(x.id == 1 || x.id == specialAccount.id)  ? <>
                         <Button Icon="edit" Size="w-fit h-fit" Padding="px-2 py-1" Click={()=>{
                             router.get('/admin/dashboard/special_user/modify/'+x.id);

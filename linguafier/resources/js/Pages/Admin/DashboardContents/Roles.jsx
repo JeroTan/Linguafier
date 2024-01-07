@@ -91,7 +91,7 @@ export default ()=>{
                     </ul>
 
                 </div>
-                <div className='flex flex-wrap pb-1 pr-1 flex-col gap-2'>
+                <div className='sm:w-auto w-full flex flex-wrap sm:justify-normal justify-end pb-1 pr-1 sm:flex-col flex-row gap-2'>
                     <Button Icon="edit" Size="w-fit h-fit" Padding="px-2 py-1" Click={()=>{
                         router.get('/admin/dashboard/roles/modify/'+data[i].id);
                     }} />

@@ -650,7 +650,7 @@ function BoxWord(Option){
 
                 //Once finish the actual route should be /words/${ID}
                 // router.get('/admin');
-                router.get(`/words/${ID}`)
+                router.get(`/word/${ID}`)
             }}
         >
             <Rect

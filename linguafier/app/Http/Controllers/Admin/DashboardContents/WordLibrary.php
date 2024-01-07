@@ -91,6 +91,7 @@ class WordLibrary extends Controller
         $language_data = Language::find($data->language_id);
         $data->language = ['name'=>$language_data->name, 'id'=>$data->language_id];
         $data->variation = json_decode($data->variation, true);
+        $data->varname = json_decode($data->varname, true);
         $data->definition = json_decode($data->definition, true);
         $data->pronounciation = json_decode($data->pronounciation, true);
         $data->example = json_decode($data->examples, true);
@@ -369,6 +370,7 @@ class WordLibrary extends Controller
         $newWord = new Word;
         $newWord->id = HelpMoKo::generateID('OnlyMeChanics', 10);
         $newWord->keyname = $remake['v_keyname'];
+        $newWord->varname = $remake['v_varname'];
         $newWord->language_id = $remake['v_language']['id'];
         $newWord->variation = $remake['v_variation'];
         $newWord->definition = $remake['v_definition'];
@@ -406,6 +408,7 @@ class WordLibrary extends Controller
         $word = Word::find($id);
         $word->keyname = $remake['v_keyname'];
         $word->language_id = $remake['v_language']['id'];
+        $word->varname = $remake['v_varname'];
         $word->variation = $remake['v_variation'];
         $word->definition = $remake['v_definition'];
         $word->pronounciation = $remake['v_pronounciation'];
@@ -751,6 +754,7 @@ class WordLibrary extends Controller
             'v_keyname'=>"required|json",
             'v_language'=>"required|json",
             'v_variation'=>"required|json",
+            'v_varname'=>"required|json",
             'v_definition'=>"required|json",
             'v_pronounciation'=>"required|json",
             'v_example'=>"required|json",
@@ -766,6 +770,7 @@ class WordLibrary extends Controller
             "v_keyname" => json_decode($request->v_keyname, true),
             "v_language" => json_decode($request->v_language, true),
             "v_variation" => json_decode($request->v_variation, true),
+            'v_varname' => json_decode($request->v_varname, true),
             "v_definition" => json_decode($request->v_definition, true),
             "v_pronounciation" => json_decode($request->v_pronounciation, true),
             "v_example" => json_decode($request->v_example, true),
@@ -799,6 +804,9 @@ class WordLibrary extends Controller
 
             'v_definition'=>"required|array|required_array_keys:$variationIds",
             'v_definition.*'=>"required|string|not_regex:/<script\b[^>]*>[\s\S]*?<\/script\s*>/",
+
+            'v_varname'=>"required|array|required_array_keys:$variationIds",
+            'v_varname.*'=>"required|string",
 
             'v_pronounciation'=>"required|array|required_array_keys:$variationIds",
             'v_pronounciation.*'=>"required|array|required_array_keys:simple,original",
@@ -845,6 +853,9 @@ class WordLibrary extends Controller
 
             'v_language.*.required'=>"Language is required.",
             'v_language.*.exists'=>"Invalid input data detected.",
+
+            'v_varname.*.required'=>'Name for this word variation is required.',
+            'v_varname.*.string'=>'Invalid input data detected.',
 
             'v_variation.required'=>'Variation is required.',
             'v_variation.array'=>'Invalid input data detected.',
@@ -924,6 +935,7 @@ class WordLibrary extends Controller
         $validated->validate();
 
         $remake['v_variation'] = json_encode($remake['v_variation']);
+        $remake['v_varname'] = json_encode($remake['v_varname']);
         $remake['v_definition'] = json_encode($remake['v_definition']);
         $remake['v_pronounciation'] = json_encode($remake['v_pronounciation']);
         $remake['v_example'] = json_encode($remake['v_example']);
@@ -953,7 +965,6 @@ class WordLibrary extends Controller
 
         return $remake;
     }
-
     protected function successReturn($name, $type = "add"){
         $flashData = [
             'Type'=>'success',

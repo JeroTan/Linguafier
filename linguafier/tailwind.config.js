@@ -41,6 +41,8 @@ export default {
         },
         boxShadow:{
             'myBox1': "1px 1px 0 0",
+            'myBox1_2': "1px 2px 0 0",
+            'myBox1_3': "1px 3px 0 0",
             'myBox3': "3px 3px 0 0",
             'myBox5': "5px 5px 0 0",
         },

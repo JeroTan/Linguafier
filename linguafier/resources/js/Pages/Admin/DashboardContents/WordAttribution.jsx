@@ -148,7 +148,7 @@ export default ()=>{
                     </div>
                 </div>
             }
-            let t_Button = <div className='flex flex-wrap pb-1 pr-1 flex-col gap-2'>
+            let t_Button = <div className='sm:w-auto w-full flex flex-wrap sm:justify-normal justify-end pb-1 pr-1 sm:flex-col flex-row gap-2'>
                 <Button Icon="edit" Size="w-fit h-fit" Padding="px-2 py-1" Click={()=>{
                     const where = {
                         Variation:"variation",

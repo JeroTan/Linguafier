@@ -42,6 +42,7 @@ return new class extends Migration
             $table->string('language_id', 16)->nullable();
                 $table->foreign('language_id')->references('id')->on('language')->nullOnDelete()->cascadeOnUpdate();
             $table->json('variation')->nullable();
+            $table->json('varname')->nullable();
             $table->json('definition')->nullable();
             $table->json('pronounciation')->nullable();
             $table->json('examples')->nullable();

@@ -31,6 +31,7 @@ export default ()=>{
     const [ v_language, e_language ] = useState({name:"", id:""});
 
     const [ v_variation, e_variation ] = useState([]);
+    const [ v_varname, e_varname ] = useState({});
     const [ v_definition, e_definition] = useState({});
     const [ v_pronounciation, e_pronounciation] = useState({});
     const [ v_example, e_example ] = useState({});
@@ -74,6 +75,9 @@ export default ()=>{
             })
             return structuredClone(remake);
         };
+        e_varname(prev=>{
+            return remakes(prev, "");
+        });
         e_definition(prev=>{
             return remakes(prev, "");
         });
@@ -178,6 +182,13 @@ export default ()=>{
                                 <div className="flex items-center gap-1">
                                     <Icon Name="right" OutClass={"w-3 h-3"} InClass={"fill-my-green"}/> <h6 className=" break-words">{x.name}</h6>
                                 </div>
+                                {/* Variation Word Name */}
+                                <div className="my-2"></div>
+                                <div className="flex flex-wrap gap-1">
+                                    <label className="basis-full">Variation Word: </label>
+                                    <Textbox Handle={[v_varname, e_varname]} Dynamic={`${x.id}`} Size="w-96" Placeholder={`Name of the word as a ${x.name}. . .`} Error={errors.v_varname} />
+                                </div>
+
                                 {/* Definition */}
                                 <div className="my-2"></div>
                                 <div className="flex flex-col gap-1">
@@ -355,6 +366,7 @@ export default ()=>{
                         v_keyname:JSON.stringify(v_keyname),
                         v_language:JSON.stringify(v_language),
                         v_variation:JSON.stringify(v_variation),
+                        v_varname: JSON.stringify(v_varname),
                         v_definition:JSON.stringify(v_definition),
                         v_pronounciation:JSON.stringify(v_pronounciation),
                         v_example:JSON.stringify(v_example),

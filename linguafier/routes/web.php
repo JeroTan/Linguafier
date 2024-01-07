@@ -20,6 +20,7 @@ use App\Http\Middleware\CheckId;
 use App\Http\Middleware\NotOwnerAllowed;
 use App\Http\Middleware\PrivilegeEntry;
 use App\Http\Middleware\SpecAccNoSelf;
+use App\Http\Middleware\WordExist;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,12 +34,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', Homepage::class);
+Route::get('/', Homepage::class)->name('home');
 Route::get('/dictionary', Dictionary::class);
 Route::get('/study', Study::class );
 
 Route::prefix('/word')->group(function(){
     Route::get('/', Word::class);
+    Route::get('/{id}', [Word::class, 'word_ui'])->middleware(WordExist::class);
 });
 
 

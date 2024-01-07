@@ -14,7 +14,7 @@ export default ()=>{
     const { asset, popFlash, pageUser, specialAccount } = usePage().props;
 
     //** Use State */
-    const [s_profile, se_profile] = useState(false);
+    const [c_profile, e_profile] = useState(false);
 
     //** Helper */
     const firstNav = useMemo(()=>{
@@ -49,7 +49,7 @@ export default ()=>{
     const profileDropDown = useMemo(()=>{
         if(specialAccount){
             return <>
-            <div className={`${s_profile ? "absolute" : "hidden"} w-max top-[60px] p-2 bg-my-green shadow-myBox3 outline outline-2 outline-black text-white`}>
+            <div className={`${c_profile ? "absolute" : "hidden"} w-max top-[60px] p-2 bg-my-green shadow-myBox3 outline outline-2 outline-black text-white z-[100]`}>
                 <div className="pb-2 border-b border-slate-800 flex flex-col items-end">
                     <h4 className="text-2xl font-bold text-my-light drop-shadow-myDrop1">{specialAccount.username}</h4>
                     <small className="mt-[-8px] font-light"> <span className=" italic">role:</span> <span className="font-semibold">{specialAccount.rolename}</span> </small>
@@ -62,10 +62,10 @@ export default ()=>{
                 </div>
             </div>
             </>
-        }else{
+        }else if(true){
             return <></>
         }
-    }, [pageUser, specialAccount]);
+    }, [pageUser, specialAccount, c_profile]);
 
     const redirectToHome = useCallback(()=>{
         if(pageUser == 'Special'){
@@ -95,12 +95,12 @@ return <>
                 <div className="relative flex 2xl:justify-center justify-end">
                     <div className="relative bg-my-light rounded-full h-12 aspect-square drop-shadow-myDrop1 cursor-pointer overflow-hidden flex justify-center items-center delay-100 hover:drop-shadow-myDrop3 hover:brightness-125" onClick={ ()=>{
                         if(specialAccount)
-                            se_profile(prev=>prev?false:true);
+                            e_profile(prev=>!prev);
                     } }>
                         {profileNav}
                     </div>
                     {/** Drop Down of Pofile */}
-
+                    {profileDropDown}
                 </div>
             </div>
 
