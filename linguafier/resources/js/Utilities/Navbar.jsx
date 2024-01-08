@@ -47,7 +47,7 @@ export default ()=>{
     }, [pageUser]);
 
     const profileDropDown = useMemo(()=>{
-        if(specialAccount){
+        if(specialAccount){//However login first either admin or a user
             return <>
             <div className={`${c_profile ? "absolute" : "hidden"} w-max top-[60px] p-2 bg-my-green shadow-myBox3 outline outline-2 outline-black text-white z-[100]`}>
                 <div className="pb-2 border-b border-slate-800 flex flex-col items-end">

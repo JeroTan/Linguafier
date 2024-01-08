@@ -12,7 +12,7 @@ import { Stage, Layer, Star, Circle, Text, Line, Rect, Group, Path } from 'react
 export const G_Data = createContext();
 export const G_ForeGroundData = createContext("");
 
-export default function HeirarchyMap(Option){
+export default function HierarchyMap(Option){
     //** Use Page */
     const { getAllMapNodes } = usePage().props;
 
@@ -29,12 +29,10 @@ export default function HeirarchyMap(Option){
     //**>> UseState */
     const [c_popSwitch, s_popSwitch] = PopSwitch ?? useState(false);
     const [c_mapSwitch, s_mapSwitch] = MapSwitch ?? useState(true);
-    const [c_windowSize, s_windowSize] = useState([window.innerWidth, window.innerHeight]);
+    const [c_windowSize, s_windowSize] = useState(false);
     //**<< UseState */
 
-    //**>> Use Ref */
-    const StageContainer = useRef();
-    //**<< Use Ref */
+
 
 
 
@@ -59,18 +57,18 @@ export default function HeirarchyMap(Option){
         v_domainExpansion(energy[limitless[0]], limitless.filter((x,i)=>i!=0) || []);
         return energy;
     }, []);
-    const redirectLink = useCallback((id)=>{
-        return "/words/"+id;
-    }, []);
     const HandlerFixed = useMemo(()=>{
-        return Handler[0];
+        if(!Handler[0]?.head)
+            return Handler;
+        else
+            return Handler[0];
     }, [Handler[0], Dynamic]);
     const requestMapNode = useCallback(()=>{
         router.post('/getAllMapNodes', {
             getAllMapNodes: HandlerFixed,
         }, { preserveScroll: true,
         onFinish:(visit)=>{
-
+            router.reload({ only: ['getAllMapNodes'] }); //BE SURE TO ADD FLASH KEEP IN THE CONTROLLER TO RELOAD THE MAP
         }} );
     }, [HandlerFixed]);
     //**<< Helper */
@@ -84,38 +82,69 @@ export default function HeirarchyMap(Option){
             s_mapSwitch(false);
         }
     }, [OffMapSwitch]);
-    useEffect(()=>{
-        window.addEventListener('resize', ()=>{
-            s_windowSize([
-                window.innerWidth,
-                window.innerHeight,
-            ]);
-        });
-    }, []);
     //**<< Use Effect */
 
-
     //**>> Functionality */
-    const mapDesign = useCallback(()=>{
-        if(!getAllMapNodes)
-            return <div>
-                <Loading />
-            </div>
-        return <MapDesign />
-    }, [getAllMapNodes, RootName, c_windowSize]);
+
     //**<< Functionality */
 
     //** Render */
-    return <G_Data.Provider value={[getAllMapNodes, RootName, c_windowSize, s_windowSize]}>
+    return <G_Data.Provider value={[getAllMapNodes, RootName, c_windowSize, s_windowSize,c_popSwitch,c_mapSwitch]}>
         { c_mapSwitch ?
-            <div className="flex w-full">
-                {mapDesign()}
-            </div>
+            <MapSpread />
         : ""}
 
         {/* Pop */}
-        <Pop Switch={[c_popSwitch, s_popSwitch]} BlankPlate={ mapDesign() } Width={`100%`} />
+        <Pop Switch={[c_popSwitch, s_popSwitch]} BlankPlate={  <div className="h-[calc(100vh-100px)] pt-2"><MapSpread /></div>  } Width={`100%`} CloseFunc={()=>{
+            if(!OffMapSwitch){
+                s_mapSwitch(true);
+            }
+        }}/>
     </G_Data.Provider>
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function MapSpread(){
+    const [getAllMapNodes, RootName, c_windowSize, s_windowSize,c_popSwitch,c_mapSwitch] = useContext(G_Data);
+    //**>> Use Ref */
+    const StageContainer = useRef();
+    //**<< Use Ref */
+    const switchOld = useState([true, false]);
+    useEffect(()=>{
+        function updateSize(){
+            if(StageContainer.current && (c_popSwitch || c_mapSwitch) && StageContainer.current.clientWidth >0 && StageContainer.current.clientHeight>0){
+                s_windowSize([
+                    StageContainer.current.clientWidth,
+                    StageContainer.current.clientHeight,
+                ]);
+            }
+        }
+        updateSize();
+        window.addEventListener('resize', updateSize);
+
+        if(switchOld[0][0] != c_mapSwitch || switchOld[0][1] != c_popSwitch){
+            switchOld[1]([c_mapSwitch, c_popSwitch]);
+            s_windowSize([0,0]);
+
+        }
+
+    }, [StageContainer.current, StageContainer.current?.clientWidth, StageContainer.current?.clientHeight,  c_popSwitch, c_mapSwitch]);
+
+    const mapLoader = useCallback(()=>{
+        if(!getAllMapNodes || !c_windowSize || c_windowSize[0] <= 0 || c_windowSize[1] <= 0)
+            return <div className="flex flex-col items-center">
+                <Loading />
+                <small className="italic text-slate-500 font-light">Creating Map Please Wait. . .</small>
+            </div>
+        return <MapDesign />
+    },[getAllMapNodes, RootName, c_windowSize]);
+
+    return <div id="thisStage" ref={StageContainer} className="relative w-full flex justify-center items-center" style={{height: "100%", width:"100%"}}>
+        {mapLoader()}
+    </div>
 }
 
 /*
@@ -137,7 +166,6 @@ function MapDesign(){
     const [getAllMapNodes, RootName, c_windowSize, s_windowSize] = useContext(G_Data);
 
     //**>> Use Ref */
-    const StageContainer = useRef();
     const TheStage = useRef();
     //**<< Use Ref */
 
@@ -152,7 +180,7 @@ function MapDesign(){
 
     //**>> Helper */
     const mapSize = useMemo(()=>{
-        return [c_windowSize[0]-100, c_windowSize[1]-100]; //The ratio is 1000 x 800
+        return [c_windowSize[0], c_windowSize[1]]; //The ratio is 1000 x 800
     }, [c_windowSize, ...c_windowSize]);
     const screenRatio = useMemo(()=>{
         return mapSize[1]>0 ? (mapSize[0]/mapSize[1]) : 0
@@ -315,8 +343,7 @@ function MapDesign(){
 
 
    //** Render */
-   return <div ref={StageContainer} className="relative w-full flex justify-center items-center" style={{height: c_windowSize[1]-100}} >
-        <Stage ref={TheStage} width={ mapSize[0] } height={ mapSize[1] }
+   return <Stage ref={TheStage} width={ mapSize[0] } height={ mapSize[1] }
 
         style={{
             cursor: c_stageCursor,
@@ -343,9 +370,6 @@ function MapDesign(){
             //Get The Movement Position of the canvas
             let x = e.evt.offsetX - c_mouseDownPos[0];
             let y = e.evt.offsetY - c_mouseDownPos[1];
-
-
-            // console.log(x, y, c_mouseDownPos, [e.evt.offsetX, e.evt.offsetY]);
 
             //Movement Speed; Define the how a movement will increase the pan of canvas
             let movementSpeed = .5;
@@ -446,8 +470,7 @@ function MapDesign(){
                 </G_ForeGroundData.Provider>
             </Layer>
 
-        </Stage>
-    </div>
+    </Stage>
 }
 
 
@@ -644,7 +667,7 @@ function BoxWord(Option){
                 Hoverinot();
             }}
             listening={true}
-            onClick={()=>{
+            onPointerDown={()=>{
                 if(Type == 'root')
                     return;
 

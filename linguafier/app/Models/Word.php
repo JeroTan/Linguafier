@@ -19,7 +19,7 @@ class Word extends Model
     //     'examples'=>'array',
     //     'attributes'=>'array',
     //     'relationyms'=>'array',
-    //     'heirarchy_map'=>'array',
+    //     'hierarchy_map'=>'array',
     //     'sources'=>'array',
     // ];
     public $incrementing = false;

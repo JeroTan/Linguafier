@@ -50,7 +50,7 @@ return new class extends Migration
                 $table->foreign('rarity_id')->references('id')->on('rarity')->nullOnDelete()->cascadeOnUpdate();
             $table->json('attributes')->nullable();
             $table->json('relationyms')->nullable();
-            $table->json('heirarchy_map')->nullable();
+            $table->json('hierarchy_map')->nullable();
 
             $table->text('origin')->nullable();
             $table->json('images')->nullable(); //Max of 3

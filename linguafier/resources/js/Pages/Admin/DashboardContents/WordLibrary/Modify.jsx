@@ -11,7 +11,7 @@ import TextboxDropDown from "../../../../Utilities/TextboxDropDown";
 import Icon from "../../../../Utilities/Icon";
 import TextEditor from "../../../../Utilities/TextEditor";
 import TextEditorSimple from "../../../../Utilities/TextEditorSimple";
-import HeirarchyMap from "../../../../Utilities/HeirarchyMap";
+import HierarchyMap from "../../../../Utilities/HierarchyMap";
 
 
 // HOOKS
@@ -39,17 +39,17 @@ export default ()=>{
         antonyms:useState(structuredClone(data.relationyms.antonyms)),
         homonyms:useState(structuredClone(data.relationyms.homonyms)),
     }
-    const v_heirarchymap = {
-        tail: useState(structuredClone(data.heirarchymap.tail)),
-        side: useState(structuredClone(data.heirarchymap.side)),
-        head: useState(structuredClone(data.heirarchymap.head)),
+    const v_hierarchymap = {
+        tail: useState(structuredClone(data.hierarchymap.tail)),
+        side: useState(structuredClone(data.hierarchymap.side)),
+        head: useState(structuredClone(data.hierarchymap.head)),
     };
-    const v_heirarchymapPreview = useState({
+    const v_hierarchymapPreview = useState({
         tail: [],
         side: [],
         head: [],
     });
-    const v_heirarchymapPreviewSwitch = useState(false);
+    const v_hierarchymapPreviewSwitch = useState(false);
     const [v_origin, e_origin] = useState(data.origin);
     const [v_images, e_images] = useState(data.images);
     const [v_prevImages, e_prevImages] = useState(data.previmages);
@@ -113,10 +113,10 @@ export default ()=>{
                                 antonyms: v_relationyms.antonyms[0],
                                 homonyms: v_relationyms.homonyms[0],
                             }),
-                            v_heirarchymap:JSON.stringify({
-                                tail:v_heirarchymap.tail[0],
-                                side:v_heirarchymap.side[0],
-                                head:v_heirarchymap.head[0],
+                            v_hierarchymap:JSON.stringify({
+                                tail:v_hierarchymap.tail[0],
+                                side:v_hierarchymap.side[0],
+                                head:v_hierarchymap.head[0],
                             }),
                             v_origin:JSON.stringify(v_origin),
                             v_sources:JSON.stringify(v_sources),
@@ -203,15 +203,15 @@ export default ()=>{
         }else{
             e_disabled(false);
         }
-    }, [v_keyname, v_language, v_variation, v_definition, v_pronounciation, v_example, v_rarity, v_attributes, v_relationyms.synonyms[0], v_relationyms.antonyms[0], v_relationyms.homonyms[0], v_heirarchymap.tail[0], v_heirarchymap.side[0], v_heirarchymap.head[0], v_origin, v_images, v_prevImages, v_sources,]);
+    }, [v_keyname, v_language, v_variation, v_definition, v_pronounciation, v_example, v_rarity, v_attributes, v_relationyms.synonyms[0], v_relationyms.antonyms[0], v_relationyms.homonyms[0], v_hierarchymap.tail[0], v_hierarchymap.side[0], v_hierarchymap.head[0], v_origin, v_images, v_prevImages, v_sources,]);
     useEffect(()=>{
-        v_heirarchymapPreview[1](prev=>{
-            prev.tail = v_heirarchymap.tail[0];
-            prev.side = v_heirarchymap.side[0];
-            prev.head = v_heirarchymap.head[0];
+        v_hierarchymapPreview[1](prev=>{
+            prev.tail = v_hierarchymap.tail[0];
+            prev.side = v_hierarchymap.side[0];
+            prev.head = v_hierarchymap.head[0];
             return structuredClone(prev);
         });
-    }, [v_heirarchymap.tail[0], v_heirarchymap.side[0], v_heirarchymap.head[0]]);
+    }, [v_hierarchymap.tail[0], v_hierarchymap.side[0], v_hierarchymap.head[0]]);
     //**<< Use Effect */
 
     //** Functionality */
@@ -229,9 +229,9 @@ export default ()=>{
             JSON.stringify(v_relationyms.synonyms[0]) == JSON.stringify(data.relationyms.synonyms) &&
             JSON.stringify(v_relationyms.antonyms[0]) == JSON.stringify(data.relationyms.antonyms) &&
             JSON.stringify(v_relationyms.homonyms[0]) == JSON.stringify(data.relationyms.homonyms) &&
-            JSON.stringify(v_heirarchymap.tail[0]) == JSON.stringify(data.heirarchymap.tail) &&
-            JSON.stringify(v_heirarchymap.head[0]) == JSON.stringify(data.heirarchymap.head) &&
-            JSON.stringify(v_heirarchymap.side[0]) == JSON.stringify(data.heirarchymap.side) &&
+            JSON.stringify(v_hierarchymap.tail[0]) == JSON.stringify(data.hierarchymap.tail) &&
+            JSON.stringify(v_hierarchymap.head[0]) == JSON.stringify(data.hierarchymap.head) &&
+            JSON.stringify(v_hierarchymap.side[0]) == JSON.stringify(data.hierarchymap.side) &&
             v_origin == data.origin &&
             JSON.stringify(v_images) == JSON.stringify(data.images) &&
             JSON.stringify(v_sources) == JSON.stringify(data.sources)
@@ -252,9 +252,9 @@ export default ()=>{
         v_relationyms.synonyms[1](structuredClone(data.relationyms.synonyms));
         v_relationyms.antonyms[1](structuredClone(data.relationyms.antonyms));
         v_relationyms.homonyms[1](structuredClone(data.relationyms.homonyms));
-        v_heirarchymap.tail[1](structuredClone(data.heirarchymap.tail));
-        v_heirarchymap.side[1](structuredClone(data.heirarchymap.side));
-        v_heirarchymap.head[1](structuredClone(data.heirarchymap.head));
+        v_hierarchymap.tail[1](structuredClone(data.hierarchymap.tail));
+        v_hierarchymap.side[1](structuredClone(data.hierarchymap.side));
+        v_hierarchymap.head[1](structuredClone(data.hierarchymap.head));
         e_origin(data.origin);
         e_images(data.images);
         e_prevImages(data.previmages);
@@ -404,22 +404,22 @@ export default ()=>{
                 <TextboxDropDownMultiple Handle={[v_relationyms.homonyms[0], v_relationyms.homonyms[1]]} Placeholder="No Selected. . ." Error={errors[`v_relationyms.homonyms`]} DropData={homonymsDrop} Request={`/admin/dashboard/word_library/search_data`} RequestKey={"v_searchHomonyms"} WithRef={true} Size={`sm:ml-3 ${v_relationyms.homonyms[0].length > 0 ?"":"w-96"}`} />
             </div>
 
-            {/* Heirarchy */}
+            {/* Hierarchy */}
             <div className="my-5"></div>
             <div className="flex flex-wrap gap-1">
                 <div className="flex w-full gap-2 flex-wrap">
-                    <label className="">Heirarchy Mapping: </label>
+                    <label className="">Hierarchy Mapping: </label>
                     <Button Name="Preview" Icon="eye" Padding={`px-1`} Click={()=>{
-                        v_heirarchymapPreviewSwitch[1](prev=>!prev);
+                        v_hierarchymapPreviewSwitch[1](prev=>!prev);
                     }}/>
-                    <HeirarchyMap Handle={v_heirarchymapPreview} RootName={v_keyname} PopSwitch={v_heirarchymapPreviewSwitch} OffMapSwitch={true}/>
+                    <HierarchyMap Handle={v_hierarchymapPreview} RootName={v_keyname} PopSwitch={v_hierarchymapPreviewSwitch} OffMapSwitch={true}/>
                 </div>
                 <small className=" font-light text-slate-600 w-full">Ancestor <span className="text-slate-400">(optional)</span></small>
-                <TextboxDropDownMultiple Handle={[v_heirarchymap.tail[0], v_heirarchymap.tail[1]]} Placeholder="No Selected. . ." Error={errors[`v_heirarchymap.tail`]} DropData={tailDrop} Request={`/admin/dashboard/word_library/search_data`} RequestKey={"v_searchTail"} WithRef={true} Size={`sm:ml-3 ${v_heirarchymap.tail[0].length > 0 ?"":"w-96"}`} />
+                <TextboxDropDownMultiple Handle={[v_hierarchymap.tail[0], v_hierarchymap.tail[1]]} Placeholder="No Selected. . ." Error={errors[`v_hierarchymap.tail`]} DropData={tailDrop} Request={`/admin/dashboard/word_library/search_data`} RequestKey={"v_searchTail"} WithRef={true} Size={`sm:ml-3 ${v_hierarchymap.tail[0].length > 0 ?"":"w-96"}`} />
                 <small className=" font-light text-slate-600 w-full">Same League <span className="text-slate-400">(optional)</span></small>
-                <TextboxDropDownMultiple Handle={[v_heirarchymap.side[0], v_heirarchymap.side[1]]} Placeholder="No Selected. . ." Error={errors[`v_heirarchymap.tail`]} DropData={sideDrop} Request={`/admin/dashboard/word_library/search_data`} RequestKey={"v_searchSide"} WithRef={true} Size={`sm:ml-3 ${v_heirarchymap.side[0].length > 0 ?"":"w-96"}`} />
+                <TextboxDropDownMultiple Handle={[v_hierarchymap.side[0], v_hierarchymap.side[1]]} Placeholder="No Selected. . ." Error={errors[`v_hierarchymap.tail`]} DropData={sideDrop} Request={`/admin/dashboard/word_library/search_data`} RequestKey={"v_searchSide"} WithRef={true} Size={`sm:ml-3 ${v_hierarchymap.side[0].length > 0 ?"":"w-96"}`} />
                 <small className=" font-light text-slate-600 w-full">Predecessor <span className="text-slate-400">(optional)</span></small>
-                <TextboxDropDownMultiple Handle={[v_heirarchymap.head[0], v_heirarchymap.head[1]]} Placeholder="No Selected. . ." Error={errors[`v_heirarchymap.tail`]} DropData={headDrop} Request={`/admin/dashboard/word_library/search_data`} RequestKey={"v_searchHead"} WithRef={true} Size={`sm:ml-3 ${v_heirarchymap.head[0].length > 0 ?"":"w-96"}`} />
+                <TextboxDropDownMultiple Handle={[v_hierarchymap.head[0], v_hierarchymap.head[1]]} Placeholder="No Selected. . ." Error={errors[`v_hierarchymap.tail`]} DropData={headDrop} Request={`/admin/dashboard/word_library/search_data`} RequestKey={"v_searchHead"} WithRef={true} Size={`sm:ml-3 ${v_hierarchymap.head[0].length > 0 ?"":"w-96"}`} />
             </div>
 
             {/* Origin */}

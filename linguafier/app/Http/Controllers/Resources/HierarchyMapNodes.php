@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Word;
 use Illuminate\Http\Request;
 
-class HeirarchyMapNodes extends Controller
+class HierarchyMapNodes extends Controller
 {
     // Post
     public function requestMap(Request $request){
@@ -18,7 +18,7 @@ class HeirarchyMapNodes extends Controller
             'getAllMapNodes.*.*.name'=>"required|exists:word,keyname",
         ];
         $request->validate($rules);
-        session()->flash('getAllMapNodes', $this->getMap($request->getAllMapNodes));
+        // session()->flash('getAllMapNodes', $this->getMap($request->getAllMapNodes));
         return redirect()->back()->with('getAllMapNodes', $this->getMap($request->getAllMapNodes));
     }
 
@@ -30,7 +30,6 @@ class HeirarchyMapNodes extends Controller
         $mirrorMap = $WordData;
         $mirrorMap['tail'] = $this->getMoreWord(5, $mirrorMap['tail'], 'tail');
         $mirrorMap['head'] = $this->getMoreWord(5, $mirrorMap['head'], 'head' );
-
         return $mirrorMap;
     }
 
@@ -51,7 +50,7 @@ class HeirarchyMapNodes extends Controller
             $wordRef = Word::find($val['id'])->toArray();
 
             //This is where recurssion happens to get its link data here
-            $mirrorVal[$direction] = $this->getMoreWord( $depth-1, json_decode($wordRef['heirarchy_map'], true)[$direction], $direction );
+            $mirrorVal[$direction] = $this->getMoreWord( $depth-1, json_decode($wordRef['hierarchy_map'], true)[$direction], $direction );
             $mirrorVal['open'] = false; //This is for frontend;
 
             //Finally collect all the data and modify it in the $data[$key]

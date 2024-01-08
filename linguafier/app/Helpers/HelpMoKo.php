@@ -126,7 +126,7 @@ class HelpMoKo{
                         $query->where('relationyms', 'LIKE', '%' . "\"id\":\"$id\"" . '%');
                     break;
                     case 'tail': case 'side': case 'head':
-                        $query->where('heirarchy_map', 'LIKE', '%' . "\"id\":\"$id\"" . '%');
+                        $query->where('hierarchy_map', 'LIKE', '%' . "\"id\":\"$id\"" . '%');
                     break;
                 }
             } )->get()->toArray(); //Convert it to array
@@ -142,7 +142,7 @@ class HelpMoKo{
                         $KotobaData = json_decode($val['relationyms'], true)[$where];
                     break;
                     case 'tail': case 'side': case 'head':
-                        $KotobaData = json_decode($val['heirarchy_map'], true)[$where];
+                        $KotobaData = json_decode($val['hierarchy_map'], true)[$where];
                     break;
                 };
                 if(!count($KotobaData))
@@ -176,9 +176,9 @@ class HelpMoKo{
                         $AiKotobaII->relationyms = json_encode($temp);
                     break;
                     case 'tail': case 'side': case 'head':
-                        $temp = json_decode($val['heirarchy_map'], true);
+                        $temp = json_decode($val['hierarchy_map'], true);
                         $temp[$where] = $KotobaData;
-                        $AiKotobaII->heirarchy_map = json_encode($temp);
+                        $AiKotobaII->hierarchy_map = json_encode($temp);
                     break;
                 };
                 // dd($AiKotobaII, $data);
@@ -195,7 +195,7 @@ class HelpMoKo{
                         $KotobaData = json_decode($AiKotobaIII->relationyms, true)[$where];
                     break;
                     case 'tail': case 'side': case 'head':
-                        $KotobaData = json_decode($AiKotobaIII->heirarchy_map, true)[$where];
+                        $KotobaData = json_decode($AiKotobaIII->hierarchy_map, true)[$where];
                     break;
                 };
 
@@ -224,9 +224,9 @@ class HelpMoKo{
                         $AiKotobaIII->relationyms = json_encode($temp);
                     break;
                     case 'tail': case 'side': case 'head':
-                        $temp = json_decode($AiKotobaIII->heirarchy_map, true);
+                        $temp = json_decode($AiKotobaIII->hierarchy_map, true);
                         $temp[$where] = $KotobaData;
-                        $AiKotobaIII->heirarchy_map = json_encode($temp);
+                        $AiKotobaIII->hierarchy_map = json_encode($temp);
                     break;
                 };
                 $AiKotobaIII->save();
@@ -251,7 +251,7 @@ class HelpMoKo{
         $wordLink($temp['homonyms'], 'homonyms');
         $word->relationyms = json_encode($temp);
 
-        $temp = json_decode($word->heirarchy_map, true);
+        $temp = json_decode($word->hierarchy_map, true);
         if( count($temp['tail']) ){
             $temp['tail'] = array_filter($temp['tail'], $wordCheck);
             $temp['tail'] = array_map($wordUpdate, $temp['tail']);
@@ -267,7 +267,7 @@ class HelpMoKo{
             $temp['head'] = array_map($wordUpdate, $temp['head']);
         }
         $wordLink($temp['head'], 'tail');
-        $word->heirarchy_map = json_encode($temp);
+        $word->hierarchy_map = json_encode($temp);
 
         $word->modified_time = now();
         $word->save();

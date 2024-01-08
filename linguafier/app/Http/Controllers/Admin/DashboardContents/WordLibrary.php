@@ -99,7 +99,7 @@ class WordLibrary extends Controller
         $data->rarity = ['name'=>$rarity_data->name, 'id'=>$data->rarity_id];
         $data->attributes = json_decode($data->attributes, true);
         $data->relationyms = json_decode($data->relationyms, true);
-        $data->heirarchymap = json_decode($data->heirarchy_map, true);
+        $data->hierarchymap = json_decode($data->hierarchy_map, true);
         $data->images = json_decode($data->images, true);
         $data->previmages = array_map(function($val){
             return asset('storage/word_library/'.$val);
@@ -380,7 +380,7 @@ class WordLibrary extends Controller
         $newWord->attributes = $remake['v_attributes'];
 
         $newWord->relationyms = $remake['v_relationyms'];
-        $newWord->heirarchy_map = $remake['v_heirarchymap'];
+        $newWord->hierarchy_map = $remake['v_hierarchymap'];
 
         $newWord->origin = $remake['v_origin'];
         $imagesCollecter = [];
@@ -416,7 +416,7 @@ class WordLibrary extends Controller
         $word->rarity_id = $remake['v_rarity']['id'];
         $word->attributes = $remake['v_attributes'];
         $word->relationyms = $remake['v_relationyms'];
-        $word->heirarchy_map = $remake['v_heirarchymap'];
+        $word->hierarchy_map = $remake['v_hierarchymap'];
         $word->origin = $remake['v_origin'];
         $imagesCollecter = [];
         foreach($remake['v_images']  as $key => $val ){//Images
@@ -460,7 +460,7 @@ class WordLibrary extends Controller
         //Delete its content from other dependencies and update each use the json search to search for it or use id:
         $wordDependencies = Word::where(function($query)use($word){
             $query->orWhere('relationyms', 'LIKE', '%' . "\"id\":\"$word->id\"" . '%')
-                ->orWhere('heirarchy_map', 'LIKE', '%' . "\"id\":\"$word->id\"" . '%')
+                ->orWhere('hierarchy_map', 'LIKE', '%' . "\"id\":\"$word->id\"" . '%')
             ;
         })->get();
 
@@ -744,7 +744,7 @@ class WordLibrary extends Controller
          * - Rarity
          * - Attributes
          * - Relationyns
-         * - Heirarchy Map
+         * - Hierarchy Map
          * - Origin
          * - Image
          * - Sources
@@ -761,7 +761,7 @@ class WordLibrary extends Controller
             'v_rarity'=>"required|json",
             'v_attributes'=>"required|json",
             'v_relationyms'=>"required|json",
-            'v_heirarchymap'=>"required|json",
+            'v_hierarchymap'=>"required|json",
             'v_origin'=>"required|json",
             'v_sources'=>"required|json",
         ]);
@@ -777,7 +777,7 @@ class WordLibrary extends Controller
             "v_rarity" => json_decode($request->v_rarity, true),
             "v_attributes" => json_decode($request->v_attributes, true),
             "v_relationyms" => json_decode($request->v_relationyms, true),
-            "v_heirarchymap" => json_decode($request->v_heirarchymap, true),
+            "v_hierarchymap" => json_decode($request->v_hierarchymap, true),
             "v_origin" => json_decode($request->v_origin, true),
             "v_sources" => json_decode($request->v_sources, true),
             "v_images"=>$request->v_images,
@@ -832,11 +832,11 @@ class WordLibrary extends Controller
             'v_relationyms.*.*.id'=>"required|exists:word,id",
             'v_relationyms.*.*.name'=>"required|exists:word,keyname",
 
-            'v_heirarchymap'=>"required|array|required_array_keys:head,side,tail",
-            'v_heirarchymap.*'=>"nullable|array",
-            'v_heirarchymap.*.*'=>"required|array|required_array_keys:id,name",
-            'v_heirarchymap.*.*.id'=>"required|exists:word,id",
-            'v_heirarchymap.*.*.name'=>"required|exists:word,keyname",
+            'v_hierarchymap'=>"required|array|required_array_keys:head,side,tail",
+            'v_hierarchymap.*'=>"nullable|array",
+            'v_hierarchymap.*.*'=>"required|array|required_array_keys:id,name",
+            'v_hierarchymap.*.*.id'=>"required|exists:word,id",
+            'v_hierarchymap.*.*.name'=>"required|exists:word,keyname",
 
             'v_origin'=>"nullable|string|not_regex:/<script\b[^>]*>[\s\S]*?<\/script\s*>/",
 
@@ -879,7 +879,7 @@ class WordLibrary extends Controller
 
             'v_relationyms.*.array'=>"Invalid input data detected.",
 
-            'v_heirarchymap.*.array'=>"Invalid input data detected.",
+            'v_hierarchymap.*.array'=>"Invalid input data detected.",
 
             'v_origin.string'=>"Invalid input data detected.",
             'v_origin.not_regex'=>"Invalid input data detected.",
@@ -942,7 +942,7 @@ class WordLibrary extends Controller
         $remake['v_attributes'] = json_encode($remake['v_attributes']);
 
         $remake['v_relationyms'] = json_encode($this->avoidWordDuplicate($remake['v_relationyms']));
-        $remake['v_heirarchymap'] = json_encode($this->avoidWordDuplicate($remake['v_heirarchymap']));
+        $remake['v_hierarchymap'] = json_encode($this->avoidWordDuplicate($remake['v_hierarchymap']));
         $remake['v_sources'] = json_encode($remake['v_sources']);
 
         if($type == "Modify" ){
@@ -1076,7 +1076,7 @@ class WordLibrary extends Controller
                         $query->where('relationyms', 'LIKE', '%' . "\"id\":\"$id\"" . '%');
                     break;
                     case 'tail': case 'side': case 'head':
-                        $query->where('heirarchy_map', 'LIKE', '%' . "\"id\":\"$id\"" . '%');
+                        $query->where('hierarchy_map', 'LIKE', '%' . "\"id\":\"$id\"" . '%');
                     break;
                 }
             } )->get()->toArray(); //Convert it to array
@@ -1092,7 +1092,7 @@ class WordLibrary extends Controller
                         $KotobaData = json_decode($val['relationyms'], true)[$where];
                     break;
                     case 'tail': case 'side': case 'head':
-                        $KotobaData = json_decode($val['heirarchy_map'], true)[$where];
+                        $KotobaData = json_decode($val['hierarchy_map'], true)[$where];
                     break;
                 };
                 if(!count($KotobaData))
@@ -1126,9 +1126,9 @@ class WordLibrary extends Controller
                         $AiKotobaII->relationyms = json_encode($temp);
                     break;
                     case 'tail': case 'side': case 'head':
-                        $temp = json_decode($val['heirarchy_map'], true);
+                        $temp = json_decode($val['hierarchy_map'], true);
                         $temp[$where] = $KotobaData;
-                        $AiKotobaII->heirarchy_map = json_encode($temp);
+                        $AiKotobaII->hierarchy_map = json_encode($temp);
                     break;
                 };
                 // dd($AiKotobaII, $data);
@@ -1145,7 +1145,7 @@ class WordLibrary extends Controller
                         $KotobaData = json_decode($AiKotobaIII->relationyms, true)[$where];
                     break;
                     case 'tail': case 'side': case 'head':
-                        $KotobaData = json_decode($AiKotobaIII->heirarchy_map, true)[$where];
+                        $KotobaData = json_decode($AiKotobaIII->hierarchy_map, true)[$where];
                     break;
                 };
 
@@ -1174,9 +1174,9 @@ class WordLibrary extends Controller
                         $AiKotobaIII->relationyms = json_encode($temp);
                     break;
                     case 'tail': case 'side': case 'head':
-                        $temp = json_decode($AiKotobaIII->heirarchy_map, true);
+                        $temp = json_decode($AiKotobaIII->hierarchy_map, true);
                         $temp[$where] = $KotobaData;
-                        $AiKotobaIII->heirarchy_map = json_encode($temp);
+                        $AiKotobaIII->hierarchy_map = json_encode($temp);
                     break;
                 };
                 $AiKotobaIII->save();
@@ -1201,7 +1201,7 @@ class WordLibrary extends Controller
         $wordLink($temp['homonyms'], 'homonyms');
         $word->relationyms = json_encode($temp);
 
-        $temp = json_decode($word->heirarchy_map, true);
+        $temp = json_decode($word->hierarchy_map, true);
         if( count($temp['tail']) ){
             $temp['tail'] = array_filter($temp['tail'], $wordCheck);
             $temp['tail'] = array_map($wordUpdate, $temp['tail']);
@@ -1217,7 +1217,7 @@ class WordLibrary extends Controller
             $temp['head'] = array_map($wordUpdate, $temp['head']);
         }
         $wordLink($temp['head'], 'tail');
-        $word->heirarchy_map = json_encode($temp);
+        $word->hierarchy_map = json_encode($temp);
 
         $word->modified_time = now();
         $word->save();

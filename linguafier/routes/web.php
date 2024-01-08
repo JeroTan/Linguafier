@@ -13,7 +13,7 @@ use App\Http\Controllers\User\Login as UserLogin;
 use App\Http\Controllers\User\Dashboard as UserDashboard;
 
 use App\Http\Controllers\Homepage;
-use App\Http\Controllers\Resources\HeirarchyMapNodes;
+use App\Http\Controllers\Resources\HierarchyMapNodes;
 use App\Http\Controllers\Study;
 use App\Http\Controllers\Word;
 use App\Http\Middleware\CheckId;
@@ -44,7 +44,7 @@ Route::prefix('/word')->group(function(){
 });
 
 
-Route::post('/getAllMapNodes',  [HeirarchyMapNodes::class, 'requestMap']);
+Route::post('/getAllMapNodes',  [HierarchyMapNodes::class, 'requestMap']);
 
 Route::prefix('/user')->group(function(){
     Route::get('/login', UserLogin::class)->middleware('UserAccLog:off')->name('user.login');

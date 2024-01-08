@@ -72,8 +72,8 @@ export default function SideNav(Option){
 
     //Remember That it needs to have a parent with flex-wrap at md so that it can be responsive
     return <>
-        <aside className="lg:w-[20rem] md:w-[13rem] w-full shrink-0 sticky top-0 z-50">
-            <div className="bg-my-green min-h-fit border-2 border-black rounded shadow-myBox1_3 shadow-black text-white font-sniglet lg:text-xl text-base">
+        <aside className="lg:w-[20rem] md:w-[13rem] w-full shrink-0 md:relative sticky top-0 z-50">
+            <div className="bg-my-green min-h-fit border-2 border-black rounded shadow-myBox1_3 shadow-black text-white font-sniglet lg:text-xl text-base md:sticky relative top-0">
                 <div className="lg:p-4 p-1 md:flex flex-wrap flex-col lg:gap-2 gap-1 hidden">
                 { wideScreen() }
                 </div>

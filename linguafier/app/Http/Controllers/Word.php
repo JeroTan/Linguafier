@@ -20,6 +20,7 @@ class Word extends Controller
     }
 
     public function word_ui($id){
+        session()->keep(['getAllMapNodes']);
         HelpMoKo::updateWordDependency($id);
         $data = ModelsWord::find($id);
         $toUserData = [];
@@ -45,13 +46,14 @@ class Word extends Controller
         }
         $toUserData['attributes'] = $attribute_data;
         $toUserData['relationyms'] = json_decode($data->relationyms, true);
-        $toUserData['heirarchymap'] = json_decode($data->heirarchy_map, true);
+        $toUserData['hierarchymap'] = json_decode($data->hierarchy_map, true);
         $toUserData['origin']= $data->origin;
         $toUserData['images'] = json_decode($data->images, true);
         $toUserData['sources'] = json_decode($data->sources, true);
         return Inertia::render('Word', [
             'pageUser'=>'User',
             'data'=>$toUserData,
+            'getAllMapNodes'=>session('getAllMapNodes'),
         ]);
     }
 }
