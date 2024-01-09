@@ -35,7 +35,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', Homepage::class)->name('home');
+
 Route::get('/dictionary', Dictionary::class);
+Route::post('/dictionary/change_contents', [Dictionary::class, 'change_contents']);
+
 Route::get('/study', Study::class );
 
 Route::prefix('/word')->group(function(){

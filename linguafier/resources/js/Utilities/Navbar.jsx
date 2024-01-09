@@ -40,7 +40,7 @@ export default ()=>{
                 <Icon OutClass={`w-7 h-7`} Name="person" />
             </>,
             User:<>
-
+                <Icon OutClass={`w-7 h-7`} Name="person" />
             </>
         }
         return des[pageUser] ?? <></>;
@@ -106,7 +106,7 @@ return <>
 
         </nav>
     </header>
-    <div className="w-full h-[5px] bg-black">
+    <div className="w-full h-[3px] bg-slate-700">
 
     </div>
 </>

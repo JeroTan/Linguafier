@@ -17,7 +17,7 @@ import parse from "html-react-parser";
 
 //Components
 function C_Word({Ref,Name}){
-    return <div ref={Ref} className='flex flex-wrap gap-1'>
+    return <div ref={Ref} className='flex flex-wrap gap-1 pt-8'>
         <h2 className='font-bold md:text-5xl sm:text-4xl xs:text-3xl text-2xl text-my-green drop-shadow-myDrop1 shrink-0'>{Name}</h2>
         <div className='flex flex-col grow font-bold'>
             <p className='text-transparent sm:opacity-50 opacity-20 uppercase md:text-base sm:text-sm tracking-wider md:mb-[-11px] sm:mb-[-9px] xs:mb-[-18px] mb-[-20px]' style={{
@@ -249,9 +249,12 @@ function C_Sources({Ref, Sources}){
     </div>
 }
 
-export default function Homepage() {
+export default function Word(Option) {
     //** Use Page */
     const { data } = usePage().props;
+
+    //** Struct */
+    const withPage = Option.Type ?? 'normal';
 
     //**>> Use State */
     const SectionSelected = useState('Word');
@@ -319,6 +322,14 @@ export default function Homepage() {
     const designSpreader = useCallback(()=>{
         if(data){
             return <>
+                {withPage == 'normal' ? <>
+                <div className='flex flex-wrap gap-2'>
+                    <Button  Icon={`back`} Click={()=>{router.get('/dictionary')}}/>
+                </div>
+                </>:<></>}
+
+
+
                 <C_Word Ref={Word} Name={data.keyname} />
                 <div className='py-6'></div>
 
@@ -350,8 +361,14 @@ export default function Homepage() {
             </div>
         }
     }, [data]);
+    if(withPage == 'normal'){
+        return <G_PageSection.Provider value={[SectionSelected]}><WordUIPlus>
+            {designSpreader()}
+        </WordUIPlus></G_PageSection.Provider>
+    }else if(withPage == 'no_page_plate'){
+        return <G_PageSection.Provider value={[SectionSelected]}><WordUI>
+            {designSpreader()}
+        </WordUI></G_PageSection.Provider>
+    }
 
-    return <G_PageSection.Provider value={[SectionSelected]}><WordUIPlus>
-        {designSpreader()}
-    </WordUIPlus></G_PageSection.Provider>
 }
