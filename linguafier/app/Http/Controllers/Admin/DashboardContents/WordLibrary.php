@@ -1004,7 +1004,6 @@ class WordLibrary extends Controller
     }
     protected function updateWordDependency($id){
         $word = Word::find($id);
-        // dd($word);
         if(!$word)
             return false;
         //Update Variation
@@ -1085,6 +1084,7 @@ class WordLibrary extends Controller
                 goto PlugNewWord;
 
             //If there is then go here to rotate each value
+
             foreach($AiKotobaI as $key => $val){
                 $KotobaData = [];
                 switch($where){ //Get the instance where the data occurs
@@ -1095,17 +1095,21 @@ class WordLibrary extends Controller
                         $KotobaData = json_decode($val['hierarchy_map'], true)[$where];
                     break;
                 };
-                if(!count($KotobaData))
+
+                if(!count($KotobaData)){
                     continue;
+                }
+
                 $KotobaId = $val['id'];
-                $OldCount = count($KotobaData);
-                $KotobaData = array_filter($KotobaData, function($val)use($KotobaId,$data, $id){
+                $OldCount = count($KotobaData);//To skip saving if there nothing change
+                $KotobaData = array_filter($KotobaData, function($val2)use($KotobaId,$data, $id){
                     $notExist = true;
-                    if($val['id'] == $id){//Check if this Kotoba Id is equals to the id of this word
+                    if($val2['id'] == $id){//Check if this Kotoba Id is equals to the id of this word
+
                         $notExist = false;//Make it false first then rotate through the given array of this function; If none existed then it will remain false if it is then make it true
-                        foreach($data as $key2=>$val2){
-                            if($val2['id'] == $KotobaId){//check if the list of this word have the ID of the selected stuff from Kotoba;
-                                $notExist = false;
+                        foreach($data as $key3=>$val3){
+                            if($val3['id'] == $KotobaId){//check if the list of this word have the ID of the selected stuff from Kotoba;
+                                $notExist = true;
                                 break;
                             }
 
@@ -1114,9 +1118,9 @@ class WordLibrary extends Controller
                     return $notExist;
                 });
 
-                if($OldCount == count($KotobaData))
+                if($OldCount == count($KotobaData)){
                     continue;
-
+                }
 
                 $AiKotobaII = $Word::find($KotobaId);
                 switch($where){
@@ -1131,7 +1135,7 @@ class WordLibrary extends Controller
                         $AiKotobaII->hierarchy_map = json_encode($temp);
                     break;
                 };
-                // dd($AiKotobaII, $data);
+
                 $AiKotobaII->save();
             }
 
