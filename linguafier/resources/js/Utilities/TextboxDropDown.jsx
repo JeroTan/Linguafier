@@ -51,6 +51,7 @@ export default function TextboxDropDown(Option){
         }else{
             handler[1](data.name);
         }
+            console.log(data);
         textField.current.blur();
         s_dropBox(false);
         s_textBox(false);
@@ -73,6 +74,9 @@ export default function TextboxDropDown(Option){
             textField.current.focus();
         }}
         onBlur={(event)=>{
+            if(c_textBox)
+                return true;
+
             if(event.currentTarget.contains(event.relatedTarget)){
                 return true;
             }

@@ -18,8 +18,11 @@ import parse from "html-react-parser";
 //Components
 function C_Word({Ref,Name}){
     return <div ref={Ref} className='flex flex-wrap gap-1 pt-8'>
-        <h2 className='font-bold md:text-5xl sm:text-4xl xs:text-3xl text-2xl text-my-green drop-shadow-myDrop1 shrink-0'>{Name}</h2>
-        <div className='flex flex-col grow font-bold'>
+        <h2 className='font-bold md:text-5xl sm:text-4xl xs:text-3xl text-2xl text-my-green drop-shadow-myDrop1' style={{
+            wordBreak: 'break-all',
+            overflowWrap: 'break-word',
+        }}>{Name}</h2>
+        <div className='flex flex-col grow font-bold xs:overflow-ellipsis overflow-hidden'>
             <p className='text-transparent sm:opacity-50 opacity-20 uppercase md:text-base sm:text-sm tracking-wider md:mb-[-11px] sm:mb-[-9px] xs:mb-[-18px] mb-[-20px]' style={{
                 WebkitTextStrokeWidth: "1px",
                 WebkitTextStrokeColor: "black",
@@ -99,7 +102,10 @@ function C_Definition({Ref, Variation, Varname, Pronounciation, Definition}){
                 </div>
             </div>;
             let desVarname = <div className='flex flex-wrap sm:items-center sm:gap-2 sm:flex-row flex-col'>
-                <h3 className='font-semibold md:text-2xl sm:text-xl text-lg text-slate-600'>
+                <h3 className='font-semibold md:text-2xl sm:text-xl text-lg text-slate-600' style={{
+                    wordBreak: 'break-all',
+                    overflowWrap: 'break-word',
+                }}>
                     {Varname[x.id]}
                 </h3>
                 <div className='text-slate-500 text-xs sm:mt-0  mt-[-6px]'>
@@ -303,6 +309,8 @@ export default function Word(Option) {
             }
             window.addEventListener('scroll',(e)=>{
                 for(const key in scrollSelect){
+                    if(!scrollSelect[key]?.current?.getBoundingClientRect()?.y || !scrollSelect[key]?.current?.getBoundingClientRect()?.height)
+                        break;
                     let elementYPosition = scrollSelect[key].current.getBoundingClientRect().y+window.scrollY;
                     let elementHeight = scrollSelect[key].current.getBoundingClientRect().height;
                     let center = window.scrollY;

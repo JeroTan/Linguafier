@@ -14,14 +14,14 @@ return new class extends Migration
         Schema::create('attribute', function (Blueprint $table) {
             $table->string('id', 16)->primary();
             $table->string('name', 16)->nullable();
-            $table->string('image', 16)->nullable();
+            $table->string('image', 32)->nullable();
             $table->string('color', 16)->nullable();
         });
 
         Schema::create('variation', function (Blueprint $table) {
             $table->string('id', 16)->primary();
             $table->string('name', 16)->nullable();
-            $table->string('image', 16)->nullable();
+            $table->string('image', 32)->nullable();
         });
 
         Schema::create('rarity', function (Blueprint $table) {

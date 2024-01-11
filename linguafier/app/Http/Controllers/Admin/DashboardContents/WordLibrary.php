@@ -617,7 +617,7 @@ class WordLibrary extends Controller
         return $data->orderBy('name', 'ASC')->limit(15)->get();
     }
     protected function getRarity(){
-        $data = Rarity::select('id','name');
+        $data = Rarity::select('id','name', 'level');
         //Requirement
 
         //Search
@@ -626,7 +626,12 @@ class WordLibrary extends Controller
                 $query->orwhereRaw("LOWER(name) LIKE '%". HelpMoKo::cleanse(session('v_searchRarity'))."%'");
             });
         }
-        return $data->orderBy('name', 'ASC')->limit(15)->get();
+        $data2 = [];
+        $data = $data->orderBy('level', 'ASC')->limit(15)->get();
+        foreach($data as $key => $val){
+            $data2[$key] =  ['id'=>$val->id, 'name'=>$val->name." | Level: ".$val->level];
+        }
+        return $data2;
     }
     protected function getLanguage(){
         $data = Language::select('id','name');
@@ -790,7 +795,7 @@ class WordLibrary extends Controller
         $rules = [
             'v_keyname'=>[
                 'required',
-                'regex:/^[a-zA-Z0-9\,\.\s]*$/',
+                'regex:/^[a-zA-Z0-9\,\.\\\'\s]*$/',
                 'max:64',
             ],
             'v_language'=>'required|array|required_array_keys:id,name',
@@ -819,7 +824,6 @@ class WordLibrary extends Controller
 
             'v_rarity'=>"required|array|required_array_keys:id,name",
             'v_rarity.id'=>"required|exists:rarity,id",
-            'v_rarity.name'=>"required|exists:rarity,name",
 
             'v_attributes'=>"required|array|min:1",
             'v_attributes.*'=>"required|array|required_array_keys:id,name",
